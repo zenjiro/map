@@ -1,4 +1,2 @@
-#!/bin/tcsh -f
-set pwd = `pwd`
-set ver = $pwd:t
-jar -cvfm map-$ver.jar META-INF/MANIFEST.MF *
+#!/bin/sh
+jar -cvfm map.jar META-INF/MANIFEST.MF *
