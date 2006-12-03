@@ -30,7 +30,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * 国土数値情報の鉄道データ（JPGIS準拠データ）を読み込んで、都道府県単位のCSVファイルに変換するプログラムです。
  * @author zenjiro
  */
-public class ConvertRailway {
+public class ConvertRailwayToCSV {
 
 	/**
 	 * 状態を表す列挙型です。
