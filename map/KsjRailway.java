@@ -152,17 +152,17 @@ public class KsjRailway {
 		/**
 		 * 事業者種別コード
 		 */
-		private Business business;
+		Business business;
 
 		/**
 		 * 鉄道区分コード
 		 */
-		private Classification classification;
+		Classification classification;
 
 		/**
 		 * 表記
 		 */
-		private String caption;
+		String caption;
 		
 		/**
 		 * 文字列の描画位置
