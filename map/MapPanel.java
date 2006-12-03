@@ -980,10 +980,9 @@ public class MapPanel extends JPanel implements Printable {
 		final double h2 = height / zoom * z2;
 		for (int y = (int) (Math.floor(y2 / Const.Ksj.Height.HEIGHT)) * Const.Ksj.Height.HEIGHT; y - y2 < h2; y += Const.Ksj.Height.HEIGHT) {
 			for (int x = (int) (Math.floor(x2 / Const.Ksj.Height.WIDTH)) * Const.Ksj.Height.WIDTH; x - x2 < w2; x += Const.Ksj.Height.WIDTH) {
-				final InputStream in = this.getClass().getResourceAsStream(new Formatter().format("%s%s%d_%d_%f_%d_%d.png", 
-						Const.DIR,
-						Const.Ksj.Height.PREFIX,
-						Const.Ksj.Height.WIDTH, Const.Ksj.Height.HEIGHT, z2, x, y).toString());
+				final InputStream in = this.getClass().getResourceAsStream(
+						new Formatter().format("%s%s%d_%d_%f_%d_%d.png", Const.DIR, Const.Ksj.Height.PREFIX,
+								Const.Ksj.Height.WIDTH, Const.Ksj.Height.HEIGHT, z2, x, y).toString());
 				if (in != null) {
 					final Image image = ImageIO.read(in);
 					g.drawImage(image, (int) (x * zoom / z2 - offsetX), (int) (y * zoom / z2 - offsetY),
@@ -1060,6 +1059,11 @@ public class MapPanel extends JPanel implements Printable {
 						zoom);
 				g.setColor(this.mapPreferences.getKsjRailwayStationPreferences().getFillColor());
 				drawKsjStation(g, isTransform, transform, x, y, w, h);
+				// since 5.01
+				for (final Prefecture prefecture : this.prefectures) {
+					drawKsjRoadHighway(g, prefecture.getKsjRailwayCurves(), prefecture, isTransform, transform, x, y,
+							w, h, zoom);
+				}
 			}
 		}
 	}
@@ -1109,8 +1113,30 @@ public class MapPanel extends JPanel implements Printable {
 				drawKsjRailway(g, KsjRailway.Business.ROAD_KOKUDO, railways, isTransform, transform, zoom);
 				drawKsjRailway(g, KsjRailway.Business.UNKNOWN, railways, isTransform, transform, zoom);
 				drawKsjRailway(g, KsjRailway.Business.JR, railways, isTransform, transform, zoom);
-				drawKsjRailway(g, KsjRailway.Business.ROAD_HIGHWAY, railways, isTransform, transform, zoom);
 				drawKsjRailway(g, KsjRailway.Business.SHINKANSEN, railways, isTransform, transform, zoom);
+			}
+		}
+	}
+
+	/**
+	 * 国土数値情報の高速道路を描画します。
+	 * @param g 描画対象
+	 * @param railways 鉄道
+	 * @param prefecture 都道府県
+	 * @param isTransform 描画対象を座標変換するかどうか
+	 * @param transform 座標変換
+	 * @param x 描画領域の左端のx座標（仮想座標）
+	 * @param y 描画領域の上端のy座標（仮想座標）
+	 * @param w 描画領域の幅（仮想座標）
+	 * @param h 描画領域の高さ（仮想座標）
+	 * @param zoom 表示倍率
+	 */
+	private void drawKsjRoadHighway(final Graphics2D g, final Collection<? extends Railway> railways,
+			final Prefecture prefecture, final boolean isTransform, final AffineTransform transform, final double x,
+			final double y, final double w, final double h, final double zoom) {
+		if (prefecture.getBounds().intersects(x, y, w, h)) {
+			if (prefecture.hasFine()) {
+				drawKsjRailway(g, KsjRailway.Business.ROAD_HIGHWAY, railways, isTransform, transform, zoom);
 			}
 		}
 	}
@@ -1131,14 +1157,16 @@ public class MapPanel extends JPanel implements Printable {
 			this.setFixedStroke(g, this.mapPreferences.getKsjRailwayJRPreferences().getWidth() + 2, isTransform, zoom);
 			g.setColor(this.mapPreferences.getKsjRailwayJRPreferences().getBorderColor());
 		} else if (business == KsjRailway.Business.ROAD_HIGHWAY) {
-			this.setFixedStroke(g, this.mapPreferences.getHighwayPreferences().getWidth() + 2, isTransform, zoom);
-			g.setColor(this.mapPreferences.getHighwayPreferences().getBorderColor());
+			this
+					.setFixedStroke(g, this.mapPreferences.getKsjRoadHighwayPreferences().getWidth() + 2, isTransform,
+							zoom);
+			g.setColor(this.mapPreferences.getKsjRoadHighwayPreferences().getBorderColor());
 		} else if (business == KsjRailway.Business.ROAD_KOKUDO) {
-			this.setFixedStroke(g, this.mapPreferences.getKokudoPreferences().getWidth() + 2, isTransform, zoom);
-			g.setColor(this.mapPreferences.getKokudoPreferences().getBorderColor());
+			this.setFixedStroke(g, this.mapPreferences.getKsjRoadKokudoPreferences().getWidth() + 2, isTransform, zoom);
+			g.setColor(this.mapPreferences.getKsjRoadKokudoPreferences().getBorderColor());
 		} else if (business == KsjRailway.Business.ROAD_MAJOR) {
-			this.setFixedStroke(g, this.mapPreferences.getChihodoPreferences().getWidth() + 2, isTransform, zoom);
-			g.setColor(this.mapPreferences.getChihodoPreferences().getBorderColor());
+			this.setFixedStroke(g, this.mapPreferences.getKsjRoadMajorPreferences().getWidth() + 2, isTransform, zoom);
+			g.setColor(this.mapPreferences.getKsjRoadMajorPreferences().getBorderColor());
 		} else {
 			this.setFixedStroke(g, this.mapPreferences.getKsjRailwayPreferences().getWidth(), isTransform, zoom);
 			g.setColor(this.mapPreferences.getKsjRailwayPreferences().getBorderColor());
@@ -1153,14 +1181,16 @@ public class MapPanel extends JPanel implements Printable {
 			setFixedJRStroke(g, this.mapPreferences.getKsjRailwayJRPreferences().getWidth(), 15, isTransform);
 			g.setColor(this.mapPreferences.getKsjRailwayJRPreferences().getFillColor());
 		} else if (business == KsjRailway.Business.ROAD_HIGHWAY) {
-			this.setFixedStroke(g, this.mapPreferences.getHighwayPreferences().getWidth(), isTransform, zoom);
-			g.setColor(this.mapPreferences.getHighwayPreferences().getFillColor());
+			this.setFixedStroke(g, this.mapPreferences.getKsjRoadHighwayPreferences().getWidth(), isTransform, zoom);
+			g.setColor(this.mapPreferences.getKsjRoadHighwayPreferences().getFillColor());
 		} else if (business == KsjRailway.Business.ROAD_KOKUDO) {
-			this.setFixedStroke(g, this.mapPreferences.getKokudoPreferences().getWidth(), isTransform, zoom);
-			g.setColor(this.mapPreferences.getKokudoPreferences().getFillColor());
+			this.setFixedStroke(g, this.mapPreferences.getKsjRoadKokudoPreferences().getWidth(), isTransform, zoom);
+			g.setColor(this.mapPreferences.getKsjRoadKokudoPreferences().getFillColor());
 		} else if (business == KsjRailway.Business.ROAD_MAJOR) {
-			this.setFixedStroke(g, this.mapPreferences.getChihodoPreferences().getWidth(), isTransform, zoom);
-			g.setColor(this.mapPreferences.getChihodoPreferences().getFillColor());
+			this.setFixedStroke(g, this.mapPreferences.getKsjRoadMajorPreferences().getWidth(), isTransform, zoom);
+			g.setColor(this.mapPreferences.getKsjRoadMajorPreferences().getFillColor());
+		} else {
+			return;
 		}
 		for (final Railway railway : railways) {
 			drawKsjRailway(g, railway, business, isTransform, transform);
@@ -1177,13 +1207,18 @@ public class MapPanel extends JPanel implements Printable {
 	 */
 	private void drawKsjRailway(final Graphics2D g, final Railway railway, final Business business,
 			final boolean isTransform, final AffineTransform transform) {
-		if (business == KsjRailway.Business.JR || business == KsjRailway.Business.SHINKANSEN) {
+		if (business == KsjRailway.Business.JR || business == KsjRailway.Business.SHINKANSEN
+				|| business == KsjRailway.Business.ROAD_HIGHWAY || business == KsjRailway.Business.ROAD_KOKUDO
+				|| business == KsjRailway.Business.ROAD_MAJOR) {
 			if (railway.getBusiness() == business) {
 				this.draw(g, railway.getShape(), isTransform, transform);
 			}
 		} else {
 			if (railway.getBusiness() != KsjRailway.Business.JR
-					&& railway.getBusiness() != KsjRailway.Business.SHINKANSEN) {
+					&& railway.getBusiness() != KsjRailway.Business.SHINKANSEN
+					&& railway.getBusiness() != KsjRailway.Business.ROAD_HIGHWAY
+					&& railway.getBusiness() != KsjRailway.Business.ROAD_KOKUDO
+					&& railway.getBusiness() != KsjRailway.Business.ROAD_MAJOR) {
 				this.draw(g, railway.getShape(), isTransform, transform);
 			}
 		}

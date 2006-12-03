@@ -153,7 +153,7 @@ public class KsjRailway {
 			} else if (captions.length == 1) {
 				// since 5.01 道路のとき
 				this.caption = captions[0];
-				this.business = Business.UNKNOWN;
+				this.classification = Classification.UNKNOWN;
 				if (this.caption.contains("高速")) {
 					this.business = Business.ROAD_HIGHWAY;
 				} else if (this.caption.startsWith("国道")) {

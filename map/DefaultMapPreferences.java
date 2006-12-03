@@ -42,6 +42,7 @@ public class DefaultMapPreferences implements MapPreferences {
 		this.tyomePreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (9 * zoom)));
 		this.ksjRailwayPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (13 * zoom)));
 		this.ksjRailwayStationPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (15 * zoom)));
+		this.ksjRoadMajorPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (15 * zoom)));
 	}
 
 	/**
@@ -287,7 +288,7 @@ public class DefaultMapPreferences implements MapPreferences {
 	 * 国土数値情報の道路データのうち、高速道路の設定
 	 */
 	private Preferences ksjRoadHighawyPreferences = new Preferences(this.highwayPreferences.getFillColor(),
-			this.highwayPreferences.getBorderColor(), 1.5f, null, null);
+			this.highwayPreferences.getBorderColor(), 2f, null, null);
 	/**
 	 * 国土数値情報の道路データのうち、国道の設定
 	 */
@@ -297,7 +298,7 @@ public class DefaultMapPreferences implements MapPreferences {
 	 * 国土数値情報の道路データのうち、主要道路の設定
 	 */
 	private Preferences ksjRoadMajorPreferences = new Preferences(this.chihodoPreferences.getFillColor(),
-			this.chihodoPreferences.getBorderColor(), 1.5f, null, null);
+			this.chihodoPreferences.getBorderColor(), 1.5f, Color.BLUE.darker(), new Font(Fonts.GOTHIC, Font.PLAIN, 15));
 
 	/**
 	 * 国土数値情報の道路データのうち、高速道路の設定を取得します。
