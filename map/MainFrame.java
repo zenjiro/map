@@ -34,7 +34,7 @@ public class MainFrame extends JFrame {
 	 * @author zenjiro
 	 * Created on 2005/02/28 17:49:02
 	 */
-	private class ExitListener implements ActionListener {
+	class ExitListener implements ActionListener {
 		public void actionPerformed(final ActionEvent e) {
 			System.exit(0);
 		}
@@ -45,7 +45,7 @@ public class MainFrame extends JFrame {
 	 * @author zenjiro
 	 * Created on 2005/02/28 15:39:42
 	 */
-	private class ImageExportListener implements ActionListener {
+	class ImageExportListener implements ActionListener {
 		public void actionPerformed(final ActionEvent e) {
 			try {
 				final JFileChooser chooser = new JFileChooser(new File("."));
@@ -85,7 +85,7 @@ public class MainFrame extends JFrame {
 	/**
 	 * 印刷の実装です。
 	 */
-	private class PrintListener implements ActionListener {
+	class PrintListener implements ActionListener {
 		public void actionPerformed(final ActionEvent e) {
 			try {
 				MainFrame.this.panel.print();
@@ -100,7 +100,7 @@ public class MainFrame extends JFrame {
 	 * @author zenjiro
 	 * Created on 2005/03/20 16:42:34
 	 */
-	private class PSExportListener implements ActionListener {
+	class PSExportListener implements ActionListener {
 		public void actionPerformed(final ActionEvent e) {
 			try {
 				final JFileChooser chooser = new JFileChooser(new File("."));
