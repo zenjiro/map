@@ -981,7 +981,7 @@ public class MapPanel extends JPanel implements Printable {
 		for (int y = (int) (Math.floor(y2 / Const.Ksj.Height.HEIGHT)) * Const.Ksj.Height.HEIGHT; y - y2 < h2; y += Const.Ksj.Height.HEIGHT) {
 			for (int x = (int) (Math.floor(x2 / Const.Ksj.Height.WIDTH)) * Const.Ksj.Height.WIDTH; x - x2 < w2; x += Const.Ksj.Height.WIDTH) {
 				final InputStream in = this.getClass().getResourceAsStream(new Formatter().format("%s%s%d_%d_%f_%d_%d.png", 
-						Const.Ksj.Height.DIR,
+						Const.DIR,
 						Const.Ksj.Height.PREFIX,
 						Const.Ksj.Height.WIDTH, Const.Ksj.Height.HEIGHT, z2, x, y).toString());
 				if (in != null) {

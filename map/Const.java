@@ -115,11 +115,6 @@ public class Const {
 			public static final String PREFIX = "height_";
 			
 			/**
-			 * リソース中の位置
-			 */
-			public static final String DIR = "/data/";
-			
-			/**
 			 * 倍率1
 			 */
 			public static final double zoom1 = .0005;
@@ -265,7 +260,7 @@ public class Const {
 		/**
 		 * 全ての都道府県の情報が記載されているファイル
 		 */
-		public static final InputStream PREFECTURES = Const.class.getResourceAsStream("prefectures.csv");
+		public static final InputStream PREFECTURES = Const.class.getResourceAsStream(DIR + "prefectures.csv");
 
 		/**
 		 * 高精度の都道府県の情報が記載されているファイルの拡張子
@@ -342,5 +337,10 @@ public class Const {
 		 */
 		public static final String ENCODING = "SJIS";
 	}
+
+	/**
+	 * リソース中の位置
+	 */
+	public static final String DIR = "/data/";
 
 }

@@ -290,7 +290,7 @@ public class Prefecture {
 	 */
 	private void loadFineShape() {
 		final Map<Shape, String> map = ShapeIO
-				.readShapes(Prefecture.class.getResourceAsStream(Const.Prefecture.PREFECTURE_PREFIX + this.id
+				.readShapes(Prefecture.class.getResourceAsStream(Const.DIR + Const.Prefecture.PREFECTURE_PREFIX + this.id
 						+ Const.Prefecture.PREFECTURE_SUFFIX));
 		if (map.isEmpty()) {
 			System.out.println("WARNING: 高精度の都道府県の情報が読み込めませんでした。" + Const.Prefecture.PREFECTURE_PREFIX + this.id
@@ -311,7 +311,7 @@ public class Prefecture {
 	private void loadKsjRailwayLines() {
 		if (this.ksjRailwayLines.isEmpty()) {
 			for (final Map.Entry<Shape, String> entry : ShapeIO.readShapes(
-					Prefecture.class.getResourceAsStream(Const.Ksj.RAILWAY_LINES_PREFIX + this.id
+					Prefecture.class.getResourceAsStream(Const.DIR + Const.Ksj.RAILWAY_LINES_PREFIX + this.id
 							+ Const.Ksj.RAILWAY_SUFFIX)).entrySet()) {
 				this.ksjRailwayLines.add(new Railway(entry.getKey(), entry.getValue()));
 			}
@@ -325,7 +325,7 @@ public class Prefecture {
 	private void loadKsjRailwayCurves() {
 		if (this.ksjRailwayCurves.isEmpty()) {
 			for (final Map.Entry<Shape, String> entry : ShapeIO.readShapes(
-					Prefecture.class.getResourceAsStream(Const.Ksj.RAILWAY_CURVES_PREFIX + this.id
+					Prefecture.class.getResourceAsStream(Const.DIR + Const.Ksj.RAILWAY_CURVES_PREFIX + this.id
 							+ Const.Ksj.RAILWAY_SUFFIX)).entrySet()) {
 				this.ksjRailwayCurves.add(new Railway(entry.getKey(), entry.getValue()));
 			}
@@ -339,7 +339,7 @@ public class Prefecture {
 	private void loadKsjRailwayStations() {
 		if (this.ksjRailwayStations.isEmpty()) {
 			for (final Map.Entry<Shape, String> entry : ShapeIO.readShapes(
-					Prefecture.class.getResourceAsStream(Const.Ksj.RAILWAY_STATIONS_PREFIX + this.id
+					Prefecture.class.getResourceAsStream(Const.DIR + Const.Ksj.RAILWAY_STATIONS_PREFIX + this.id
 							+ Const.Ksj.RAILWAY_SUFFIX)).entrySet()) {
 				this.ksjRailwayStations.add(new Station(entry.getKey(), entry.getValue()));
 			}
