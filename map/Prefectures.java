@@ -119,7 +119,7 @@ public class Prefectures {
 				}
 			}
 		}
-		if (panel.getZoom() >= Zoom.LOAD_2500) {
+		if (panel.getZoom() >= Zoom.LOAD_GYOUSEI) {
 			final Rectangle2D visibleRectangle = panel.getVisibleRectangle(false);
 			final Collection<URL> urls = new ArrayList<URL>();
 			for (final Prefecture prefecture : prefectures) {
