@@ -165,6 +165,21 @@ public interface MapPreferences {
     Preferences getKsjRailwayStationPreferences();
     
     /**
+     * @return 国土数値情報の道路データのうち、高速道路の設定
+     */
+    Preferences getKsjRoadHighwayPreferences();
+
+    /**
+     * @return 国土数値情報の道路データのうち、国道の設定
+     */
+    Preferences getKsjRoadKokudoPreferences();
+
+    /**
+     * @return 国土数値情報の道路データのうち、主要な道路の設定
+     */
+    Preferences getKsjRoadMajorPreferences();
+
+    /**
      * 弧とポリゴンの設定を扱うクラスです。
      * @author zenjiro
      */

@@ -76,12 +76,12 @@ public class Prefecture {
 	/**
 	 * 国土数値情報の鉄道データの曲線
 	 */
-	private Collection<Railway> ksjRailwayCurves;
+	final private Collection<Railway> ksjRailwayCurves;
 
 	/**
 	 * 国土数値情報の鉄道データの駅
 	 */
-	private Collection<Station> ksjRailwayStations;
+	final private Collection<Station> ksjRailwayStations;
 
 	/**
 	 * 新しい都道府県を初期化します。
@@ -289,9 +289,8 @@ public class Prefecture {
 	 * 高精度の領域を読み込みます。
 	 */
 	private void loadFineShape() {
-		final Map<Shape, String> map = ShapeIO
-				.readShapes(Prefecture.class.getResourceAsStream(Const.DIR + Const.Prefecture.PREFECTURE_PREFIX + this.id
-						+ Const.Prefecture.PREFECTURE_SUFFIX));
+		final Map<Shape, String> map = ShapeIO.readShapes(Prefecture.class.getResourceAsStream(Const.DIR
+				+ Const.Prefecture.PREFECTURE_PREFIX + this.id + Const.Prefecture.PREFECTURE_SUFFIX));
 		if (map.isEmpty()) {
 			System.out.println("WARNING: 高精度の都道府県の情報が読み込めませんでした。" + Const.Prefecture.PREFECTURE_PREFIX + this.id
 					+ Const.Prefecture.PREFECTURE_SUFFIX);
@@ -327,6 +326,11 @@ public class Prefecture {
 			for (final Map.Entry<Shape, String> entry : ShapeIO.readShapes(
 					Prefecture.class.getResourceAsStream(Const.DIR + Const.Ksj.RAILWAY_CURVES_PREFIX + this.id
 							+ Const.Ksj.RAILWAY_SUFFIX)).entrySet()) {
+				this.ksjRailwayCurves.add(new Railway(entry.getKey(), entry.getValue()));
+			}
+			for (final Map.Entry<Shape, String> entry : ShapeIO.readShapes(
+					Prefecture.class.getResourceAsStream(Const.DIR + Const.Ksj.ROAD_PREFIX + this.id
+							+ Const.Ksj.ROAD_SUFFIX)).entrySet()) {
 				this.ksjRailwayCurves.add(new Railway(entry.getKey(), entry.getValue()));
 			}
 		}
@@ -387,7 +391,6 @@ public class Prefecture {
 	public Collection<Railway> getKsjRailwayCurves() {
 		return this.ksjRailwayCurves;
 	}
-
 
 	/**
 	 * @return 鉄道データの直線

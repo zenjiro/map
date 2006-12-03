@@ -17,23 +17,48 @@ import java.util.Scanner;
 
 import map.UTMUtil;
 
+/**
+ * 国土数値情報の道路をCSV形式に変換するプログラムです。
+ * @author zenjiro
+ */
 public class ConvertRoadToCSV {
+	/**
+	 * 線分データを表すクラスです。
+	 * @author zenjiro
+	 */
 	static class Link {
+		/**
+		 * 点列
+		 */
 		final List<Point2D> points;
 
+		/**
+		 * 属性
+		 */
 		final String attribute;
 
+		/**
+		 * 線分データを初期化します。
+		 * @param points 点列
+		 * @param attribute 属性
+		 */
 		public Link(final List<Point2D> points, final String attribute) {
 			this.points = points;
 			this.attribute = attribute;
 		}
 	}
 
+	/**
+	 * メインメソッドです。
+	 * @param args コマンドライン引数
+	 * @throws UnsupportedEncodingException サポート外エンコーディング例外
+	 * @throws FileNotFoundException ファイル未検出例外
+	 */
 	public static void main(final String[] args)
 			throws UnsupportedEncodingException, FileNotFoundException {
 		final Map<String, String> attributes = new HashMap<String, String>();
 		{
-			final File file = new File("a/N01_07L_dl.txt");
+			final File file = new File("N01_07L_dl.txt");
 			final Scanner scanner = new Scanner(new InputStreamReader(
 					new FileInputStream(file), "SJIS"));
 			while (scanner.hasNextLine()) {
@@ -54,7 +79,7 @@ public class ConvertRoadToCSV {
 			scanner.close();
 		}
 
-		for (final File file : new File("a").listFiles()) {
+		for (final File file : new File(".").listFiles()) {
 			if (file.getName().matches("N01-07L-2K-[0-9][0-9]\\.txt")) {
 				System.out.println(file);
 				final Map<String, Link> links = new HashMap<String, Link>();

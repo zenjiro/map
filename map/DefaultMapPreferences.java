@@ -268,8 +268,8 @@ public class DefaultMapPreferences implements MapPreferences {
 	/**
 	 * 国土数値情報の鉄道データのうち、駅の設定
 	 */
-	private Preferences ksjRailwayStationPreferences = new Preferences(Color.RED, Color.GRAY, 3, Color.BLACK,
-			new Font(Fonts.GOTHIC, Font.PLAIN, 15));
+	private Preferences ksjRailwayStationPreferences = new Preferences(Color.RED, Color.GRAY, 3, Color.BLACK, new Font(
+			Fonts.GOTHIC, Font.PLAIN, 15));
 
 	public Preferences getKsjRailwayJRPreferences() {
 		return this.ksjRailwayJRPreferences;
@@ -282,4 +282,42 @@ public class DefaultMapPreferences implements MapPreferences {
 	public Preferences getKsjRailwayStationPreferences() {
 		return this.ksjRailwayStationPreferences;
 	}
+
+	/**
+	 * 国土数値情報の道路データのうち、高速道路の設定
+	 */
+	private Preferences ksjRoadHighawyPreferences = new Preferences(this.highwayPreferences.getFillColor(),
+			this.highwayPreferences.getBorderColor(), 1.5f, null, null);
+	/**
+	 * 国土数値情報の道路データのうち、国道の設定
+	 */
+	private Preferences ksjRoadKokudoPreferences = new Preferences(this.kokudoPreferences.getFillColor(),
+			this.kokudoPreferences.getBorderColor(), 1.5f, null, null);
+	/**
+	 * 国土数値情報の道路データのうち、主要道路の設定
+	 */
+	private Preferences ksjRoadMajorPreferences = new Preferences(this.chihodoPreferences.getFillColor(),
+			this.chihodoPreferences.getBorderColor(), 1.5f, null, null);
+
+	/**
+	 * 国土数値情報の道路データのうち、高速道路の設定を取得します。
+	 */
+	public Preferences getKsjRoadHighwayPreferences() {
+		return this.ksjRoadHighawyPreferences;
+	}
+
+	/**
+	 * 国土数値情報の道路データのうち、国道の設定を取得します。
+	 */
+	public Preferences getKsjRoadKokudoPreferences() {
+		return this.ksjRoadKokudoPreferences;
+	}
+
+	/**
+	 * 国土数値情報の道路データのうち、主要な道路の設定を取得します。
+	 */
+	public Preferences getKsjRoadMajorPreferences() {
+		return this.ksjRoadMajorPreferences;
+	}
+	
 }

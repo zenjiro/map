@@ -61,6 +61,18 @@ public class KsjRailway {
 		 */
 		SEMI_PUBLIC,
 		/**
+		 * 高速道路
+		 */
+		ROAD_HIGHWAY,
+		/**
+		 * 国道
+		 */
+		ROAD_KOKUDO,
+		/**
+		 * 主要な道路
+		 */
+		ROAD_MAJOR,
+		/**
 		 * 不明
 		 */
 		UNKNOWN
@@ -138,6 +150,17 @@ public class KsjRailway {
 					line = "";
 				}
 				this.caption = company + line;
+			} else if (captions.length == 1) {
+				// since 5.01 道路のとき
+				this.caption = captions[0];
+				this.business = Business.UNKNOWN;
+				if (this.caption.contains("高速")) {
+					this.business = Business.ROAD_HIGHWAY;
+				} else if (this.caption.startsWith("国道")) {
+					this.business = Business.ROAD_KOKUDO;
+				} else {
+					this.business= Business.ROAD_MAJOR;
+				}
 			} else {
 				throw new IllegalArgumentException(
 						"Invalid caption: caption must be RAC_INT_LIN_OPC format. caption = " + caption);

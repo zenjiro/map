@@ -94,6 +94,18 @@ public class Const {
 		public static final String RAILWAY_SUFFIX = ".csv";
 
 		/**
+		 * 道路データの接頭語
+		 * @since 5.01
+		 */
+		public static final String ROAD_PREFIX = "N01-07L-2K-";
+		
+		/**
+		 * 道路データの接尾語
+		 * @since 5.01
+		 */
+		public static final String ROAD_SUFFIX = ".csv";
+		
+		/**
 		 * 国土数値情報の標高・傾斜度3次メッシュに関する定数を集めたクラスです。
 		 * @author zenjiro
 		 * @since 5.00
