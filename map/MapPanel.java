@@ -727,11 +727,11 @@ public class MapPanel extends JPanel implements Printable {
 			}
 		}
 		// 国土数値情報の駅名を描画する
-		if (zoom < Const.Zoom.LOAD_GYOUSEI && zoom >= Const.Zoom.LOAD_FINE_CITIES) {
+		if (zoom < Const.Zoom.LOAD_ALL && zoom >= Const.Zoom.LOAD_FINE_CITIES) {
 			drawKsjRailwayStationLabels(g, visibleRectangle, zoom, offsetX, offsetY);
 		}
 		// 国土数値情報の鉄道の文字列を描画する
-		if (zoom < Const.Zoom.LOAD_GYOUSEI && zoom >= Const.Zoom.LOAD_FINE_CITIES) {
+		if (zoom < Const.Zoom.LOAD_ALL && zoom >= Const.Zoom.LOAD_FINE_CITIES) {
 			drawKsjRailwayCurveLabels(g, visibleRectangle, zoom, offsetX, offsetY);
 		}
 	}
@@ -1046,7 +1046,7 @@ public class MapPanel extends JPanel implements Printable {
 	private void drawKsjRailway(final Graphics2D g, final boolean isTransform, final AffineTransform transform,
 			final double x, final double y, final double w, final double h, final double zoom) {
 		if (this.prefectures != null) {
-			if (this.zoom < Const.Zoom.LOAD_GYOUSEI && Const.Zoom.LOAD_FINE_CITIES <= this.zoom) {
+			if (this.zoom < Const.Zoom.LOAD_ALL && Const.Zoom.LOAD_FINE_CITIES <= this.zoom) {
 				for (final Prefecture prefecture : this.prefectures) {
 					drawKsjRailway(g, prefecture.getKsjRailwayCurves(), prefecture, isTransform, transform, x, y, w, h,
 							zoom);

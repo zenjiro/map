@@ -11,7 +11,8 @@
 - 国土数値情報の道路データを読み込んでCSV形式に変換するプログラムを作りました。（ksj.ConvertRoadToCSV）
 - 国土数値情報の道路データをCSV形式に変換したものを読み込んで表示するようにしました。（map.MapPanel）
 -- 地図の読み込みがかなり重くなりました。
-- 数値地図2500（空間データ基盤）がない市区町村を暗くするときに、道路や鉄道の上から描画するようにしました。（まだ）
+- map.Const.Zoom.LOAD_GYOUSEIで、国土数値情報の道路と鉄道を描画するようにしました。（map.MapPanel）
+-- 数値地図2500（空間データ基盤）の鉄道は描画しないようにしました。
 - Subversionを使ってみました。
 -- http://sourceforge.jp/projects/sourceforge/document/how_to_use_subversion/ja/ に解説があります。
 

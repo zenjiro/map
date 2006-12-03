@@ -68,14 +68,14 @@ public class LoadMap {
 					mapData.freeSi_tyo();
 					mapData.freeTyome();
 					mapData.freeGyousei();
-					mapData.freeOthers();
-					mapData.freeEki();
 					this.isChanged = true;
 				}
 			}
 			if (zoom < Zoom.LOAD_ALL) {
 				if (mapData.hasRoadArc()) {
 					mapData.freeRoadArc();
+					mapData.freeOthers();
+					mapData.freeEki();
 					this.isChanged = true;
 				}
 				if (mapData.hasMizuArc()) {
@@ -96,6 +96,14 @@ public class LoadMap {
 			if (mapData.getBounds().intersects(preLoadRectangle)) {
 				// データを読み込む
 				if (zoom >= Zoom.LOAD_GYOUSEI) {
+					if (!mapData.hasGyousei()) {
+						mapData.loadGyousei();
+						//mapData.loadSi_tyo();
+						mapData.loadTyome();
+						this.isChanged = true;
+					}
+				}
+				if (zoom >= Zoom.LOAD_ALL) {
 					if (!mapData.hasEki()) {
 						mapData.loadEki();
 						this.isChanged = true;
@@ -104,18 +112,6 @@ public class LoadMap {
 						mapData.loadOthers();
 						this.isChanged = true;
 					}
-					if (!mapData.hasGyousei()) {
-						mapData.loadGyousei();
-						//mapData.loadSi_tyo();
-						mapData.loadTyome();
-						this.isChanged = true;
-					}
-					if (!mapData.hasOthers()) {
-						mapData.loadOthers();
-						this.isChanged = true;
-					}
-				}
-				if (zoom >= Zoom.LOAD_ALL) {
 					if (!mapData.hasRoadArc()) {
 						mapData.loadRoadArc();
 						this.isChanged = true;

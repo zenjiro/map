@@ -24,6 +24,7 @@ import search.Search;
  * 作成日: 2004/01/16
  */
 class FixAttributeLocation {
+	
 	/** 属性を描画する座標を決定します。
 	 * @param maps 地図
 	 * @param prefectures 都道府県の一覧
@@ -48,7 +49,7 @@ class FixAttributeLocation {
 		final double tatemonoPointSize = 4; // 建物に表示する点の直径
 		final double ekiPointSize = 8; // 駅に表示する点の直径
 		final double zoom = panel.getZoom();
-		if (zoom >= Const.Zoom.LOAD_2500) {
+		if (zoom >= Const.Zoom.LOAD_ALL) {
 			// 駅の属性の表示位置を計算する
 			for (final MapData mapData : maps.values()) {
 				if (mapData.hasEki()) {
@@ -76,7 +77,7 @@ class FixAttributeLocation {
 			}
 		}
 		// 国土数値情報の駅の表示位置を計算する
-		if (zoom < Const.Zoom.LOAD_GYOUSEI && zoom >= Const.Zoom.LOAD_FINE_CITIES) {
+		if (zoom < Const.Zoom.LOAD_ALL && zoom >= Const.Zoom.LOAD_FINE_CITIES) {
 			final FontMetrics metrics = panel.getFontMetrics(panel.getMapPreferences()
 					.getKsjRailwayStationPreferences().getFont());
 			final double attributeHeight = metrics.getHeight() / zoom;
@@ -87,16 +88,14 @@ class FixAttributeLocation {
 								station.getShape().getBounds2D().getCenterY());
 						point.setAttribute(station.getStation());
 						this.fixPointAttributeLocation(point, usedPoints, visibleRectangle, zoom, attributeHeight,
-								metrics, (station.getShape().getBounds2D().getWidth() + station.getShape()
-										.getBounds2D().getHeight())
-										/ 2 * zoom + 2, search);
+								metrics, ekiPointSize, search);
 						station.setCaptionLocation(new Point2D.Double(point.getAttributeX(), point.getAttributeY()));
 					}
 				}
 			}
 		}
 		// 国土数値情報の鉄道の表示位置を計算する
-		if (zoom < Const.Zoom.LOAD_GYOUSEI && zoom >= Const.Zoom.LOAD_FINE_CITIES) {
+		if (zoom < Const.Zoom.LOAD_ALL && zoom >= Const.Zoom.LOAD_FINE_CITIES) {
 			final FontMetrics metrics = panel.getFontMetrics(panel.getMapPreferences().getKsjRailwayPreferences()
 					.getFont());
 			final double captionHeight = metrics.getHeight() / zoom;
