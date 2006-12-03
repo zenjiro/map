@@ -40,12 +40,14 @@ public class ConvertRoadToCSV {
 				final String line = scanner.nextLine();
 				if (line.startsWith("DL")) {
 					final String attributeNumber = line.substring(3, 14).trim();
-					final String attribute = line.substring(18, 60).trim()
-							.replace(" ", "").replace("０", "0").replace("１",
-									"1").replace("２", "2").replace("３", "3")
-							.replace("４", "4").replace("５", "5").replace("６",
-									"6").replace("７", "7").replace("８", "8")
-							.replace("９", "9").replaceFirst("号線$", "号");
+					final String[] items = line.substring(18).split(" ");
+					final String attribute = (items[0] + (items.length > 1 ? items[1]
+							: "")).trim().replace(" ", "").replace("０", "0")
+							.replace("１", "1").replace("２", "2").replace("３",
+									"3").replace("４", "4").replace("５", "5")
+							.replace("６", "6").replace("７", "7").replace("８",
+									"8").replace("９", "9").replaceFirst("号線$",
+									"号");
 					attributes.put(attributeNumber, attribute);
 				}
 			}
@@ -53,7 +55,7 @@ public class ConvertRoadToCSV {
 		}
 
 		for (final File file : new File("a").listFiles()) {
-			 if (file.getName().matches("N01-07L-2K-[0-9][0-9]\\.txt")) {
+			if (file.getName().matches("N01-07L-2K-[0-9][0-9]\\.txt")) {
 				System.out.println(file);
 				final Map<String, Link> links = new HashMap<String, Link>();
 				{
