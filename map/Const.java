@@ -306,7 +306,7 @@ public class Const {
 		/**
 		 * ビットマップキャッシュを生成する表示倍率
 		 */
-		public static final double ZOOM = Double.POSITIVE_INFINITY; // 0
+		public static final double ZOOM = 0;
 
 		/**
 		 * ビットマップキャッシュの幅
@@ -326,7 +326,7 @@ public class Const {
 		/**
 		 * ビットマップキャッシュの接頭辞
 		 */
-		public static final String PREFIX = "bitmap_5.00_";
+		public static final String PREFIX = "bitmap_5.01_";
 	}
 
 	/**
