@@ -97,7 +97,7 @@ public class Const {
 		 * 道路データの接頭語
 		 * @since 5.01
 		 */
-		public static final String ROAD_PREFIX = "ksj_road_";
+		public static final String ROAD_FINE_PREFIX = "ksj_road_";
 
 		/**
 		 * 簡略化した道路データの接頭語

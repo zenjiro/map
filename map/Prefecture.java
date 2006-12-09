@@ -308,7 +308,7 @@ public class Prefecture {
 	public void loadKsjFineRoad() {
 		if (this.ksjFineRoad.isEmpty()) {
 			for (final Map.Entry<Shape, String> entry : ShapeIO.readShapes(
-					Prefecture.class.getResourceAsStream(Const.DIR + Const.Ksj.ROAD_PREFIX + this.id
+					Prefecture.class.getResourceAsStream(Const.DIR + Const.Ksj.ROAD_FINE_PREFIX + this.id
 							+ Const.Ksj.ROAD_SUFFIX)).entrySet()) {
 				this.ksjFineRoad.add(new Railway(entry.getKey(), entry.getValue()));
 			}

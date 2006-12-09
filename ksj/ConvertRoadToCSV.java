@@ -160,7 +160,7 @@ public class ConvertRoadToCSV {
 						simpleShapes.put(new Line2D.Double(start, end), link.attribute);
 					}
 				}
-				ShapeIO.writeShape(shapes, new FileOutputStream(new File(Const.Ksj.ROAD_PREFIX + matcher.group(1) + Const.Ksj.ROAD_SUFFIX)));
+				ShapeIO.writeShape(shapes, new FileOutputStream(new File(Const.Ksj.ROAD_FINE_PREFIX + matcher.group(1) + Const.Ksj.ROAD_SUFFIX)));
 				ShapeIO.writeShape(simpleShapes, new FileOutputStream(new File(Const.Ksj.ROAD_SIMPLE_PREFIX + matcher.group(1) + Const.Ksj.ROAD_SUFFIX)));
 			}
 		}
