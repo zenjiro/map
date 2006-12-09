@@ -140,7 +140,7 @@ public class KsjRailway {
 				}
 				String company = captions[3].replaceFirst(".+旅客鉄道$", "JR").replaceFirst("^阪急電鉄$", "阪急").replaceFirst(
 						"^阪神電気鉄道$", "阪神").replaceFirst("^神戸電鉄$", "神鉄").replaceFirst("^近畿日本鉄道$", "近鉄").replaceFirst(
-						"電気鉄道$", "電鉄");
+						"電気鉄道$", "電鉄").replaceFirst("^東京急行電鉄", "東急").replaceFirst("^京浜急行電鉄", "京急");
 				String line = captions[2].replaceFirst("^本線$", "").replaceFirst("ケーブル線$", "ケーブル").replaceFirst("^智頭線$",
 						"").replaceFirst("^神戸本線$", "神戸線").replaceFirst("^宝塚本線$", "宝塚線")
 						.replaceFirst("モノレール線$", "モノレール").replaceFirst("^京都本線$", "京都線");

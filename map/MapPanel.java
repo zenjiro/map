@@ -1048,8 +1048,8 @@ public class MapPanel extends JPanel implements Printable {
 		if (this.prefectures != null) {
 			if (this.zoom < Const.Zoom.LOAD_ALL && Const.Zoom.LOAD_FINE_CITIES <= this.zoom) {
 				for (final Prefecture prefecture : this.prefectures) {
-					drawKsjRailway(g, prefecture.getKsjRailwayCurves(), prefecture, isTransform, transform, x, y, w, h,
-							zoom);
+					drawKsjRailway(g, prefecture.getKsjRailwayCurves(), prefecture.getKsjFineRoad(), prefecture,
+							isTransform, transform, x, y, w, h, zoom);
 				}
 				this.setFixedStroke(g, this.mapPreferences.getKsjRailwayStationPreferences().getWidth() + 2,
 						isTransform, zoom);
@@ -1062,8 +1062,8 @@ public class MapPanel extends JPanel implements Printable {
 				// since 5.01
 				for (final Prefecture prefecture : this.prefectures) {
 					if (prefecture.hasFineRoad()) {
-						drawKsjRoadHighway(g, prefecture.getKsjFineRoad(), prefecture, isTransform, transform, x,
-								y, w, h, zoom);
+						drawKsjRoadHighway(g, prefecture.getKsjFineRoad(), prefecture, isTransform, transform, x, y, w,
+								h, zoom);
 					} else {
 						drawKsjRoadHighway(g, prefecture.getKsjRailwayCurves(), prefecture, isTransform, transform, x,
 								y, w, h, zoom);
@@ -1100,6 +1100,7 @@ public class MapPanel extends JPanel implements Printable {
 	 * 国土数値情報の鉄道を描画します。
 	 * @param g 描画対象
 	 * @param railways 鉄道
+	 * @param fineRoad 高精度の道路データ
 	 * @param prefecture 都道府県
 	 * @param isTransform 描画対象を座標変換するかどうか
 	 * @param transform 座標変換
@@ -1110,12 +1111,18 @@ public class MapPanel extends JPanel implements Printable {
 	 * @param zoom 表示倍率
 	 */
 	private void drawKsjRailway(final Graphics2D g, final Collection<? extends Railway> railways,
-			final Prefecture prefecture, final boolean isTransform, final AffineTransform transform, final double x,
-			final double y, final double w, final double h, final double zoom) {
+			final Collection<? extends Railway> fineRoad, final Prefecture prefecture, final boolean isTransform,
+			final AffineTransform transform, final double x, final double y, final double w, final double h,
+			final double zoom) {
 		if (prefecture.getBounds().intersects(x, y, w, h)) {
 			if (prefecture.hasFine()) {
-				drawKsjRailway(g, KsjRailway.Business.ROAD_MAJOR, railways, isTransform, transform, zoom);
-				drawKsjRailway(g, KsjRailway.Business.ROAD_KOKUDO, railways, isTransform, transform, zoom);
+				if (prefecture.hasFineRoad()) {
+					drawKsjRailway(g, KsjRailway.Business.ROAD_MAJOR, fineRoad, isTransform, transform, zoom);
+					drawKsjRailway(g, KsjRailway.Business.ROAD_KOKUDO, fineRoad, isTransform, transform, zoom);
+				} else {
+					drawKsjRailway(g, KsjRailway.Business.ROAD_MAJOR, railways, isTransform, transform, zoom);
+					drawKsjRailway(g, KsjRailway.Business.ROAD_KOKUDO, railways, isTransform, transform, zoom);
+				}
 				drawKsjRailway(g, KsjRailway.Business.UNKNOWN, railways, isTransform, transform, zoom);
 				drawKsjRailway(g, KsjRailway.Business.JR, railways, isTransform, transform, zoom);
 				drawKsjRailway(g, KsjRailway.Business.SHINKANSEN, railways, isTransform, transform, zoom);
