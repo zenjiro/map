@@ -355,7 +355,7 @@ public class Prefecture {
 	public void freeKsjFineRoad() {
 		freeKsjRailway(this.ksjFineRoad);
 	}
-	
+
 	/**
 	 * @return 高精度の国土数値情報の道路データを持っているかどうか
 	 * @since 5.01
@@ -363,7 +363,7 @@ public class Prefecture {
 	public boolean hasKsjFineRoad() {
 		return !this.ksjFineRoad.isEmpty();
 	}
-	
+
 	/**
 	 * 鉄道データの曲線を開放します。
 	 * @since 4.17
