@@ -97,7 +97,13 @@ public class Const {
 		 * 道路データの接頭語
 		 * @since 5.01
 		 */
-		public static final String ROAD_PREFIX = "N01-07L-2K-";
+		public static final String ROAD_PREFIX = "ksj_road_";
+
+		/**
+		 * 簡略化した道路データの接頭語
+		 * @since 5.01
+		 */
+		public static final String ROAD_SIMPLE_PREFIX = "ksj_road_simple_";
 		
 		/**
 		 * 道路データの接尾語

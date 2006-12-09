@@ -1,8 +1,9 @@
 package ksj;
 
 import java.awt.Shape;
-import java.awt.geom.Point2D;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -14,7 +15,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import map.Const;
 import map.UTMUtil;
 
 /**
@@ -79,8 +83,10 @@ public class ConvertRoadToCSV {
 			scanner.close();
 		}
 
-		for (final File file : new File(".").listFiles()) {
-			if (file.getName().matches("N01-07L-2K-[0-9][0-9]\\.txt")) {
+		final Pattern pattern = Pattern.compile("N01-07L-2K-([0-9][0-9])\\.txt");
+		for (final File file : new File("").listFiles()) {
+			final Matcher matcher = pattern.matcher(file.getName());
+			if (matcher.matches()) {
 				System.out.println(file);
 				final Map<String, Link> links = new HashMap<String, Link>();
 				{
@@ -131,25 +137,31 @@ public class ConvertRoadToCSV {
 				}
 
 				final Map<Shape, String> shapes = new HashMap<Shape, String>();
+				final Map<Shape, String> simpleShapes = new HashMap<Shape, String>();
 				{
 					for (final Map.Entry<String, Link> entry : links.entrySet()) {
 						final Link link = entry.getValue();
 						GeneralPath path = null;
+						Point2D start = null;
+						Point2D end = null;
 						for (final Point2D point : link.points) {
 							if (path == null) {
 								path = new GeneralPath();
 								path.moveTo((float) point.getX(), (float) point
 										.getY());
+								start = point;
 							} else {
 								path.lineTo((float) point.getX(), (float) point
 										.getY());
+								end = point;
 							}
 						}
 						shapes.put(path, link.attribute);
+						simpleShapes.put(new Line2D.Double(start, end), link.attribute);
 					}
 				}
-				ShapeIO.writeShape(shapes, new FileOutputStream(new File(file
-						.getName().replaceFirst("\\.txt$", ".csv"))));
+				ShapeIO.writeShape(shapes, new FileOutputStream(new File(Const.Ksj.ROAD_PREFIX + matcher.group(1) + Const.Ksj.ROAD_SUFFIX)));
+				ShapeIO.writeShape(simpleShapes, new FileOutputStream(new File(Const.Ksj.ROAD_SIMPLE_PREFIX + matcher.group(1) + Const.Ksj.ROAD_SUFFIX)));
 			}
 		}
 	}
