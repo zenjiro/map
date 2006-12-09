@@ -126,7 +126,7 @@ public class Prefectures {
 					final Shape shape = prefecture.hasFine() ? prefecture.getFineShape()
 						: prefecture.getShape();
 					if (shape.intersects(visibleRectangle)) {
-						if (!prefecture.hasKsjFineRoad()) {
+						if (!prefecture.hasFineRoad()) {
 							prefecture.loadKsjFineRoad();
 						}
 					}
@@ -134,7 +134,7 @@ public class Prefectures {
 			}
 		} else {
 			for (final Prefecture prefecture : prefectures) {
-				if (prefecture.hasKsjFineRoad()) {
+				if (prefecture.hasFineRoad()) {
 					prefecture.freeKsjFineRoad();
 				}
 			}

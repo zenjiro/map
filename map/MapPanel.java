@@ -1061,8 +1061,13 @@ public class MapPanel extends JPanel implements Printable {
 				drawKsjStation(g, isTransform, transform, x, y, w, h);
 				// since 5.01
 				for (final Prefecture prefecture : this.prefectures) {
-					drawKsjRoadHighway(g, prefecture.getKsjRailwayCurves(), prefecture, isTransform, transform, x, y,
-							w, h, zoom);
+					if (prefecture.hasFineRoad()) {
+						drawKsjRoadHighway(g, prefecture.getKsjFineRoad(), prefecture, isTransform, transform, x,
+								y, w, h, zoom);
+					} else {
+						drawKsjRoadHighway(g, prefecture.getKsjRailwayCurves(), prefecture, isTransform, transform, x,
+								y, w, h, zoom);
+					}
 				}
 			}
 		}

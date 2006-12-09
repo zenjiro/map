@@ -360,7 +360,7 @@ public class Prefecture {
 	 * @return 高精度の国土数値情報の道路データを持っているかどうか
 	 * @since 5.01
 	 */
-	public boolean hasKsjFineRoad() {
+	public boolean hasFineRoad() {
 		return !this.ksjFineRoad.isEmpty();
 	}
 
@@ -398,6 +398,13 @@ public class Prefecture {
 		return this.ksjRailwayCurves;
 	}
 
+	/**
+	 * @return 高精度の国土数値情報の道路データ
+	 */
+	public Collection<Railway> getKsjFineRoad() {
+		return this.ksjFineRoad;
+	}
+	
 	/**
 	 * @return 鉄道データの直線
 	 */
