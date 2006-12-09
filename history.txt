@@ -16,6 +16,7 @@
 -- 数値地図2500（空間データ基盤）の鉄道は描画しないようにしました。
 - Subversionを使ってみました。
 -- http://sourceforge.jp/projects/sourceforge/document/how_to_use_subversion/ja/ に解説があります。
+- Antを使ってみました。（build.xml）
 
 2006/11/04 5.00
 - 国土数値情報の標高・傾斜度3次メッシュデータを読み込んで表示するようにしました。（map.MapPanel#drawHeight）
