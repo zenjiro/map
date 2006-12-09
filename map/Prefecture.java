@@ -305,7 +305,7 @@ public class Prefecture {
 	 * 簡略化した道路データの読み込みます。
 	 * @since 5.01
 	 */
-	private void loadKsjSimpleRoad() {
+	public void loadKsjSimpleRoad() {
 		if (this.ksjSimpleRoad.isEmpty()) {
 			for (final Map.Entry<Shape, String> entry : ShapeIO.readShapes(
 					Prefecture.class.getResourceAsStream(Const.DIR + Const.Ksj.ROAD_SIMPLE_PREFIX + this.id

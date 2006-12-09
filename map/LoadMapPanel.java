@@ -178,7 +178,7 @@ public class LoadMapPanel extends JPanel {
 					final Collection<String> loadedMaps;
 						loadedMaps = loadMap.loadMaps(selectedURLs, maps);
 					panel.moveTo(panel.getBounds(loadedMaps));
-					if (panel.getZoom() < Const.Zoom.LOAD_2500) {
+					if (panel.getZoom() < Const.Zoom.LOAD_FINE_ROAD) {
 						panel.zoomWide();
 					}
 					panel.getActionListener().actionPerformed(

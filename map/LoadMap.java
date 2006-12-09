@@ -131,7 +131,7 @@ public class LoadMap {
 						this.isChanged = true;
 					}
 				}
-				if (zoom >= Zoom.LOAD_2500) {
+				if (zoom >= Zoom.LOAD_FINE_ROAD) {
 					// since 5.01 何もしない。
 				}
 			} else if (!mapData.getBounds().intersects(keepRectangle)) {

@@ -227,7 +227,7 @@ public class MapPanel extends JPanel implements Printable {
 							MapPanel.this.zoomCities();
 						} else if (MapPanel.this.getZoom() < Const.Zoom.LOAD_FINE_CITIES) {
 							MapPanel.this.zoomFineCities();
-						} else if (MapPanel.this.getZoom() < Const.Zoom.LOAD_2500) {
+						} else if (MapPanel.this.getZoom() < Const.Zoom.LOAD_FINE_ROAD) {
 							MapPanel.this.zoomWide();
 						} else if (MapPanel.this.getZoom() < Const.Zoom.LOAD_GYOUSEI) {
 							MapPanel.this.zoomMiddle();
@@ -239,7 +239,7 @@ public class MapPanel extends JPanel implements Printable {
 							MapPanel.this.zoomDetail();
 						} else if (MapPanel.this.getZoom() > Const.Zoom.LOAD_GYOUSEI) {
 							MapPanel.this.zoomMiddle();
-						} else if (MapPanel.this.getZoom() > Const.Zoom.LOAD_2500) {
+						} else if (MapPanel.this.getZoom() > Const.Zoom.LOAD_FINE_ROAD) {
 							MapPanel.this.zoomWide();
 						} else if (MapPanel.this.getZoom() > Const.Zoom.LOAD_FINE_CITIES) {
 							MapPanel.this.zoomFineCities();
@@ -695,7 +695,7 @@ public class MapPanel extends JPanel implements Printable {
 	private void drawLabels(final Graphics2D g, final Rectangle2D visibleRectangle, final double zoom,
 			final double offsetX, final double offsetY) throws FileNotFoundException, IOException,
 			UnsupportedEncodingException {
-		if (this.maps != null & zoom >= Const.Zoom.LOAD_2500) {
+		if (this.maps != null & zoom >= Const.Zoom.LOAD_FINE_ROAD) {
 			g.setStroke(new BasicStroke(1f));
 			for (final MapData mapData : this.maps.values()) {
 				if (mapData.getBounds().intersects(visibleRectangle)) {
@@ -1445,7 +1445,7 @@ public class MapPanel extends JPanel implements Printable {
 	private void drawSdf(final Graphics2D g, final boolean isTransform, final double x, final double y, final double w,
 			final double h, final Point2D center, final AffineTransform transform, final double zoom)
 			throws FileNotFoundException, IOException {
-		if (this.maps != null & this.zoom >= Const.Zoom.LOAD_2500) {
+		if (this.maps != null & this.zoom >= Const.Zoom.LOAD_FINE_ROAD) {
 			g.setStroke(new BasicStroke(1f));
 			// 海を描画する
 			this.drawSeas(g, isTransform, transform, x, y, w, h);
@@ -2677,7 +2677,7 @@ public class MapPanel extends JPanel implements Printable {
 	 * 広域表示します。
 	 */
 	public void zoomWide() {
-		this.zoom(Const.Zoom.LOAD_2500, this.getWidth() / 2, this.getHeight() / 2);
+		this.zoom(Const.Zoom.LOAD_FINE_ROAD, this.getWidth() / 2, this.getHeight() / 2);
 		if (this.listener != null) {
 			this.listener.actionPerformed(new ActionEvent(this, this.hashCode(), "zoom wide"));
 		}

@@ -150,7 +150,7 @@ class FixAttributeLocation {
 				}
 			}
 		}
-		if (zoom >= Const.Zoom.LOAD_2500) {
+		if (zoom >= Const.Zoom.LOAD_FINE_ROAD) {
 			// 公共建物の属性の表示位置を計算する
 			for (final MapData mapData : maps.values()) {
 				if (mapData.hasTatemono()) {

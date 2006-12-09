@@ -209,9 +209,9 @@ public class Const {
 		public static final double LOAD_FINE_CITIES = Const.Zoom.RESOLUTION / 2.5 * 100 / 150000;
 
 		/**
-		 * 数値地図2500（空間データ基盤）を読み込む表示倍率
+		 * 高精度の国土数値情報の道路データを読み込む表示倍率
 		 */
-		public static final double LOAD_2500 = Const.Zoom.RESOLUTION / 2.5 * 100 / 75000;
+		public static final double LOAD_FINE_ROAD = Const.Zoom.RESOLUTION / 2.5 * 100 / 75000;
 
 		/**
 		 * 丁目のポリゴンデータを読み込む表示倍率
