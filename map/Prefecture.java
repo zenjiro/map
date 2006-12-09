@@ -69,9 +69,9 @@ public class Prefecture {
 	private final MapPanel panel;
 
 	/**
-	 * 国土数値情報の鉄道データの直線
+	 * 簡略化した国土数値情報の道路データ
 	 */
-	private Collection<Railway> ksjRailwayLines;
+	private Collection<Railway> ksjSimpleRoad;
 
 	/**
 	 * 国土数値情報の鉄道データの曲線
@@ -99,7 +99,7 @@ public class Prefecture {
 		this.id = id;
 		this.color = color;
 		this.cities = new ArrayList<City>();
-		this.ksjRailwayLines = new ArrayList<Railway>();
+		this.ksjSimpleRoad = new ArrayList<Railway>();
 		this.ksjRailwayCurves = new ArrayList<Railway>();
 		this.ksjRailwayStations = new ArrayList<Station>();
 	}
@@ -302,17 +302,15 @@ public class Prefecture {
 	}
 
 	/**
-	 * 鉄道データの直線を読み込みます。
-	 * 新幹線が海の中を通ることが多いので、未使用です。
-	 * @since 4.17
+	 * 簡略化した道路データの読み込みます。
+	 * @since 5.01
 	 */
-	@SuppressWarnings("unused")
-	private void loadKsjRailwayLines() {
-		if (this.ksjRailwayLines.isEmpty()) {
+	private void loadKsjSimpleRoad() {
+		if (this.ksjSimpleRoad.isEmpty()) {
 			for (final Map.Entry<Shape, String> entry : ShapeIO.readShapes(
-					Prefecture.class.getResourceAsStream(Const.DIR + Const.Ksj.RAILWAY_LINES_PREFIX + this.id
-							+ Const.Ksj.RAILWAY_SUFFIX)).entrySet()) {
-				this.ksjRailwayLines.add(new Railway(entry.getKey(), entry.getValue()));
+					Prefecture.class.getResourceAsStream(Const.DIR + Const.Ksj.ROAD_SIMPLE_PREFIX + this.id
+							+ Const.Ksj.ROAD_SUFFIX)).entrySet()) {
+				this.ksjSimpleRoad.add(new Railway(entry.getKey(), entry.getValue()));
 			}
 		}
 	}
@@ -351,11 +349,11 @@ public class Prefecture {
 	}
 
 	/**
-	 * 鉄道データの直線を開放します。
-	 * @since 4.17
+	 * 簡略化した道路データを開放します。
+	 * @since 5.01
 	 */
-	public void freeKsjRailwayLines() {
-		freeKsjRailway(this.ksjRailwayLines);
+	public void freeKsjSimpleRoad() {
+		freeKsjRailway(this.ksjSimpleRoad);
 	}
 
 	/**
@@ -396,7 +394,7 @@ public class Prefecture {
 	 * @return 鉄道データの直線
 	 */
 	public Collection<Railway> getKsjRailwayLines() {
-		return this.ksjRailwayLines;
+		return this.ksjSimpleRoad;
 	}
 
 	/**
