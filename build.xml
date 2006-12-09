@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<project name="Map" default="default">
+	<description>
+            数値地図2500（空間データ基盤）、国土数値地図などを表示します。
+    </description>
+	<target name="default">
+		<jar jarfile="map.jar" basedir="." manifest="META-INF/MANIFEST.MF" excludes="**/.svn/**,.map/**,map.jar" />
+	</target>
+</project>
