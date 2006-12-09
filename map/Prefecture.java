@@ -69,9 +69,9 @@ public class Prefecture {
 	private final MapPanel panel;
 
 	/**
-	 * 簡略化した国土数値情報の道路データ
+	 * 高精度の国土数値情報の道路データ
 	 */
-	private Collection<Railway> ksjSimpleRoad;
+	private Collection<Railway> ksjFineRoad;
 
 	/**
 	 * 国土数値情報の鉄道データの曲線
@@ -99,7 +99,7 @@ public class Prefecture {
 		this.id = id;
 		this.color = color;
 		this.cities = new ArrayList<City>();
-		this.ksjSimpleRoad = new ArrayList<Railway>();
+		this.ksjFineRoad = new ArrayList<Railway>();
 		this.ksjRailwayCurves = new ArrayList<Railway>();
 		this.ksjRailwayStations = new ArrayList<Station>();
 	}
@@ -302,15 +302,15 @@ public class Prefecture {
 	}
 
 	/**
-	 * 簡略化した道路データの読み込みます。
+	 * 高精度な国土数値情報の道路データの読み込みます。
 	 * @since 5.01
 	 */
-	public void loadKsjSimpleRoad() {
-		if (this.ksjSimpleRoad.isEmpty()) {
+	public void loadKsjFineRoad() {
+		if (this.ksjFineRoad.isEmpty()) {
 			for (final Map.Entry<Shape, String> entry : ShapeIO.readShapes(
-					Prefecture.class.getResourceAsStream(Const.DIR + Const.Ksj.ROAD_SIMPLE_PREFIX + this.id
+					Prefecture.class.getResourceAsStream(Const.DIR + Const.Ksj.ROAD_PREFIX + this.id
 							+ Const.Ksj.ROAD_SUFFIX)).entrySet()) {
-				this.ksjSimpleRoad.add(new Railway(entry.getKey(), entry.getValue()));
+				this.ksjFineRoad.add(new Railway(entry.getKey(), entry.getValue()));
 			}
 		}
 	}
@@ -327,7 +327,7 @@ public class Prefecture {
 				this.ksjRailwayCurves.add(new Railway(entry.getKey(), entry.getValue()));
 			}
 			for (final Map.Entry<Shape, String> entry : ShapeIO.readShapes(
-					Prefecture.class.getResourceAsStream(Const.DIR + Const.Ksj.ROAD_PREFIX + this.id
+					Prefecture.class.getResourceAsStream(Const.DIR + Const.Ksj.ROAD_SIMPLE_PREFIX + this.id
 							+ Const.Ksj.ROAD_SUFFIX)).entrySet()) {
 				this.ksjRailwayCurves.add(new Railway(entry.getKey(), entry.getValue()));
 			}
@@ -349,18 +349,26 @@ public class Prefecture {
 	}
 
 	/**
-	 * 簡略化した道路データを開放します。
+	 * 高精度の道路データを開放します。
 	 * @since 5.01
 	 */
-	public void freeKsjSimpleRoad() {
-		freeKsjRailway(this.ksjSimpleRoad);
+	public void freeKsjFineRoad() {
+		freeKsjRailway(this.ksjFineRoad);
 	}
-
+	
+	/**
+	 * @return 高精度の国土数値情報の道路データを持っているかどうか
+	 * @since 5.01
+	 */
+	public boolean hasKsjFineRoad() {
+		return !this.ksjFineRoad.isEmpty();
+	}
+	
 	/**
 	 * 鉄道データの曲線を開放します。
 	 * @since 4.17
 	 */
-	public void freeKsjRailwayCurves() {
+	private void freeKsjRailwayCurves() {
 		freeKsjRailway(this.ksjRailwayCurves);
 	}
 
@@ -368,7 +376,7 @@ public class Prefecture {
 	 * 鉄道データの駅を開放します。
 	 * @since 4.17
 	 */
-	public void freeKsjRailwayStations() {
+	private void freeKsjRailwayStations() {
 		freeKsjRailway(this.ksjRailwayStations);
 	}
 
@@ -394,7 +402,7 @@ public class Prefecture {
 	 * @return 鉄道データの直線
 	 */
 	public Collection<Railway> getKsjRailwayLines() {
-		return this.ksjSimpleRoad;
+		return this.ksjFineRoad;
 	}
 
 	/**

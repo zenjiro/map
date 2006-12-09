@@ -119,6 +119,26 @@ public class Prefectures {
 				}
 			}
 		}
+		if (panel.getZoom() >= Zoom.LOAD_FINE_ROAD) {
+			final Rectangle2D visibleRectangle = panel.getVisibleRectangle(false);
+			for (final Prefecture prefecture : prefectures) {
+				if (prefecture.getBounds().intersects(visibleRectangle)) {
+					final Shape shape = prefecture.hasFine() ? prefecture.getFineShape()
+						: prefecture.getShape();
+					if (shape.intersects(visibleRectangle)) {
+						if (!prefecture.hasKsjFineRoad()) {
+							prefecture.loadKsjFineRoad();
+						}
+					}
+				}
+			}
+		} else {
+			for (final Prefecture prefecture : prefectures) {
+				if (prefecture.hasKsjFineRoad()) {
+					prefecture.freeKsjFineRoad();
+				}
+			}
+		}
 		if (panel.getZoom() >= Zoom.LOAD_GYOUSEI) {
 			final Rectangle2D visibleRectangle = panel.getVisibleRectangle(false);
 			final Collection<URL> urls = new ArrayList<URL>();
