@@ -1445,7 +1445,7 @@ public class MapPanel extends JPanel implements Printable {
 	private void drawSdf(final Graphics2D g, final boolean isTransform, final double x, final double y, final double w,
 			final double h, final Point2D center, final AffineTransform transform, final double zoom)
 			throws FileNotFoundException, IOException {
-		if (this.maps != null & this.zoom >= Const.Zoom.LOAD_FINE_ROAD) {
+		if (this.maps != null & this.zoom >= Const.Zoom.LOAD_GYOUSEI) {
 			g.setStroke(new BasicStroke(1f));
 			// 海を描画する
 			this.drawSeas(g, isTransform, transform, x, y, w, h);
