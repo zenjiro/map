@@ -695,7 +695,7 @@ public class MapPanel extends JPanel implements Printable {
 	private void drawLabels(final Graphics2D g, final Rectangle2D visibleRectangle, final double zoom,
 			final double offsetX, final double offsetY) throws FileNotFoundException, IOException,
 			UnsupportedEncodingException {
-		if (this.maps != null & zoom >= Const.Zoom.LOAD_FINE_ROAD) {
+		if (this.maps != null & zoom >= Const.Zoom.LOAD_GYOUSEI) {
 			g.setStroke(new BasicStroke(1f));
 			for (final MapData mapData : this.maps.values()) {
 				if (mapData.getBounds().intersects(visibleRectangle)) {
