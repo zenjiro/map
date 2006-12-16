@@ -15,6 +15,7 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
 import map.BackgroundThread;
+import map.Const;
 import map.LoadMap;
 import map.MainFrame;
 import map.MapData;
@@ -60,7 +61,7 @@ public class Main {
 		final LoadMap loadMap = new LoadMap();
 		final MainFrame frame = new MainFrame(maps, panel, loadMap);
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		frame.setSize(640, 480);
+		frame.setSize(Const.GUI.FRAME_WIDTH, Const.GUI.FRAME_HEIGHT);
 		frame.setLocationByPlatform(true);
 		frame.setVisible(true);
 		panel.addMessage("地図を読み込んでいます。");

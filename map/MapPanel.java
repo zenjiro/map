@@ -379,6 +379,14 @@ public class MapPanel extends JPanel implements Printable {
 			final int width = MapPanel.this.size == null ? MapPanel.this.getWidth() : MapPanel.this.size.width;
 			final int height = MapPanel.this.size == null ? MapPanel.this.getHeight() : MapPanel.this.size.height;
 			new File(Const.BitmapCache.CACHE_DIR).mkdirs();
+			int maxCount = 0;
+			for (int y = (int) (Math.floor(offsetY / Const.BitmapCache.HEIGHT)) * Const.BitmapCache.HEIGHT; y - offsetY < height; y += Const.BitmapCache.HEIGHT) {
+				for (int x = (int) (Math.floor(offsetX / Const.BitmapCache.WIDTH)) * Const.BitmapCache.WIDTH; x
+						- offsetX < width; x += Const.BitmapCache.WIDTH) {
+					maxCount++;
+				}
+			}
+			int count = 0;
 			for (int y = (int) (Math.floor(offsetY / Const.BitmapCache.HEIGHT)) * Const.BitmapCache.HEIGHT; y - offsetY < height; y += Const.BitmapCache.HEIGHT) {
 				for (int x = (int) (Math.floor(offsetX / Const.BitmapCache.WIDTH)) * Const.BitmapCache.WIDTH; x
 						- offsetX < width; x += Const.BitmapCache.WIDTH) {
@@ -422,6 +430,8 @@ public class MapPanel extends JPanel implements Printable {
 						}
 						ImageIO.write(image, "PNG", file);
 					}
+					count++;
+					Progress.getInstance().setCreateBitmapProgress((int) ((double) count / maxCount * 100));
 				}
 			}
 			g.dispose();
@@ -561,10 +571,10 @@ public class MapPanel extends JPanel implements Printable {
 							}
 						}
 						if (!isDark) {
-						this.setFixedStroke(g, this.mapPreferences.getPrefecturePreferences().getWidth(), isTransform,
-								zoom);
-						this.draw(g, prefecture.hasFine() ? prefecture.getFineShape() : prefecture.getShape(),
-								isTransform, transform);
+							this.setFixedStroke(g, this.mapPreferences.getPrefecturePreferences().getWidth(),
+									isTransform, zoom);
+							this.draw(g, prefecture.hasFine() ? prefecture.getFineShape() : prefecture.getShape(),
+									isTransform, transform);
 						}
 					}
 				}
@@ -2307,6 +2317,7 @@ public class MapPanel extends JPanel implements Printable {
 					g.drawImage(this.image, 0, 0, this);
 				}
 			} else {
+				Progress.getInstance().setRepaintProgress(0);
 				final int width = MapPanel.this.size == null ? MapPanel.this.getWidth() : MapPanel.this.size.width;
 				final int height = MapPanel.this.size == null ? MapPanel.this.getHeight() : MapPanel.this.size.height;
 				final Image image = this.createImage(width, height);
@@ -2318,6 +2329,7 @@ public class MapPanel extends JPanel implements Printable {
 				final double offsetX = this.getOffsetX();
 				final double offsetY = this.getOffsetY();
 				final double saturationDifference = this.getSaturationDifference();
+				Progress.getInstance().setRepaintProgress(20);
 				for (int y = (int) (Math.floor(offsetY / Const.BitmapCache.HEIGHT)) * Const.BitmapCache.HEIGHT; y
 						- offsetY < height; y += Const.BitmapCache.HEIGHT) {
 					for (int x = (int) (Math.floor(offsetX / Const.BitmapCache.WIDTH)) * Const.BitmapCache.WIDTH; x
@@ -2335,12 +2347,14 @@ public class MapPanel extends JPanel implements Printable {
 						}
 					}
 				}
+				Progress.getInstance().setRepaintProgress(40);
 				if (!clip.isEmpty()) {
 					final Shape originalClip = g2.getClip();
 					g2.clip(clip);
 					this.drawBackground(g2, true);
 					g2.setClip(originalClip);
 				}
+				Progress.getInstance().setRepaintProgress(60);
 				if (this.prefectures != null) {
 					new FixAttributeLocation().fixAttributeLocation(this.maps, this.prefectures, this);
 				}
@@ -2348,9 +2362,11 @@ public class MapPanel extends JPanel implements Printable {
 				if (Const.Fonts.HAS_MS_FONTS) {
 					g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
 				}
+				Progress.getInstance().setRepaintProgress(80);
 				this.drawLabels(g2, visibleRectangle, zoom, offsetX, offsetY);
 				g2.dispose();
 				g.drawImage(image, 0, 0, this);
+				Progress.getInstance().setRepaintProgress(100);
 			}
 		} catch (final IndexOutOfBoundsException e) {
 			// 読み込もうとしたビットマップキャッシュが保存中だったとき

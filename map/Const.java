@@ -361,4 +361,36 @@ public class Const {
 	 */
 	public static final String DIR = "/data/";
 
+	/**
+	 * GUIに関する定数を集めたクラスです。
+	 * @author zenjiro
+	 * @since 5.02
+	 */
+	public static class GUI {
+		/**
+		 * サイドパネルの幅
+		 */
+		public static final int SIDE_PANEL_WIDTH = 200;
+		
+		/**
+		 * フレームの幅
+		 */
+		public static final int FRAME_WIDTH = 640;
+		
+		/**
+		 * フレームの高さ
+		 */
+		public static final int FRAME_HEIGHT = 480;
+		
+		/**
+		 * プログレスバーの高さ
+		 */
+		public static final int PROGRESS_BAR_HEIGHT = 10;
+		
+		/**
+		 * プログレスバーの幅
+		 */
+		public static final int PROGRESS_BAR_WIDTH = 150;
+	}
+	
 }

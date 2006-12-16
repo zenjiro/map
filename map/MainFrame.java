@@ -149,6 +149,12 @@ public class MainFrame extends JFrame {
 	private final JLabel statusBar;
 
 	/**
+	 * ステータスバーを納めるパネル
+	 * @since 5.02
+	 */
+	private final JPanel statusPanel;
+	
+	/**
 	 * 新しくフレームを初期化します。
 	 * @param maps 地図
 	 * @param panel 地図を表示するパネル
@@ -162,7 +168,7 @@ public class MainFrame extends JFrame {
 		final JSplitPane splitPane = new JSplitPane();
 		this.add(splitPane, BorderLayout.CENTER);
 		final JPanel sidePanel = new SidePanel(maps, panel, loadMap);
-		sidePanel.setPreferredSize(new Dimension(200, 0));
+		sidePanel.setPreferredSize(new Dimension(Const.GUI.SIDE_PANEL_WIDTH, 0));
 		sidePanel.setMinimumSize(new Dimension(0, 0));
 		splitPane.setLeftComponent(sidePanel);
 		splitPane.setRightComponent(panel);
@@ -357,7 +363,11 @@ public class MainFrame extends JFrame {
 		});
 		viewMenu.add(brightnessResetItem);
 		this.statusBar = new JLabel(panel.getMessage());
-		this.add(this.statusBar, BorderLayout.SOUTH);
+		this.statusPanel = new JPanel();
+		this.statusPanel.setLayout(new BorderLayout());
+		this.statusPanel.add(this.statusBar, BorderLayout.CENTER);
+		this.statusPanel.add(Progress.getInstance().getProgressBar(), BorderLayout.EAST);
+		this.add(this.statusPanel, BorderLayout.SOUTH);
 		panel.setStatusBar(this.statusBar);
 	}
 }

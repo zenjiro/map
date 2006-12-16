@@ -25,7 +25,7 @@ public class BackgroundThread extends TimerTask {
 	/**
 	 * 地図
 	 */
-	private final Map<String, MapData> maps; // 地図
+	private final Map<String, MapData> maps;
 
 	/**
 	 * 都道府県の一覧
@@ -40,7 +40,7 @@ public class BackgroundThread extends TimerTask {
 	/**
 	 * 地図の状態が変化したかどうか
 	 */
-	boolean isChanged; // 地図の状態が変化したかどうか
+	boolean isChanged;
 
 	/**
 	 * 地図を読み込むためのオブジェクト
@@ -102,17 +102,24 @@ public class BackgroundThread extends TimerTask {
 	void loadMapPaintTyomeJoinTyome(final Rectangle2D visibleRectangle) {
 		try {
 			this.panel.addMessage("地図を読み込んでいます。");
+			Progress.getInstance().setLoadMapPaintTyomeProgress(0);
 			if (this.prefectures != null) {
 				Prefectures.loadCities(this.prefectures, this.panel, this.maps, this.loadMap);
 			}
 			synchronized (this.maps) {
+				Progress.getInstance().setLoadMapPaintTyomeProgress(20);
 				this.loadMap.loadMap(this.maps, this.panel, visibleRectangle);
+				Progress.getInstance().setLoadMapPaintTyomeProgress(40);
 				this.panel.loadYomi();
+				Progress.getInstance().setLoadMapPaintTyomeProgress(50);
 				new PaintTyome().paintTyome(this.maps);
+				Progress.getInstance().setLoadMapPaintTyomeProgress(60);
 				new JoinPolygon().joinPolygon(this.maps, visibleRectangle);
+				Progress.getInstance().setLoadMapPaintTyomeProgress(80);
 			}
 			new JoinTatemono().joinTatemono(this.maps);
 			this.panel.removeMessage();
+			Progress.getInstance().setLoadMapPaintTyomeProgress(100);
 		} catch (final Exception exception) {
 			System.err.println("EXCEPTION: Failed to load map.");
 			exception.printStackTrace();
@@ -127,6 +134,8 @@ public class BackgroundThread extends TimerTask {
 				this.mapSize = this.maps.size();
 			}
 			if (this.isChanged) {
+				Progress.getInstance().initialize();
+				Progress.getInstance().setStatus(Progress.Status.LOADING_MAP_PAINTING_TYOME);
 				this.isChanged = false;
 				final Rectangle2D visibleRectangle = this.panel.getVisibleRectangle(false);
 				final double zoom = this.panel.getZoom();
@@ -134,9 +143,14 @@ public class BackgroundThread extends TimerTask {
 				final double offsetY = this.panel.getOffsetY();
 				final double saturationDifference = this.panel.getSaturationDifference();
 				this.loadMapPaintTyomeJoinTyome(visibleRectangle);
+				Progress.getInstance().setStatus(Progress.Status.CREATING_BITMAP);
+				Progress.getInstance().setCreateBitmapProgress(0);
 				this.panel.createBitmapCache(zoom, offsetX, offsetY, saturationDifference);
+				Progress.getInstance().setStatus(Progress.Status.REPAINTING);
+				Progress.getInstance().setRepaintProgress(0);
 				this.panel.setChanged();
 				this.panel.forceRepaint();
+				Progress.getInstance().complete();
 			}
 		} catch (final IOException e) {
 			e.printStackTrace();
