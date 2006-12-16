@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Scanner;
 
 import javax.imageio.ImageIO;
+import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 
 import map.Const;
 import map.DefaultMapPreferences;
@@ -46,6 +48,7 @@ public class ConvertHeightToPNG {
 	 * @throws NoninvertibleTransformException 
 	 */
 	public static void main(String[] args) throws IOException, NoninvertibleTransformException {
+		final boolean isFrame = false; // フレームを表示するかどうか
 		double minX = Double.POSITIVE_INFINITY;
 		double minY = Double.POSITIVE_INFINITY;
 		double maxX = Double.NEGATIVE_INFINITY;
@@ -53,9 +56,10 @@ public class ConvertHeightToPNG {
 		final Map<Shape, Color> shapes = new LinkedHashMap<Shape, Color>();
 		for (final File file : new File(".").listFiles()) {
 			if (file.getName().matches("G04-b-81_[0-9]{4}\\.csv")) {
-//							if (file.getName().matches("G04-b-81_(51|52|53)(34|35)\\.csv")) {
+				//			if (file.getName().matches("G04-b-81_(51|52|53)(34|35)\\.csv")) {
 				System.out.println(file + ", using "
-						+ (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024.0 / 1024 + "[MB]");
+						+ (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024.0 / 1024
+						+ "[MB]");
 				final Scanner scanner = new Scanner(new InputStreamReader(new FileInputStream(file), "UTF-8"));
 				while (scanner.hasNextLine()) {
 					final String line = scanner.nextLine();
@@ -98,8 +102,10 @@ public class ConvertHeightToPNG {
 								minY = Math.min(minY, bounds.getMinY());
 								maxX = Math.max(maxX, bounds.getMaxX());
 								maxY = Math.max(maxY, bounds.getMaxY());
-								final Color color = Color.getHSBColor(.4f - height2, Math.min(.4f - height2, 1 - height
-										* height), height + height2 * .8f);
+								//final float brightness = height + height2 * .8f;
+								final float brightness = (float) (1 / (1 + Math.exp(-(height * 3 + height2 * 6))));
+								final float saturation = Math.min(.4f - height2, 1 - height * height) * .4f;
+								final Color color = Color.getHSBColor(.4f - height2, saturation, brightness);
 								final double x = path.getBounds2D().getCenterX();
 								final double y = path.getBounds2D().getCenterY();
 								final AffineTransform transform = new AffineTransform();
@@ -116,43 +122,63 @@ public class ConvertHeightToPNG {
 				scanner.close();
 			}
 		}
-		for (final double zoom : new double[] { Const.Ksj.Height.zoom4 }) {
-			final double offsetX = minX * zoom;
-			final double offsetY = minY * zoom;
-			final double width = (maxX - minX) * zoom;
-			final double height = (maxY - minY) * zoom;
-			final BufferedImage image = new BufferedImage(Const.Ksj.Height.WIDTH, Const.Ksj.Height.HEIGHT,
-					BufferedImage.TYPE_INT_BGR);
-			final Graphics2D g = (Graphics2D) image.getGraphics();
-			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			for (int y = (int) (Math.floor(offsetY / Const.Ksj.Height.HEIGHT)) * Const.Ksj.Height.HEIGHT; y - offsetY < height; y += Const.Ksj.Height.HEIGHT) {
-				for (int x = (int) (Math.floor(offsetX / Const.Ksj.Height.WIDTH)) * Const.Ksj.Height.WIDTH; x - offsetX < width; x += Const.Ksj.Height.WIDTH) {
-					g.setColor(new DefaultMapPreferences().getMizuPreferences().getFillColor());
-					g.fillRect(0, 0, image.getWidth(), image.getHeight());
-					final double virtualX = x / zoom;
-					final double virtualY = y / zoom;
-					final double virtualWidth = Const.Ksj.Height.WIDTH / zoom;
-					final double virtualHeight = Const.Ksj.Height.HEIGHT / zoom;
-					final AffineTransform transform = new AffineTransform();
-					transform.translate(-x, -y);
-					transform.scale(zoom, zoom);
-					g.transform(transform);
-					boolean hadDrawn = false;
-					for (Map.Entry<Shape, Color> entry : shapes.entrySet()) {
-						if (entry.getKey().intersects(virtualX, virtualY, virtualWidth, virtualHeight)) {
-							g.setColor(entry.getValue());
-							g.fill(entry.getKey());
-							hadDrawn = true;
+
+		if (isFrame) {
+			final ShapePanel panel = new ShapePanel(false);
+			for (final Map.Entry<Shape, Color> entry : shapes.entrySet()) {
+				panel.add(entry.getKey());
+				panel.setFillColor(entry.getKey(), entry.getValue());
+				panel.setBorderColor(entry.getKey(), null);
+			}
+			final JFrame frame = new JFrame("テスト");
+			frame.setSize(800, 600);
+			frame.setLocationByPlatform(true);
+			frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+			frame.add(panel);
+			frame.setVisible(true);
+		} else {
+			for (final double zoom : new double[] { Const.Ksj.Height.zoom1, Const.Ksj.Height.zoom2,
+					Const.Ksj.Height.zoom3, Const.Ksj.Height.zoom4 }) {
+				final double offsetX = minX * zoom;
+				final double offsetY = minY * zoom;
+				final double width = (maxX - minX) * zoom;
+				final double height = (maxY - minY) * zoom;
+				final BufferedImage image = new BufferedImage(Const.Ksj.Height.WIDTH, Const.Ksj.Height.HEIGHT,
+						BufferedImage.TYPE_INT_BGR);
+				final Graphics2D g = (Graphics2D) image.getGraphics();
+				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+				for (int y = (int) (Math.floor(offsetY / Const.Ksj.Height.HEIGHT)) * Const.Ksj.Height.HEIGHT; y
+						- offsetY < height; y += Const.Ksj.Height.HEIGHT) {
+					for (int x = (int) (Math.floor(offsetX / Const.Ksj.Height.WIDTH)) * Const.Ksj.Height.WIDTH; x
+							- offsetX < width; x += Const.Ksj.Height.WIDTH) {
+						g.setColor(new DefaultMapPreferences().getMizuPreferences().getFillColor());
+						g.fillRect(0, 0, image.getWidth(), image.getHeight());
+						final double virtualX = x / zoom;
+						final double virtualY = y / zoom;
+						final double virtualWidth = Const.Ksj.Height.WIDTH / zoom;
+						final double virtualHeight = Const.Ksj.Height.HEIGHT / zoom;
+						final AffineTransform transform = new AffineTransform();
+						transform.translate(-x, -y);
+						transform.scale(zoom, zoom);
+						g.transform(transform);
+						boolean hadDrawn = false;
+						for (Map.Entry<Shape, Color> entry : shapes.entrySet()) {
+							if (entry.getKey().intersects(virtualX, virtualY, virtualWidth, virtualHeight)) {
+								g.setColor(entry.getValue());
+								g.fill(entry.getKey());
+								hadDrawn = true;
+							}
 						}
-					}
-					g.transform(transform.createInverse());
-					final File file = new File(new Formatter().format("%s%d_%d_%f_%d_%d.png", Const.Ksj.Height.PREFIX,
-							Const.Ksj.Height.WIDTH, Const.Ksj.Height.HEIGHT, zoom, x, y).toString());
-					if (hadDrawn) {
-						ImageIO.write(image, "PNG", file);
-						System.out.println("wrote " + file);
-					} else {
-						System.out.println("skipped " + file);
+						g.transform(transform.createInverse());
+						final File file = new File(new Formatter().format("%s%d_%d_%f_%d_%d.png",
+								Const.Ksj.Height.PREFIX, Const.Ksj.Height.WIDTH, Const.Ksj.Height.HEIGHT, zoom, x, y)
+								.toString());
+						if (hadDrawn) {
+							ImageIO.write(image, "PNG", file);
+							System.out.println("wrote " + file);
+						} else {
+							System.out.println("skipped " + file);
+						}
 					}
 				}
 			}

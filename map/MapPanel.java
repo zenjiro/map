@@ -412,6 +412,8 @@ public class MapPanel extends JPanel implements Printable {
 									transform, zoom);
 							this.drawKsjRailway(g, isTransform, transform, virtualX, virtualY, virtualWidth,
 									virtualHeight, zoom);
+							this.drawCities(g, isTransform, transform, virtualX, virtualY, virtualWidth, virtualHeight,
+									center, zoom, true);
 							if (isTransform) {
 								g.transform(transform.createInverse());
 							}
@@ -508,6 +510,7 @@ public class MapPanel extends JPanel implements Printable {
 			this.drawKsj(g, isTransform, transform, x, y, w, h, center, zoom);
 			this.drawSdf(g, isTransform, x, y, w, h, center, transform, zoom);
 			this.drawKsjRailway(g, isTransform, transform, x, y, w, h, zoom);
+			this.drawCities(g, isTransform, transform, x, y, w, h, center, zoom, true);
 			if (isTransform) {
 				g.transform(transform.createInverse());
 			}
@@ -525,38 +528,45 @@ public class MapPanel extends JPanel implements Printable {
 	 * @param h 描画領域の高さ（仮想座標）
 	 * @param center 中心の座標（仮想座標）
 	 * @param zoom 表示倍率
+	 * @param isDark 暗くする部分のみ描画するかどうか
 	 * @throws UnsupportedEncodingException
 	 * @throws IOException
 	 */
 	private void drawCities(final Graphics2D g, final boolean isTransform, final AffineTransform transform,
-			final double x, final double y, final double w, final double h, final Point2D center, final double zoom)
-			throws UnsupportedEncodingException, IOException {
-		if (this.prefectures != null) {
-			for (final Prefecture prefecture : this.prefectures) {
-				if (prefecture.hasCities()) {
-					this.setFixedStroke(g, this.mapPreferences.getCityPreferences().getWidth(), isTransform, zoom);
-					for (final City city : prefecture.getCities()) {
-						final Shape shape = city.hasFineShape() ? city.getFineShape() : city.getShape();
-						if (shape.intersects(x, y, w, h)) {
-							if (city.getURL() == null) {
-								g.setColor(Color.BLACK);
-								final Composite composite = g.getComposite();
-								g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .1f));
-								this.fill(g, shape, isTransform, transform);
-								g.setComposite(composite);
-							}
-							g.setColor(Color.BLACK);
-							this.draw(g, shape, isTransform, transform);
-							if (city.hasFineShape() && shape.contains(center)) {
-								this.centerPrefectureCity = prefecture.getLabel() + city.getLabel();
+			final double x, final double y, final double w, final double h, final Point2D center, final double zoom,
+			final boolean isDark) throws UnsupportedEncodingException, IOException {
+		if (this.zoom >= Const.Zoom.LOAD_CITIES) {
+			if (this.prefectures != null) {
+				for (final Prefecture prefecture : this.prefectures) {
+					if (prefecture.hasCities()) {
+						this.setFixedStroke(g, this.mapPreferences.getCityPreferences().getWidth(), isTransform, zoom);
+						for (final City city : prefecture.getCities()) {
+							final Shape shape = city.hasFineShape() ? city.getFineShape() : city.getShape();
+							if (shape.intersects(x, y, w, h)) {
+								if (isDark) {
+									if (city.getURL() == null) {
+										g.setColor(Color.BLACK);
+										final Composite composite = g.getComposite();
+										g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .1f));
+										this.fill(g, shape, isTransform, transform);
+										g.setComposite(composite);
+									}
+								} else {
+									g.setColor(Color.BLACK);
+									this.draw(g, shape, isTransform, transform);
+									if (city.hasFineShape() && shape.contains(center)) {
+										this.centerPrefectureCity = prefecture.getLabel() + city.getLabel();
+									}
+								}
 							}
 						}
+						if (!isDark) {
+						this.setFixedStroke(g, this.mapPreferences.getPrefecturePreferences().getWidth(), isTransform,
+								zoom);
+						this.draw(g, prefecture.hasFine() ? prefecture.getFineShape() : prefecture.getShape(),
+								isTransform, transform);
+						}
 					}
-					this
-							.setFixedStroke(g, this.mapPreferences.getPrefecturePreferences().getWidth(), isTransform,
-									zoom);
-					this.draw(g, prefecture.hasFine() ? prefecture.getFineShape() : prefecture.getShape(), isTransform,
-							transform);
 				}
 			}
 		}
@@ -681,10 +691,8 @@ public class MapPanel extends JPanel implements Printable {
 			throws UnsupportedEncodingException, IOException {
 		// 都道府県を描画する
 		this.drawPrefectures(g, isTransform, transform, x, y, w, h, zoom);
-		if (this.zoom >= Const.Zoom.LOAD_CITIES) {
-			// 市区町村を描画する
-			this.drawCities(g, isTransform, transform, x, y, w, h, center, zoom);
-		}
+		// 市区町村を描画する
+		this.drawCities(g, isTransform, transform, x, y, w, h, center, zoom, false);
 	}
 
 	/**
