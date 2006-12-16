@@ -326,7 +326,7 @@ public class Const {
 		/**
 		 * ビットマップキャッシュの接頭辞
 		 */
-		public static final String PREFIX = "bitmap_5.01_";
+		public static final String PREFIX = "bitmap_5.02_";
 	}
 
 	/**

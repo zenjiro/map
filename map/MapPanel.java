@@ -365,9 +365,11 @@ public class MapPanel extends JPanel implements Printable {
 	 * @param zoom 表示倍率
 	 * @param offsetX オフセット（実座標）
 	 * @param offsetY オフセット（実座標）
+	 * @param saturationDifference 彩度の増分
 	 * @throws IOException 入出力例外
 	 */
-	public void createBitmapCache(final double zoom, final double offsetX, final double offsetY) throws IOException {
+	public void createBitmapCache(final double zoom, final double offsetX, final double offsetY,
+			final double saturationDifference) throws IOException {
 		if (zoom >= Const.BitmapCache.ZOOM) {
 			this.addMessage("地図を描画しています。");
 			final BufferedImage image = new BufferedImage(Const.BitmapCache.WIDTH, Const.BitmapCache.HEIGHT,
@@ -380,9 +382,10 @@ public class MapPanel extends JPanel implements Printable {
 			for (int y = (int) (Math.floor(offsetY / Const.BitmapCache.HEIGHT)) * Const.BitmapCache.HEIGHT; y - offsetY < height; y += Const.BitmapCache.HEIGHT) {
 				for (int x = (int) (Math.floor(offsetX / Const.BitmapCache.WIDTH)) * Const.BitmapCache.WIDTH; x
 						- offsetX < width; x += Const.BitmapCache.WIDTH) {
-					final File file = new File(new Formatter().format("%s%s%d_%d_%f_%d_%d.png",
+					final File file = new File(new Formatter().format("%s%s%d_%d_%f_%f_%d_%d.png",
 							Const.BitmapCache.CACHE_DIR + File.separator, Const.BitmapCache.PREFIX,
-							Const.BitmapCache.WIDTH, Const.BitmapCache.HEIGHT, zoom, x, y).toString());
+							Const.BitmapCache.WIDTH, Const.BitmapCache.HEIGHT, saturationDifference, zoom, x, y)
+							.toString());
 					if (!file.exists()) {
 						g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 						g.setColor(MapPanel.this.mapPreferences.getMizuPreferences().getFillColor());
@@ -442,6 +445,9 @@ public class MapPanel extends JPanel implements Printable {
 	public void decreaseSaturation() {
 		this.saturationDifference -= 0.05;
 		this.isChanged = true;
+		if (this.listener != null) {
+			this.listener.actionPerformed(new ActionEvent(this, this.hashCode(), "zoom fine cities"));
+		}
 	}
 
 	/**
@@ -2163,6 +2169,9 @@ public class MapPanel extends JPanel implements Printable {
 	public void increaseSaturation() {
 		this.saturationDifference += 0.05;
 		this.isChanged = true;
+		if (this.listener != null) {
+			this.listener.actionPerformed(new ActionEvent(this, this.hashCode(), "zoom fine cities"));
+		}
 	}
 
 	/**
@@ -2300,13 +2309,15 @@ public class MapPanel extends JPanel implements Printable {
 				final double zoom = this.getZoom();
 				final double offsetX = this.getOffsetX();
 				final double offsetY = this.getOffsetY();
+				final double saturationDifference = this.getSaturationDifference();
 				for (int y = (int) (Math.floor(offsetY / Const.BitmapCache.HEIGHT)) * Const.BitmapCache.HEIGHT; y
 						- offsetY < height; y += Const.BitmapCache.HEIGHT) {
 					for (int x = (int) (Math.floor(offsetX / Const.BitmapCache.WIDTH)) * Const.BitmapCache.WIDTH; x
 							- offsetX < width; x += Const.BitmapCache.WIDTH) {
-						final File file = new File(new Formatter().format("%s%s%d_%d_%f_%d_%d.png",
+						final File file = new File(new Formatter().format("%s%s%d_%d_%f_%f_%d_%d.png",
 								Const.BitmapCache.CACHE_DIR + File.separator, Const.BitmapCache.PREFIX,
-								Const.BitmapCache.WIDTH, Const.BitmapCache.HEIGHT, zoom, x, y).toString());
+								Const.BitmapCache.WIDTH, Const.BitmapCache.HEIGHT, saturationDifference, zoom, x, y)
+								.toString());
 						if (file.exists()) {
 							final Image image2 = ImageIO.read(file);
 							g2.drawImage(image2, x - (int) offsetX, y - (int) offsetY, this);
@@ -2455,6 +2466,9 @@ public class MapPanel extends JPanel implements Printable {
 	public void resetSaturation() {
 		this.saturationDifference = 0;
 		this.isChanged = true;
+		if (this.listener != null) {
+			this.listener.actionPerformed(new ActionEvent(this, this.hashCode(), "zoom fine cities"));
+		}
 	}
 
 	/**
@@ -2693,5 +2707,12 @@ public class MapPanel extends JPanel implements Printable {
 		if (this.listener != null) {
 			this.listener.actionPerformed(new ActionEvent(this, this.hashCode(), "zoom wide"));
 		}
+	}
+
+	/**
+	 * @return 彩度の増分
+	 */
+	public float getSaturationDifference() {
+		return saturationDifference;
 	}
 }

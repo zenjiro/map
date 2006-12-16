@@ -132,8 +132,9 @@ public class BackgroundThread extends TimerTask {
 				final double zoom = this.panel.getZoom();
 				final double offsetX = this.panel.getOffsetX();
 				final double offsetY = this.panel.getOffsetY();
+				final double saturationDifference = this.panel.getSaturationDifference();
 				this.loadMapPaintTyomeJoinTyome(visibleRectangle);
-				this.panel.createBitmapCache(zoom, offsetX, offsetY);
+				this.panel.createBitmapCache(zoom, offsetX, offsetY, saturationDifference);
 				this.panel.setChanged();
 				this.panel.forceRepaint();
 			}
