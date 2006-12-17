@@ -42,6 +42,7 @@ public class Prefectures {
 		throws UnsupportedEncodingException, IOException, InterruptedException, ExecutionException {
 		boolean ret = false;
 		if (panel.getZoom() >= Zoom.LOAD_CITIES) {
+			Progress.getInstance().setLoadMapPaintTyomeProgress(0);
 			final Rectangle2D visibleRectangle = panel.getVisibleRectangle(false);
 			for (final Prefecture prefecture : prefectures) {
 				if (prefecture.getBounds().intersects(visibleRectangle)) {
@@ -100,6 +101,7 @@ public class Prefectures {
 			}
 		}
 		if (panel.getZoom() >= Zoom.LOAD_FINE_CITIES) {
+			Progress.getInstance().setLoadMapPaintTyomeProgress(4);
 			final Rectangle2D visibleRectangle = panel.getVisibleRectangle(false);
 			for (final Prefecture prefecture : prefectures) {
 				if (prefecture.getBounds().intersects(visibleRectangle)) {
@@ -120,6 +122,7 @@ public class Prefectures {
 			}
 		}
 		if (panel.getZoom() >= Zoom.LOAD_FINE_ROAD) {
+			Progress.getInstance().setLoadMapPaintTyomeProgress(8);
 			final Rectangle2D visibleRectangle = panel.getVisibleRectangle(false);
 			for (final Prefecture prefecture : prefectures) {
 				if (prefecture.getBounds().intersects(visibleRectangle)) {
@@ -140,6 +143,7 @@ public class Prefectures {
 			}
 		}
 		if (panel.getZoom() >= Zoom.LOAD_GYOUSEI) {
+			Progress.getInstance().setLoadMapPaintTyomeProgress(12);
 			final Rectangle2D visibleRectangle = panel.getVisibleRectangle(false);
 			final Collection<URL> urls = new ArrayList<URL>();
 			for (final Prefecture prefecture : prefectures) {
@@ -178,6 +182,7 @@ public class Prefectures {
 		}
 		// since 3.08
 		if (panel.getZoom() >= Zoom.LOAD_ALL) {
+			Progress.getInstance().setLoadMapPaintTyomeProgress(16);
 			final Rectangle2D visibleRectangle = panel.getVisibleRectangle(false);
 			for (final Prefecture prefecture : prefectures) {
 				if (prefecture.hasCities()) {
@@ -199,6 +204,7 @@ public class Prefectures {
 				}
 			}
 		}
+		Progress.getInstance().setLoadMapPaintTyomeProgress(20);
 		return ret;
 	}
 

@@ -37,6 +37,7 @@ public class Progress {
 		this.progressBar.setPreferredSize(new Dimension(Const.GUI.PROGRESS_BAR_WIDTH, Const.GUI.PROGRESS_BAR_HEIGHT));
 		this.progressBar.setVisible(false);
 		this.status = Status.COMPLETE;
+		this.startTime = Long.MAX_VALUE;
 		new Timer(20, new ActionListener() {
 			public void actionPerformed(final ActionEvent event) {
 				if (Progress.this.value < Progress.this.progressBar.getValue()) {
@@ -47,6 +48,9 @@ public class Progress {
 					if (Progress.this.progressBar.getValue() == Progress.this.progressBar.getMaximum()) {
 						Progress.this.progressBar.setVisible(false);
 					}
+				}
+				if (Progress.this.status != Status.COMPLETE && System.currentTimeMillis() - Progress.this.startTime > 1000) {
+					Progress.this.progressBar.setVisible(true);
 				}
 			}
 
@@ -74,10 +78,15 @@ public class Progress {
 	 * プログレスバーを初期化します。
 	 */
 	public void initialize() {
+		this.startTime = System.currentTimeMillis();
 		this.progressBar.setValue(0);
-		this.progressBar.setVisible(true);
 		this.value = 0;
 	}
+	
+	/**
+	 * プログレスバーが動き始めた時刻
+	 */
+	private long startTime;
 
 	/**
 	 * プログレスバーを完了状態にします。
@@ -85,6 +94,7 @@ public class Progress {
 	public void complete() {
 		this.status = Status.COMPLETE;
 		this.value = this.progressBar.getMaximum();
+		this.startTime = Long.MAX_VALUE;
 	}
 
 	/**
