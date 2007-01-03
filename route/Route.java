@@ -1,6 +1,10 @@
 package route;
 
-import java.awt.geom.GeneralPath;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.PathIterator;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -95,17 +99,17 @@ public class Route {
 		/**
 		 * 頂点1
 		 */
-		private String node1;
+		private String first;
 
 		/**
 		 * 頂点2
 		 */
-		private String node2;
+		private String last;
 
 		/**
 		 * 辺
 		 */
-		private GeneralPath path;
+		private Shape path;
 
 		/**
 		 * 辺の種類
@@ -114,16 +118,20 @@ public class Route {
 
 		/**
 		 * コンストラクタです。
-		 * @param node1 頂点1
-		 * @param node2 頂点2
+		 * @param first 頂点1
+		 * @param last 頂点2
 		 * @param path 辺
 		 * @param category 辺の種類
 		 */
-		public Edge(final String node1, final String node2, final GeneralPath path, final Category category) {
-			this.node1 = node1;
-			this.node2 = node2;
+		public Edge(final String first, final String last, final Shape path, final Category category) {
+			this.first = first;
+			this.last = last;
 			this.path = path;
 			this.category = category;
+		}
+
+		public String toString() {
+			return this.first + "--" + this.last;
 		}
 	}
 
@@ -156,6 +164,10 @@ public class Route {
 		public int compareTo(final Node other) {
 			return this.value < other.value ? 1 : (this.value > other.value ? -1 : 0);
 		}
+
+		public String toString() {
+			return this.node + "(" + this.value + ")";
+		}
 	}
 
 	/**
@@ -163,6 +175,7 @@ public class Route {
 	 */
 	private Route() {
 		this.graph = new HashMap<String, Collection<Edge>>();
+		this.route = new ArrayList<Shape>();
 	}
 
 	/**
@@ -183,18 +196,42 @@ public class Route {
 	/**
 	 * 最短経路
 	 */
-	private List<GeneralPath> route;
+	private List<Shape> route;
 
 	/**
 	 * 経路探索のための辺を1本追加します。
-	 * @param node1 頂点1
-	 * @param node2 頂点2
 	 * @param path 辺
 	 * @param category 辺の種類
 	 */
-	public void add(final String node1, final String node2, final GeneralPath path, final Category category) {
-		final Edge edge = new Edge(node1, node2, path, category);
-		for (final String node : new String[] { node1, node2 }) {
+	public void add(final Shape path, final Category category) {
+		Point2D first = null;
+		Point2D last = null;
+		final PathIterator iterator = path.getPathIterator(new AffineTransform());
+		while (!iterator.isDone()) {
+			float[] coords = new float[6];
+			final int type = iterator.currentSegment(coords);
+			if (type == PathIterator.SEG_MOVETO || type == PathIterator.SEG_LINETO) {
+				if (first == null) {
+					first = new Point2D.Double(coords[0], coords[1]);
+				} else {
+					last = new Point2D.Double(coords[0], coords[1]);
+				}
+			}
+			iterator.next();
+		}
+		this.add(Route.toString(first), Route.toString(last), path, category);
+	}
+
+	/**
+	 * 経路探索のための辺を1本追加します。
+	 * @param first 頂点1
+	 * @param last 頂点2
+	 * @param path 辺
+	 * @param category 辺の種類
+	 */
+	public void add(final String first, final String last, final Shape path, final Category category) {
+		final Edge edge = new Edge(first, last, path, category);
+		for (final String node : new String[] { first, last }) {
 			if (!this.graph.containsKey(node)) {
 				this.graph.put(node, new HashSet<Edge>());
 			}
@@ -221,7 +258,7 @@ public class Route {
 	/**
 	 * @return 最短経路
 	 */
-	public List<GeneralPath> getRoute() {
+	public List<Shape> getRoute() {
 		if (this.route.isEmpty()) {
 			this.calcRoute();
 		}
@@ -231,20 +268,29 @@ public class Route {
 	/**
 	 * 最短経路を求め、フィールドに記憶します。
 	 */
-	private void calcRoute() {
+	public void calcRoute() {
 		this.route.clear();
 		if (this.start == null || this.goal == null || !this.graph.containsKey(this.start)
 				|| !this.graph.containsKey(this.goal)) {
 			return;
 		}
+		final Map<String, Edge> parents = new HashMap<String, Edge>();
+		final Map<String, Node> nodes = new HashMap<String, Node>();
 		final Set<Edge> doneEdges = new HashSet<Edge>();
 		final Set<String> doneNodes = new HashSet<String>();
 		final PriorityQueue<Node> queue = new PriorityQueue<Node>();
 		queue.add(new Node(this.start, 0));
 		while (!queue.isEmpty()) {
+//			System.out.printf("queue = %s, doneNodes = %s, doneEdges = %s\n", queue, doneNodes, doneEdges);
 			final Node node = queue.poll();
-			if (node.node == goal) {
-				// TODO 親をたどって経路を表示する。
+//			System.out.println("polled " + node);
+			if (node.node.equals(goal)) {
+				String node2 = goal;
+				while (parents.containsKey(node2)) {
+					final Edge edge = parents.get(node2);
+					this.route.add(edge.path);
+					node2 = (edge.first == node2) ? edge.last : edge.first;
+				}
 				break;
 			}
 			doneNodes.add(node.node);
@@ -253,12 +299,26 @@ public class Route {
 			}
 			for (final Edge edge : this.graph.get(node.node)) {
 				doneEdges.add(edge);
-				for (final String node2 : new String[] { edge.node1, edge.node2 }) {
-					// TODO 値の更新は未実装。
-					if (!doneEdges.contains(node2)) {
-						// TODO とりあえず外接長方形の長い方を辺の長さとしてみる。
-						queue.add(new Node(node2, node.value
-								+ Math.max(edge.path.getBounds2D().getWidth(), edge.path.getBounds2D().getHeight())));
+				for (final String node2 : new String[] { edge.first, edge.last }) {
+					// TODO とりあえず始点終点間の直線距離を長さとしてみる。
+					final double length = Route.toPoint(edge.first).distance(Route.toPoint(edge.last));
+					if (!doneNodes.contains(node2)) {
+						if (nodes.containsKey(node2) && queue.contains(nodes.get(node2))) {
+							final Node node3 = nodes.get(node2);
+							if (node3.value > node.value + length) {
+								node3.value = node.value + length;
+								queue.remove(node3);
+								queue.add(node3);
+								parents.put(node2, edge);
+//								System.out.println("removed and added " + node3);
+							}
+						} else {
+							final Node node3 = new Node(node2, node.value + length);
+							nodes.put(node2, node3);
+							queue.add(node3);
+							parents.put(node2, edge);
+//							System.out.println("added " + node3);
+						}
 					}
 				}
 			}
@@ -295,6 +355,49 @@ public class Route {
 	 */
 	public void setStart(final String start) {
 		this.start = start;
+	}
+
+	/**
+	 * @param point 点
+	 * @return 文字列表現
+	 */
+	public static String toString(final Point2D point) {
+		return ((int) point.getX()) / 100 * 100 + "_" + ((int) point.getY()) / 100 * 100;
+	}
+
+	/**
+	 * @param string 文字列表現
+	 * @return 点
+	 */
+	public static Point2D toPoint(final String string) {
+		final String[] items = string.split("_");
+		return new Point2D.Double(Double.parseDouble(items[0]), Double.parseDouble(items[1]));
+	}
+
+	/**
+	 * @param point 点
+	 * @return 最近傍ノード
+	 */
+	public String getNearestNode(final Point2D point) {
+		String ret = null;
+		double minDistance = Double.POSITIVE_INFINITY;
+		for (final String node : this.graph.keySet()) {
+			final Point2D point2 = Route.toPoint(node);
+			final double distance = point.distanceSq(point2);
+			if (distance < minDistance) {
+				ret = node;
+				minDistance = distance;
+			}
+		}
+		return ret;
+	}
+
+	public Collection<Point2D> getNodes() {
+		final Collection<Point2D> ret = new ArrayList<Point2D>();
+		for (final String node : this.graph.keySet()) {
+			ret.add(Route.toPoint(node));
+		}
+		return ret;
 	}
 
 }

@@ -57,6 +57,8 @@ import map.KsjRailway.Station;
 import org.apache.batik.svggen.SVGGraphics2DIOException;
 
 import psout.PSOut;
+import route.Route;
+import route.Route.Category;
 import search.Search;
 import svgout.Paintable;
 import svgout.SVGOut;
@@ -263,6 +265,27 @@ public class MapPanel extends JPanel implements Printable {
 			@Override
 			public void mouseReleased(final MouseEvent e) {
 				MapPanel.this.isAntialias = true;
+				// test 5.03
+				if (e.getModifiers() == 17) { // Shift + Button1
+					final Point2D point = toVirtualLocation(new Point2D.Double(e.getX(), e.getY()));
+					if (MapPanel.this.prefectures != null) {
+						if (MapPanel.this.zoom < Const.Zoom.LOAD_ALL
+								&& Const.Zoom.LOAD_FINE_CITIES <= MapPanel.this.zoom) {
+							Route.getInstance().clear();
+							for (final Prefecture prefecture : MapPanel.this.prefectures) {
+								for (final Railway railway : prefecture.getKsjRailwayCurves()) {
+									Route.getInstance().add(railway.getShape(), Category.UNKNOWN);
+								}
+							}
+						}
+					}
+					Route.getInstance().setStart(Route.getInstance().getNearestNode(point));
+					Route.getInstance().calcRoute();
+				} else if (e.getModifiers() == 18) { // Ctrl + Button1
+					final Point2D point = toVirtualLocation(new Point2D.Double(e.getX(), e.getY()));
+					Route.getInstance().setGoal(Route.getInstance().getNearestNode(point));
+					Route.getInstance().calcRoute();
+				}
 			}
 
 		});
@@ -757,6 +780,40 @@ public class MapPanel extends JPanel implements Printable {
 		// 国土数値情報の鉄道の文字列を描画する
 		if (zoom < Const.Zoom.LOAD_ALL && zoom >= Const.Zoom.LOAD_FINE_CITIES) {
 			drawKsjRailwayCurveLabels(g, visibleRectangle, zoom, offsetX, offsetY);
+		}
+		// test 5.03 最短経路探索の探索結果、始点、終点を描画してみる。
+		for (final boolean is1st : new boolean[] { true, false }) {
+			for (final Shape shape : Route.getInstance().getRoute()) {
+				if (is1st) {
+					g.setStroke(new BasicStroke(2f));
+					g.setColor(Color.BLACK);
+				} else {
+					g.setStroke(new BasicStroke(1f));
+					g.setColor(Color.YELLOW);
+				}
+				final AffineTransform transform = new AffineTransform();
+				transform.translate(-this.offsetX, -this.offsetY);
+				transform.scale(this.zoom, this.zoom);
+				this.draw(g, shape, false, transform);
+			}
+		}
+		for (final Point2D point : Route.getInstance().getNodes()) {
+			final Point2D realPoint = toRealLocation(point);
+			final Ellipse2D ellipse = new Ellipse2D.Double(realPoint.getX() - 3, realPoint.getY() - 3, 6, 6);
+			g.setColor(Color.GRAY);
+			g.fill(ellipse);
+			
+		}
+		for (final String string : new String[] { Route.getInstance().getStart(), Route.getInstance().getGoal() }) {
+			if (string != null) {
+				final Point2D point = toRealLocation(Route.toPoint(string));
+				final Ellipse2D ellipse = new Ellipse2D.Double(point.getX() - 3, point.getY() - 3, 6, 6);
+				g.setStroke(new BasicStroke(1f));
+				g.setColor(string == Route.getInstance().getStart() ? Color.GREEN : Color.RED);
+				g.fill(ellipse);
+				g.setColor(Color.BLACK);
+				g.draw(ellipse);
+			}
 		}
 	}
 
