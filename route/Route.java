@@ -162,7 +162,7 @@ public class Route {
 		}
 
 		public int compareTo(final Node other) {
-			return this.value < other.value ? 1 : (this.value > other.value ? -1 : 0);
+			return this.value < other.value ? -1 : (this.value > other.value ? 1 : 0);
 		}
 
 		public String toString() {
@@ -362,7 +362,7 @@ public class Route {
 	 * @return 文字列表現
 	 */
 	public static String toString(final Point2D point) {
-		return ((int) point.getX()) / 100 * 100 + "_" + ((int) point.getY()) / 100 * 100;
+		return ((int) point.getX()) / 10 * 10 + "_" + ((int) point.getY()) / 10 * 10;
 	}
 
 	/**
@@ -388,14 +388,6 @@ public class Route {
 				ret = node;
 				minDistance = distance;
 			}
-		}
-		return ret;
-	}
-
-	public Collection<Point2D> getNodes() {
-		final Collection<Point2D> ret = new ArrayList<Point2D>();
-		for (final String node : this.graph.keySet()) {
-			ret.add(Route.toPoint(node));
 		}
 		return ret;
 	}

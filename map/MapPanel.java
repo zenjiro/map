@@ -785,10 +785,10 @@ public class MapPanel extends JPanel implements Printable {
 		for (final boolean is1st : new boolean[] { true, false }) {
 			for (final Shape shape : Route.getInstance().getRoute()) {
 				if (is1st) {
-					g.setStroke(new BasicStroke(2f));
-					g.setColor(Color.BLACK);
+					g.setStroke(new BasicStroke(6f));
+					g.setColor(Color.YELLOW.darker());
 				} else {
-					g.setStroke(new BasicStroke(1f));
+					g.setStroke(new BasicStroke(4f));
 					g.setColor(Color.YELLOW);
 				}
 				final AffineTransform transform = new AffineTransform();
@@ -796,13 +796,6 @@ public class MapPanel extends JPanel implements Printable {
 				transform.scale(this.zoom, this.zoom);
 				this.draw(g, shape, false, transform);
 			}
-		}
-		for (final Point2D point : Route.getInstance().getNodes()) {
-			final Point2D realPoint = toRealLocation(point);
-			final Ellipse2D ellipse = new Ellipse2D.Double(realPoint.getX() - 3, realPoint.getY() - 3, 6, 6);
-			g.setColor(Color.GRAY);
-			g.fill(ellipse);
-			
 		}
 		for (final String string : new String[] { Route.getInstance().getStart(), Route.getInstance().getGoal() }) {
 			if (string != null) {
