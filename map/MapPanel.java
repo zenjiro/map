@@ -7,6 +7,7 @@ import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -26,7 +27,9 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
 import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -273,10 +276,27 @@ public class MapPanel extends JPanel implements Printable {
 								&& Const.Zoom.LOAD_FINE_CITIES <= MapPanel.this.zoom) {
 							Route.getInstance().clear();
 							for (final Prefecture prefecture : MapPanel.this.prefectures) {
-								for (final Railway railway : prefecture.getKsjRailwayCurves()) {
+								for (final Railway railway : prefecture.hasFineRoad() ? prefecture.getKsjFineRoad()
+										: prefecture.getKsjRailwayCurves()) {
 									Route.getInstance().add(railway.getShape(), Category.UNKNOWN);
 								}
 							}
+						}
+					}
+					if (MapPanel.this.maps != null) {
+						try {
+							if (MapPanel.this.zoom >= Const.Zoom.LOAD_ALL) {
+								Route.getInstance().clear();
+								for (final MapData mapData : MapPanel.this.maps.values()) {
+									if (mapData.hasRoadArc() && mapData.hasTyome()) {
+										for (final ArcData arc : mapData.getRoadArc().values()) {
+											Route.getInstance().add(arc.getPath(), Category.UNKNOWN);
+										}
+									}
+								}
+							}
+						} catch (IOException exception) {
+							exception.printStackTrace();
 						}
 					}
 					Route.getInstance().setStart(Route.getInstance().getNearestNode(point));

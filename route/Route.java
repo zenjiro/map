@@ -6,6 +6,7 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Formatter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -281,9 +282,9 @@ public class Route {
 		final PriorityQueue<Node> queue = new PriorityQueue<Node>();
 		queue.add(new Node(this.start, 0));
 		while (!queue.isEmpty()) {
-//			System.out.printf("queue = %s, doneNodes = %s, doneEdges = %s\n", queue, doneNodes, doneEdges);
+			//			System.out.printf("queue = %s, doneNodes = %s, doneEdges = %s\n", queue, doneNodes, doneEdges);
 			final Node node = queue.poll();
-//			System.out.println("polled " + node);
+			//			System.out.println("polled " + node);
 			if (node.node.equals(goal)) {
 				String node2 = goal;
 				while (parents.containsKey(node2)) {
@@ -310,14 +311,14 @@ public class Route {
 								queue.remove(node3);
 								queue.add(node3);
 								parents.put(node2, edge);
-//								System.out.println("removed and added " + node3);
+								//								System.out.println("removed and added " + node3);
 							}
 						} else {
 							final Node node3 = new Node(node2, node.value + length);
 							nodes.put(node2, node3);
 							queue.add(node3);
 							parents.put(node2, edge);
-//							System.out.println("added " + node3);
+							//							System.out.println("added " + node3);
 						}
 					}
 				}
@@ -362,7 +363,7 @@ public class Route {
 	 * @return 文字列表現
 	 */
 	public static String toString(final Point2D point) {
-		return ((int) point.getX()) / 10 * 10 + "_" + ((int) point.getY()) / 10 * 10;
+		return (int) (point.getX() + .5) + "_" + (int) (point.getY() + .5);
 	}
 
 	/**
