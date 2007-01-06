@@ -9,7 +9,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -102,24 +101,20 @@ class FixAttributeLocation {
 					.getFont());
 			final double captionHeight = metrics.getHeight() / zoom;
 			final Collection<String> fixedCaptions = new HashSet<String>();
-			final Collection<Railway> fixedRailways = new HashSet<Railway>();
 			for (final Prefecture prefecture : panel.getPrefectures()) {
 				for (final Railway railway : prefecture.getKsjRailwayCurves()) {
 					fixKsjRailwayAttributeLocation(railway, search, visibleRectangle, zoom, metrics, captionHeight,
-							fixedCaptions, fixedRailways, false);
-					if (prefecture.hasCities()) {
+							fixedCaptions, false);
+				}
+				if (prefecture.hasCities()) {
 						for (final City city : prefecture.getCities()) {
-							try {
-								if (city.hasKsjFineRoad()) {
-									for (final Railway road : city.getKsjFineRoad()) {
-										fixKsjRailwayAttributeLocation(road, search, visibleRectangle, zoom, metrics,
-												captionHeight, fixedCaptions, fixedRailways, true);
-									}
+							if (city.hasKsjFineRoad()) {
+								for (final Railway road : city.getKsjFineRoad()) {
+									fixKsjRailwayAttributeLocation(road, search, visibleRectangle, zoom, metrics,
+											captionHeight, fixedCaptions, true);
 								}
-							} catch (final ConcurrentModificationException exception) {
 							}
 						}
-					}
 				}
 			}
 		}
@@ -350,16 +345,12 @@ class FixAttributeLocation {
 	 * @param metrics フォントメトリクス
 	 * @param captionHeight 文字列の高さ
 	 * @param fixedCaptions 決定済みの文字列
-	 * @param fixedRailways 決定済みの鉄道データ
 	 * @param isFast 急ぐかどうか
 	 */
 	private void fixKsjRailwayAttributeLocation(final Railway curve, final Search search,
 			final Rectangle2D visibleRectangle, final double zoom, final FontMetrics metrics,
-			final double captionHeight, final Collection<String> fixedCaptions,
-			final Collection<Railway> fixedRailways, final boolean isFast) {
-		if (!fixedRailways.contains(curve)) {
-			curve.setCaptionLocation(null);
-		}
+			final double captionHeight, final Collection<String> fixedCaptions, final boolean isFast) {
+		curve.setCaptionLocation(null);
 		if (!fixedCaptions.contains(curve.getCaption())) {
 			final double captionWidth = metrics.stringWidth(curve.getCaption()) / zoom;
 			final PathIterator iterator = curve.getShape().getPathIterator(new AffineTransform());
@@ -374,7 +365,6 @@ class FixAttributeLocation {
 					if (visibleRectangle.contains(captionRectangle) && search.search(captionRectangle).isEmpty()) {
 						curve.setCaptionLocation(new Point2D.Double(x - captionWidth / 2, y));
 						fixedCaptions.add(curve.getCaption());
-						fixedRailways.add(curve);
 						search.insert(captionRectangle, null);
 						break;
 					}

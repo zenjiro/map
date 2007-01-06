@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 
 import ksj.ShapeIO;
@@ -110,7 +111,7 @@ public class City {
 		this.url = url;
 		this.prefecture = prefecture;
 		this.isjLabels = new ConcurrentHashMap<Point2D, String>();
-		this.ksjFineRoad = new ArrayList<Railway>();
+		this.ksjFineRoad = new ConcurrentLinkedQueue<Railway>();
 	}
 
 	/**
@@ -251,12 +252,11 @@ public class City {
 
 	/**
 	 * 店舗の一覧を読み込みます。
-	 * @throws IOException 
 	 * @throws ExecutionException 
 	 * @throws InterruptedException 
 	 * @since 3.16
 	 */
-	public void loadShops() throws IOException, InterruptedException, ExecutionException {
+	public void loadShops() throws InterruptedException, ExecutionException {
 		this.shops = new ArrayList<PointData>();
 		final Map<String, Point2D> tempIsj = new ConcurrentHashMap<String, Point2D>();
 		for (final Map.Entry<String, Point2D> entry4 : this.isj.entrySet()) {
@@ -316,10 +316,9 @@ public class City {
 	public void loadKsjFineRoad() {
 		if (this.ksjFineRoad.isEmpty()) {
 			final InputStream in = City.class.getResourceAsStream(Const.DIR + Const.Ksj.ROAD_FINE_PREFIX + this.id
-										+ Const.Ksj.ROAD_SUFFIX);
+					+ Const.Ksj.ROAD_SUFFIX);
 			if (in != null) {
-				for (final Map.Entry<Shape, String> entry : ShapeIO.readShapes(
-						in).entrySet()) {
+				for (final Map.Entry<Shape, String> entry : ShapeIO.readShapes(in).entrySet()) {
 					this.ksjFineRoad.add(new Railway(entry.getKey(), entry.getValue()));
 				}
 			}

@@ -37,7 +37,7 @@ public class CellSearch implements Search {
          * @param shape オブジェクト
          * @param label ラベル
          */
-        private Entry(final Shape shape, final String label) {
+        Entry(final Shape shape, final String label) {
             this.shape = shape;
             this.label = label;
         }

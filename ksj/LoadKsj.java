@@ -1,11 +1,8 @@
 package ksj;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.Point;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
@@ -19,12 +16,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.swing.JFrame;
-import javax.swing.WindowConstants;
 
 import map.MapPanel;
 import map.UTMUtil;
