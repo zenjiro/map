@@ -141,7 +141,6 @@ public class SearchPanel extends JPanel {
 				} else {
 					panel.zoomWide();
 				}
-				panel.repaint();
 			}
 		});
 	}

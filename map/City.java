@@ -6,6 +6,7 @@ import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,6 +14,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
+import ksj.ShapeIO;
+import map.KsjRailway.Railway;
 import shop.Shop;
 
 /**
@@ -83,6 +86,12 @@ public class City {
 	private final MapPanel panel;
 
 	/**
+	 * 高精度の国土数値情報の道路データ
+	 * @since 5.04
+	 */
+	private Collection<Railway> ksjFineRoad;
+
+	/**
 	 * 市区町村を初期化します。
 	 * @param shape 領域
 	 * @param label 市区町村名
@@ -101,6 +110,7 @@ public class City {
 		this.url = url;
 		this.prefecture = prefecture;
 		this.isjLabels = new ConcurrentHashMap<Point2D, String>();
+		this.ksjFineRoad = new ArrayList<Railway>();
 	}
 
 	/**
@@ -253,8 +263,8 @@ public class City {
 			tempIsj.put(entry4.getKey().replaceAll(",", ""), entry4.getValue());
 		}
 		// since 4.07
-		final Map<Point2D, String> points = new Shop().getShops(this.id, this.label, this.prefecture,
-				this.isj, this.panel);
+		final Map<Point2D, String> points = new Shop().getShops(this.id, this.label, this.prefecture, this.isj,
+				this.panel);
 		for (final Map.Entry<Point2D, String> entry : points.entrySet()) {
 			final Point2D point = entry.getKey();
 			final String attribute = entry.getValue();
@@ -272,4 +282,48 @@ public class City {
 	public String getPrefecture() {
 		return this.prefecture;
 	}
+
+	/**
+	 * 高精度の道路データを開放します。
+	 * @since 5.04
+	 */
+	public void freeKsjFineRoad() {
+		if (!this.ksjFineRoad.isEmpty()) {
+			this.ksjFineRoad.clear();
+		}
+	}
+
+	/**
+	 * @return 高精度の国土数値情報の道路データ
+	 * @since 5.04
+	 */
+	public Collection<Railway> getKsjFineRoad() {
+		return this.ksjFineRoad;
+	}
+
+	/**
+	 * @return 高精度の国土数値情報の道路データを持っているかどうか
+	 * @since 5.04
+	 */
+	public boolean hasKsjFineRoad() {
+		return !this.ksjFineRoad.isEmpty();
+	}
+
+	/**
+	 * 高精度な国土数値情報の道路データを読み込みます。
+	 * @since 5.04
+	 */
+	public void loadKsjFineRoad() {
+		if (this.ksjFineRoad.isEmpty()) {
+			final InputStream in = City.class.getResourceAsStream(Const.DIR + Const.Ksj.ROAD_FINE_PREFIX + this.id
+										+ Const.Ksj.ROAD_SUFFIX);
+			if (in != null) {
+				for (final Map.Entry<Shape, String> entry : ShapeIO.readShapes(
+						in).entrySet()) {
+					this.ksjFineRoad.add(new Railway(entry.getKey(), entry.getValue()));
+				}
+			}
+		}
+	}
+
 }

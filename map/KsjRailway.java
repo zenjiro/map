@@ -159,7 +159,7 @@ public class KsjRailway {
 				} else if (this.caption.startsWith("国道")) {
 					this.business = Business.ROAD_KOKUDO;
 				} else {
-					this.business= Business.ROAD_MAJOR;
+					this.business = Business.ROAD_MAJOR;
 				}
 			} else {
 				throw new IllegalArgumentException(
@@ -186,7 +186,7 @@ public class KsjRailway {
 		 * 表記
 		 */
 		String caption;
-		
+
 		/**
 		 * 文字列の描画位置
 		 */
@@ -270,7 +270,8 @@ public class KsjRailway {
 		}
 
 		public String toString() {
-			return "[" + super.classification + ", " + super.business + ", " + super.caption + ", " + this.station + "]";
+			return "[" + super.classification + ", " + super.business + ", " + super.caption + ", " + this.station
+					+ "]";
 		}
 	}
 

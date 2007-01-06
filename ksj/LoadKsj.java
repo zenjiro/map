@@ -369,18 +369,17 @@ public class LoadKsj {
 	 */
 	public static void main(final String[] args) throws UnsupportedEncodingException,
 		FileNotFoundException {
-		final JFrame frame = new JFrame("テスト");
-		final ShapePanel panel = new ShapePanel();
-		final Random random = new Random();
-		final Font font = new Font("MS Gothic", Font.PLAIN, 1000);
-		final File file = new File("/home/kumano/ksj");
-		//		final Map<Shape, String> tyome = LoadMap.loadShapes(file, args.length > 0 ? args[0]
-		//				: "N03-11A-2K_(24|25|26|27|28|29|30)\\.txt", true);
-		final Map<Shape, String> tyome = LoadKsj.loadShapes(file, args.length > 0 ? args[0]
-			: "N03-11A-2K_[0-9][0-9]\\.txt", true);
-		final Map<Shape, String> allCityShapes = new ConcurrentHashMap<Shape, String>();
+//		final JFrame frame = new JFrame("テスト");
+//		final ShapePanel panel = new ShapePanel();
+//		final Random random = new Random();
+//		final Font font = new Font("MS Gothic", Font.PLAIN, 1000);
+		final File file = new File("../../../../ksj");
+//		final String pattern = "N03-11A-2K_(24|25|26|27|28|29|30)\\.txt";
+		final String pattern = "N03-11A-2K_[0-9][0-9]\\.txt";
+		final Map<Shape, String> tyome = LoadKsj.loadShapes(file, args.length > 0 ? args[0] : pattern, false);
+//		final Map<Shape, String> allCityShapes = new ConcurrentHashMap<Shape, String>();
 		final Map<String, Map<Shape, String>> cities = new ConcurrentHashMap<String, Map<Shape, String>>();
-		final Map<String, Area> prefectures = new ConcurrentHashMap<String, Area>();
+//		final Map<String, Area> prefectures = new ConcurrentHashMap<String, Area>();
 		for (final Map.Entry<Shape, String> entry : tyome.entrySet()) {
 			final Shape shape = entry.getKey();
 			final GeneralPath path = new GeneralPath();
@@ -407,45 +406,45 @@ public class LoadKsj {
 			}
 			final String prefecture = entry.getValue().split("_")[0] + "_"
 				+ entry.getValue().split("_")[1];
-			if (prefectures.containsKey(prefecture)) {
-				prefectures.get(prefecture).add(new Area(path));
-			} else {
-				prefectures.put(prefecture, new Area(path));
-			}
+//			if (prefectures.containsKey(prefecture)) {
+//				prefectures.get(prefecture).add(new Area(path));
+//			} else {
+//				prefectures.put(prefecture, new Area(path));
+//			}
 			if (!cities.containsKey(prefecture)) {
 				cities.put(prefecture, new ConcurrentHashMap<Shape, String>());
 			}
 			cities.get(prefecture).put(path, entry.getValue());
-			panel.add(path);
-			panel.setFillColor(path, new Color(1 - random.nextFloat() / 5,
-				1 - random.nextFloat() / 5, 1 - random.nextFloat() / 5));
-			panel.setLabel(path, entry.getValue());
-			panel.setFont(path, font);
-			allCityShapes.put(path, entry.getValue());
+//			panel.add(path);
+//			panel.setFillColor(path, new Color(1 - random.nextFloat() / 5,
+//				1 - random.nextFloat() / 5, 1 - random.nextFloat() / 5));
+//			panel.setLabel(path, entry.getValue());
+//			panel.setFont(path, font);
+//			allCityShapes.put(path, entry.getValue());
 		}
-		final Map<Shape, String> prefectureShapes = new ConcurrentHashMap<Shape, String>();
-		for (final Map.Entry<String, Area> entry : prefectures.entrySet()) {
-			final Shape shape = entry.getValue();
-			//			panel.add(shape);
-			panel.setFillColor(shape, new Color(1 - random.nextFloat() / 5,
-				1 - random.nextFloat() / 5, 1 - random.nextFloat() / 5));
-			panel.setLabel(shape, entry.getKey());
-			panel.setFont(shape, font);
-			prefectureShapes.put(shape, entry.getKey());
-		}
-		frame.add(panel);
-		frame.setLocationByPlatform(true);
-		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		frame.setSize(800, 600);
-		frame.setVisible(true);
+//		final Map<Shape, String> prefectureShapes = new ConcurrentHashMap<Shape, String>();
+//		for (final Map.Entry<String, Area> entry : prefectures.entrySet()) {
+//			final Shape shape = entry.getValue();
+//			//			panel.add(shape);
+//			panel.setFillColor(shape, new Color(1 - random.nextFloat() / 5,
+//				1 - random.nextFloat() / 5, 1 - random.nextFloat() / 5));
+//			panel.setLabel(shape, entry.getKey());
+//			panel.setFont(shape, font);
+//			prefectureShapes.put(shape, entry.getKey());
+//		}
+//		frame.add(panel);
+//		frame.setLocationByPlatform(true);
+//		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+//		frame.setSize(800, 600);
+//		frame.setVisible(true);
 		// test
-		ShapeIO.writeShape(prefectureShapes, new FileOutputStream(new File("prefectures.csv")));
-		for (final Map.Entry<Shape, String> entry : prefectureShapes.entrySet()) {
-			final Map<Shape, String> map = new ConcurrentHashMap<Shape, String>();
-			map.put(entry.getKey(), entry.getValue());
-			final String id = entry.getValue().substring(0, 2);
-			ShapeIO.writeShape(map, new FileOutputStream(new File("prefecture_" + id + ".csv")));
-		}
+//		ShapeIO.writeShape(prefectureShapes, new FileOutputStream(new File("prefectures.csv")));
+//		for (final Map.Entry<Shape, String> entry : prefectureShapes.entrySet()) {
+//			final Map<Shape, String> map = new ConcurrentHashMap<Shape, String>();
+//			map.put(entry.getKey(), entry.getValue());
+//			final String id = entry.getValue().substring(0, 2);
+//			ShapeIO.writeShape(map, new FileOutputStream(new File("prefecture_" + id + ".csv")));
+//		}
 		for (final Map.Entry<String, Map<Shape, String>> entry : cities.entrySet()) {
 			final String id = entry.getKey().substring(0, 2);
 			ShapeIO.writeShape(entry.getValue(), new FileOutputStream(new File("cities_" + id

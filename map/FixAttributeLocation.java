@@ -9,6 +9,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -24,8 +25,9 @@ import search.Search;
  * 作成日: 2004/01/16
  */
 class FixAttributeLocation {
-	
-	/** 属性を描画する座標を決定します。
+
+	/**
+	 * 属性を描画する座標を決定します。
 	 * @param maps 地図
 	 * @param prefectures 都道府県の一覧
 	 * @param panel パネル
@@ -100,29 +102,22 @@ class FixAttributeLocation {
 					.getFont());
 			final double captionHeight = metrics.getHeight() / zoom;
 			final Collection<String> fixedCaptions = new HashSet<String>();
+			final Collection<Railway> fixedRailways = new HashSet<Railway>();
 			for (final Prefecture prefecture : panel.getPrefectures()) {
-				for (final Railway curve : prefecture.getKsjRailwayCurves()) {
-					curve.setCaptionLocation(null);
-					if (!fixedCaptions.contains(curve.getCaption())) {
-						final double captionWidth = metrics.stringWidth(curve.getCaption()) / zoom;
-						final PathIterator iterator = curve.getShape().getPathIterator(new AffineTransform());
-						final double[] coords = new double[6];
-						while (!iterator.isDone()) {
-							final int segment = iterator.currentSegment(coords);
-							if (segment == PathIterator.SEG_LINETO) {
-								final double x = coords[0];
-								final double y = coords[1];
-								final Rectangle2D captionRectangle = new Rectangle2D.Double(x - captionWidth / 2, y
-										- captionHeight, captionWidth, captionHeight);
-								if (visibleRectangle.contains(captionRectangle)
-										&& search.search(captionRectangle).isEmpty()) {
-									curve.setCaptionLocation(new Point2D.Double(x - captionWidth / 2, y));
-									fixedCaptions.add(curve.getCaption());
-									search.insert(captionRectangle, null);
-									break;
+				for (final Railway railway : prefecture.getKsjRailwayCurves()) {
+					fixKsjRailwayAttributeLocation(railway, search, visibleRectangle, zoom, metrics, captionHeight,
+							fixedCaptions, fixedRailways, false);
+					if (prefecture.hasCities()) {
+						for (final City city : prefecture.getCities()) {
+							try {
+								if (city.hasKsjFineRoad()) {
+									for (final Railway road : city.getKsjFineRoad()) {
+										fixKsjRailwayAttributeLocation(road, search, visibleRectangle, zoom, metrics,
+												captionHeight, fixedCaptions, fixedRailways, true);
+									}
 								}
+							} catch (final ConcurrentModificationException exception) {
 							}
-							iterator.next();
 						}
 					}
 				}
@@ -342,6 +337,49 @@ class FixAttributeLocation {
 						}
 					}
 				}
+			}
+		}
+	}
+
+	/**
+	 * 国土数値情報の鉄道、道路データのラベル配置を行います。
+	 * @param curve 曲線
+	 * @param search 検索エンジン
+	 * @param visibleRectangle 表示されている長方形
+	 * @param zoom 表示倍率
+	 * @param metrics フォントメトリクス
+	 * @param captionHeight 文字列の高さ
+	 * @param fixedCaptions 決定済みの文字列
+	 * @param fixedRailways 決定済みの鉄道データ
+	 * @param isFast 急ぐかどうか
+	 */
+	private void fixKsjRailwayAttributeLocation(final Railway curve, final Search search,
+			final Rectangle2D visibleRectangle, final double zoom, final FontMetrics metrics,
+			final double captionHeight, final Collection<String> fixedCaptions,
+			final Collection<Railway> fixedRailways, final boolean isFast) {
+		if (!fixedRailways.contains(curve)) {
+			curve.setCaptionLocation(null);
+		}
+		if (!fixedCaptions.contains(curve.getCaption())) {
+			final double captionWidth = metrics.stringWidth(curve.getCaption()) / zoom;
+			final PathIterator iterator = curve.getShape().getPathIterator(new AffineTransform());
+			final double[] coords = new double[6];
+			while (!iterator.isDone()) {
+				final int segment = iterator.currentSegment(coords);
+				if (segment == (isFast ? PathIterator.SEG_MOVETO : PathIterator.SEG_LINETO)) {
+					final double x = coords[0];
+					final double y = coords[1];
+					final Rectangle2D captionRectangle = new Rectangle2D.Double(x - captionWidth / 2,
+							y - captionHeight, captionWidth, captionHeight);
+					if (visibleRectangle.contains(captionRectangle) && search.search(captionRectangle).isEmpty()) {
+						curve.setCaptionLocation(new Point2D.Double(x - captionWidth / 2, y));
+						fixedCaptions.add(curve.getCaption());
+						fixedRailways.add(curve);
+						search.insert(captionRectangle, null);
+						break;
+					}
+				}
+				iterator.next();
 			}
 		}
 	}

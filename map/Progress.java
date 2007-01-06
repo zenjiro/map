@@ -21,12 +21,12 @@ public class Progress {
 	/**
 	 * プログレスバー
 	 */
-	private JProgressBar progressBar;
+	JProgressBar progressBar;
 
 	/**
 	 * プログレスバーの値
 	 */
-	private int value;
+	int value;
 
 	/**
 	 * 非公開のコンストラクタ
@@ -86,7 +86,7 @@ public class Progress {
 	/**
 	 * プログレスバーが動き始めた時刻
 	 */
-	private long startTime;
+	long startTime;
 
 	/**
 	 * プログレスバーを完了状態にします。
@@ -153,7 +153,7 @@ public class Progress {
 	/**
 	 * 状態
 	 */
-	private Status status;
+	Status status;
 
 	/**
 	 * @param status 状態

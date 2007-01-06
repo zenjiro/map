@@ -97,7 +97,7 @@ public class Const {
 		 * 道路データの接頭語
 		 * @since 5.01
 		 */
-		public static final String ROAD_FINE_PREFIX = "ksj_road_";
+		public static final String ROAD_FINE_PREFIX = "ksj_road_city_";
 
 		/**
 		 * 簡略化した道路データの接頭語
@@ -326,7 +326,7 @@ public class Const {
 		/**
 		 * ビットマップキャッシュの接頭辞
 		 */
-		public static final String PREFIX = "bitmap_5.02_";
+		public static final String PREFIX = "bitmap_5.04_";
 	}
 
 	/**

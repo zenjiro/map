@@ -6,7 +6,6 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Formatter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -100,21 +99,22 @@ public class Route {
 		/**
 		 * 頂点1
 		 */
-		private String first;
+		String first;
 
 		/**
 		 * 頂点2
 		 */
-		private String last;
+		String last;
 
 		/**
 		 * 辺
 		 */
-		private Shape path;
+		Shape path;
 
 		/**
 		 * 辺の種類
 		 */
+		@SuppressWarnings("unused")
 		private Category category;
 
 		/**
@@ -145,12 +145,12 @@ public class Route {
 		/**
 		 * 頂点
 		 */
-		private String node;
+		String node;
 
 		/**
 		 * 値
 		 */
-		private double value;
+		double value;
 
 		/**
 		 * コンストラクタです。
@@ -285,8 +285,8 @@ public class Route {
 			//			System.out.printf("queue = %s, doneNodes = %s, doneEdges = %s\n", queue, doneNodes, doneEdges);
 			final Node node = queue.poll();
 			//			System.out.println("polled " + node);
-			if (node.node.equals(goal)) {
-				String node2 = goal;
+			if (node.node.equals(this.goal)) {
+				String node2 = this.goal;
 				while (parents.containsKey(node2)) {
 					final Edge edge = parents.get(node2);
 					this.route.add(edge.path);
@@ -295,7 +295,7 @@ public class Route {
 				break;
 			}
 			doneNodes.add(node.node);
-			if (!graph.containsKey(node.node)) {
+			if (!this.graph.containsKey(node.node)) {
 				continue;
 			}
 			for (final Edge edge : this.graph.get(node.node)) {

@@ -61,7 +61,7 @@ public class ConvertRoadToCSV {
 	public static void main(final String[] args) throws UnsupportedEncodingException, FileNotFoundException {
 		final Map<String, String> attributes = new HashMap<String, String>();
 		{
-			final File file = new File("N01_07L_dl.txt");
+			final File file = new File("../../../../ksj/N01_07L_dl.txt");
 			final Scanner scanner = new Scanner(new InputStreamReader(new FileInputStream(file), "SJIS"));
 			while (scanner.hasNextLine()) {
 				final String line = scanner.nextLine();
@@ -79,7 +79,7 @@ public class ConvertRoadToCSV {
 		}
 
 		final Pattern pattern = Pattern.compile("N01-07L-2K-([0-9][0-9])\\.txt");
-		for (final File file : new File("").listFiles()) {
+		for (final File file : new File("../../../../ksj").listFiles()) {
 			final Matcher matcher = pattern.matcher(file.getName());
 			if (matcher.matches()) {
 				System.out.println(file);

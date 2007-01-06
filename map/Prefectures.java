@@ -37,47 +37,44 @@ public class Prefectures {
 	 * @throws ExecutionException 実行例外
 	 * @throws InterruptedException 割り込み例外
 	 */
-	public static boolean loadCities(final Collection<Prefecture> prefectures,
-		final MapPanel panel, final Map<String, MapData> maps, final LoadMap loadMap)
-		throws UnsupportedEncodingException, IOException, InterruptedException, ExecutionException {
+	public static boolean loadCities(final Collection<Prefecture> prefectures, final MapPanel panel,
+			final Map<String, MapData> maps, final LoadMap loadMap) throws UnsupportedEncodingException, IOException,
+			InterruptedException, ExecutionException {
 		boolean ret = false;
 		if (panel.getZoom() >= Zoom.LOAD_CITIES) {
 			Progress.getInstance().setLoadMapPaintTyomeProgress(0);
 			final Rectangle2D visibleRectangle = panel.getVisibleRectangle(false);
 			for (final Prefecture prefecture : prefectures) {
 				if (prefecture.getBounds().intersects(visibleRectangle)) {
-					final Shape shape = prefecture.hasFine() ? prefecture.getFineShape()
-						: prefecture.getShape();
+					final Shape shape = prefecture.hasFine() ? prefecture.getFineShape() : prefecture.getShape();
 					if (shape.intersects(visibleRectangle)) {
 						if (prefecture.hasCities()) {
 						} else {
 							if (!new File(Const.Ksj.CACHE_DIR).exists()) {
 								new File(Const.Ksj.CACHE_DIR).mkdirs();
 							}
-							final File textFile = new File(Const.Ksj.CACHE_DIR + File.separator
-								+ Const.Ksj.TXT_PREFIX + prefecture.getId() + Const.Ksj.TXT_SUFFIX);
-							final URL url = new URL(Const.Ksj.BASE_URL + Const.Ksj.ZIP_PREFIX
-								+ prefecture.getId() + Const.Ksj.ZIP_SUFFIX);
+							final File textFile = new File(Const.Ksj.CACHE_DIR + File.separator + Const.Ksj.TXT_PREFIX
+									+ prefecture.getId() + Const.Ksj.TXT_SUFFIX);
+							final URL url = new URL(Const.Ksj.BASE_URL + Const.Ksj.ZIP_PREFIX + prefecture.getId()
+									+ Const.Ksj.ZIP_SUFFIX);
 							if (textFile.exists()) {
 							} else {
 								final File cacheDir = new File(Const.Ksj.CACHE_DIR);
 								if (!cacheDir.exists()) {
 									cacheDir.mkdir();
 								}
-								final File file = new File(Const.Ksj.CACHE_DIR + File.separator
-									+ Const.Ksj.ZIP_PREFIX + prefecture.getId()
-									+ Const.Ksj.ZIP_SUFFIX);
+								final File file = new File(Const.Ksj.CACHE_DIR + File.separator + Const.Ksj.ZIP_PREFIX
+										+ prefecture.getId() + Const.Ksj.ZIP_SUFFIX);
 								file.createNewFile();
 								panel.addMessage(url + "をダウンロードしています。");
 								WebUtilities.copy(url.openStream(), new FileOutputStream(file));
 								final ZipFile zipFile = new ZipFile(file);
-								for (final Enumeration<? extends ZipEntry> enumeration = zipFile
-									.entries(); enumeration.hasMoreElements();) {
+								for (final Enumeration<? extends ZipEntry> enumeration = zipFile.entries(); enumeration
+										.hasMoreElements();) {
 									final ZipEntry entry = enumeration.nextElement();
 									if (entry.getName().endsWith(".txt")) {
-										WebUtilities.copy(zipFile.getInputStream(entry),
-											new FileOutputStream(Const.Ksj.CACHE_DIR
-												+ File.separator + new File(entry.getName())));
+										WebUtilities.copy(zipFile.getInputStream(entry), new FileOutputStream(
+												Const.Ksj.CACHE_DIR + File.separator + new File(entry.getName())));
 									}
 								}
 								panel.removeMessage();
@@ -105,8 +102,7 @@ public class Prefectures {
 			final Rectangle2D visibleRectangle = panel.getVisibleRectangle(false);
 			for (final Prefecture prefecture : prefectures) {
 				if (prefecture.getBounds().intersects(visibleRectangle)) {
-					final Shape shape = prefecture.hasFine() ? prefecture.getFineShape()
-						: prefecture.getShape();
+					final Shape shape = prefecture.hasFine() ? prefecture.getFineShape() : prefecture.getShape();
 					if (shape.intersects(visibleRectangle)) {
 						if (!prefecture.hasFine()) {
 							prefecture.loadFine();
@@ -121,24 +117,48 @@ public class Prefectures {
 				}
 			}
 		}
-		if (panel.getZoom() >= Zoom.LOAD_FINE_ROAD) {
+		if (panel.getZoom() >= Zoom.LOAD_FINE_CITIES) {
 			Progress.getInstance().setLoadMapPaintTyomeProgress(8);
 			final Rectangle2D visibleRectangle = panel.getVisibleRectangle(false);
 			for (final Prefecture prefecture : prefectures) {
 				if (prefecture.getBounds().intersects(visibleRectangle)) {
-					final Shape shape = prefecture.hasFine() ? prefecture.getFineShape()
-						: prefecture.getShape();
+					final Shape shape = prefecture.hasFine() ? prefecture.getFineShape() : prefecture.getShape();
 					if (shape.intersects(visibleRectangle)) {
-						if (!prefecture.hasFineRoad()) {
-							prefecture.loadKsjFineRoad();
+						if (prefecture.hasCities()) {
+							for (final City city : prefecture.getCities()) {
+								final Shape shape2 = city.getFineShape();
+								if (shape2.getBounds2D().intersects(visibleRectangle)) {
+									if (shape2.intersects(visibleRectangle)) {
+										city.loadKsjFineRoad();
+									} else {
+										city.freeKsjFineRoad();
+									}
+								} else {
+									city.freeKsjFineRoad();
+								}
+							}
+						}
+					} else {
+						if (prefecture.hasCities()) {
+							for (final City city : prefecture.getCities()) {
+								city.freeKsjFineRoad();
+							}
+						}
+					}
+				} else {
+					if (prefecture.hasCities()) {
+						for (final City city : prefecture.getCities()) {
+							city.freeKsjFineRoad();
 						}
 					}
 				}
 			}
 		} else {
 			for (final Prefecture prefecture : prefectures) {
-				if (prefecture.hasFineRoad()) {
-					prefecture.freeKsjFineRoad();
+				if (prefecture.hasCities()) {
+					for (final City city : prefecture.getCities()) {
+						city.freeKsjFineRoad();
+					}
 				}
 			}
 		}
@@ -150,8 +170,7 @@ public class Prefectures {
 				if (prefecture.hasCities()) {
 					for (final City city : prefecture.getCities()) {
 						if (city.getURL() != null) {
-							final Shape shape = city.hasFineShape() ? city.getFineShape() : city
-								.getShape();
+							final Shape shape = city.hasFineShape() ? city.getFineShape() : city.getShape();
 							if (shape.getBounds2D().intersects(visibleRectangle)) {
 								if (shape.intersects(visibleRectangle)) {
 									if (!city.has2500()) {
@@ -188,8 +207,7 @@ public class Prefectures {
 				if (prefecture.hasCities()) {
 					for (final City city : prefecture.getCities()) {
 						if (city.getURL() != null) {
-							final Shape shape = city.hasFineShape() ? city.getFineShape() : city
-								.getShape();
+							final Shape shape = city.hasFineShape() ? city.getFineShape() : city.getShape();
 							if (shape.getBounds2D().intersects(visibleRectangle)) {
 								if (shape.intersects(visibleRectangle)) {
 									if (!city.hasIsj()) {
@@ -214,20 +232,16 @@ public class Prefectures {
 	 * @param panel 地図を描画するパネル
 	 * @return 都道府県の一覧
 	 */
-	public static Collection<Prefecture> loadPrefectures(final MapPreferences preferences,
-		final MapPanel panel) {
+	public static Collection<Prefecture> loadPrefectures(final MapPreferences preferences, final MapPanel panel) {
 		final Collection<Prefecture> ret = new ArrayList<Prefecture>();
-		for (final Map.Entry<Shape, String> entry : ShapeIO.readShapes(Const.Prefecture.PREFECTURES)
-			.entrySet()) {
+		for (final Map.Entry<Shape, String> entry : ShapeIO.readShapes(Const.Prefecture.PREFECTURES).entrySet()) {
 			final String[] values = entry.getValue().split("_");
 			if (values.length == 2) {
 				final String idString = values[0];
 				final int id = Integer.parseInt(idString);
 				final String label = values[1];
-				ret
-					.add(new Prefecture(entry.getKey(), label, idString, preferences
-						.getTyomeFillColor(id == 30 || id == 13 ? (id + 2) % 6 + 1 : id % 6 + 1),
-						panel));
+				ret.add(new Prefecture(entry.getKey(), label, idString, preferences.getTyomeFillColor(id == 30
+						|| id == 13 ? (id + 2) % 6 + 1 : id % 6 + 1), panel));
 			} else {
 				System.out.println("WARNING: 都道府県名の表記がおかしいです。" + entry.getValue());
 			}
