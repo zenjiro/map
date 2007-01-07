@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -93,9 +94,9 @@ public class Prefecture {
 		this.label = label;
 		this.id = id;
 		this.color = color;
-		this.cities = new ArrayList<City>();
-		this.ksjRailwayCurves = new ArrayList<Railway>();
-		this.ksjRailwayStations = new ArrayList<Station>();
+		this.cities = new ConcurrentLinkedQueue<City>();
+		this.ksjRailwayCurves = new ConcurrentLinkedQueue<Railway>();
+		this.ksjRailwayStations = new ConcurrentLinkedQueue<Station>();
 	}
 
 	/**

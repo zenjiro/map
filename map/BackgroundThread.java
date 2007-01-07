@@ -104,11 +104,16 @@ public class BackgroundThread extends TimerTask {
 			this.panel.addMessage("地図を読み込んでいます。");
 			Progress.getInstance().setLoadMapPaintTyomeProgress(0);
 			if (this.prefectures != null) {
-				Prefectures.loadCities(this.prefectures, this.panel, this.maps, this.loadMap);
+				if (Prefectures.loadCities(this.prefectures, this.panel, this.maps, this.loadMap) && this.panel.isRouteMode()) {
+					this.panel.initializeGraph();
+				}
 			}
 			synchronized (this.maps) {
 				Progress.getInstance().setLoadMapPaintTyomeProgress(20);
 				this.loadMap.loadMap(this.maps, this.panel, visibleRectangle);
+				if (this.loadMap.isRoadChanged() && this.panel.isRouteMode()) {
+					this.panel.initializeGraph();
+				}
 				Progress.getInstance().setLoadMapPaintTyomeProgress(40);
 				this.panel.loadYomi();
 				Progress.getInstance().setLoadMapPaintTyomeProgress(50);

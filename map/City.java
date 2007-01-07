@@ -311,9 +311,10 @@ public class City {
 
 	/**
 	 * 高精度な国土数値情報の道路データを読み込みます。
+	 * @return 読み込んだかどうか
 	 * @since 5.04
 	 */
-	public void loadKsjFineRoad() {
+	public boolean loadKsjFineRoad() {
 		if (this.ksjFineRoad.isEmpty()) {
 			final InputStream in = City.class.getResourceAsStream(Const.DIR + Const.Ksj.ROAD_FINE_PREFIX + this.id
 					+ Const.Ksj.ROAD_SUFFIX);
@@ -322,6 +323,9 @@ public class City {
 					this.ksjFineRoad.add(new Railway(entry.getKey(), entry.getValue()));
 				}
 			}
+			return true;
+		} else {
+			return false;
 		}
 	}
 

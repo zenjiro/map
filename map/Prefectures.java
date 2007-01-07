@@ -126,10 +126,12 @@ public class Prefectures {
 					if (shape.intersects(visibleRectangle)) {
 						if (prefecture.hasCities()) {
 							for (final City city : prefecture.getCities()) {
-								final Shape shape2 = city.getFineShape();
+								final Shape shape2 = city.hasFineShape() ? city.getFineShape() : city.getShape();
 								if (shape2.getBounds2D().intersects(visibleRectangle)) {
 									if (shape2.intersects(visibleRectangle)) {
-										city.loadKsjFineRoad();
+										if (city.loadKsjFineRoad()) {
+											ret = true;
+										}
 									} else {
 										city.freeKsjFineRoad();
 									}

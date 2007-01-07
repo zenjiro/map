@@ -26,9 +26,11 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
@@ -197,6 +199,28 @@ public class MapPanel extends JPanel implements Printable {
 	private String centerTyome;
 
 	/**
+	 * 中心点を表示するかどうか
+	 * @since 6.0.0
+	 */
+	private boolean isCenterMark;
+
+	/**
+	 * ルート探索モードかどうか
+	 * @since 6.0.0
+	 */
+	private boolean isRouteMode;
+
+	/**
+	 * マウスが押されたx座標
+	 */
+	int lastMousePressedX;
+	
+	/**
+	 * マウスが押されたy座標
+	 */
+	int lastMousePressedY;
+	
+	/**
 	 * 地図を表示するパネルを初期化します。
 	 */
 	public void init() {
@@ -214,6 +238,8 @@ public class MapPanel extends JPanel implements Printable {
 		this.prefectures = Prefectures.loadPrefectures(this.mapPreferences, this);
 		this.centerPrefectureCity = "";
 		this.centerTyome = "";
+		this.isCenterMark = false;
+		this.isRouteMode = false;
 		this.addMouseListener(new MouseAdapter() {
 			@Override
 			/**
@@ -259,58 +285,30 @@ public class MapPanel extends JPanel implements Printable {
 			public void mousePressed(final MouseEvent e) {
 				MapPanel.this.lastMouseX = e.getX();
 				MapPanel.this.lastMouseY = e.getY();
+				MapPanel.this.lastMousePressedX = e.getX();
+				MapPanel.this.lastMousePressedY = e.getY();
 				MapPanel.this.isAntialias = false;
 			}
 
 			@Override
 			public void mouseReleased(final MouseEvent e) {
 				MapPanel.this.isAntialias = true;
-				// test 5.03
-				if (e.getModifiers() == 17) { // Shift + Button1
-					final Point2D point = toVirtualLocation(new Point2D.Double(e.getX(), e.getY()));
-					if (MapPanel.this.prefectures != null) {
-						try {
-							if (Const.Zoom.LOAD_FINE_CITIES <= MapPanel.this.zoom
-									&& MapPanel.this.zoom < Const.Zoom.LOAD_ALL) {
-								Route.getInstance().clear();
-								for (final Prefecture prefecture : MapPanel.this.prefectures) {
-									if (prefecture.hasCities()) {
-										for (final City city : prefecture.getCities()) {
-											if (city.hasKsjFineRoad()) {
-												for (final Railway railway : city.getKsjFineRoad()) {
-													Route.getInstance().add(railway.getShape(), Category.UNKNOWN);
-												}
-											}
-										}
-									}
-								}
-							}
-						} catch (final IOException exception) {
-							exception.printStackTrace();
+				// since 6.0.0
+				if (MapPanel.this.isRouteMode()) {
+					if (e.getX() == MapPanel.this.lastMousePressedX && e.getY() == MapPanel.this.lastMousePressedY) {
+						if ((e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) != 0 || e.getButton() == MouseEvent.BUTTON3) {
+							Route.getInstance()
+									.removeNearestPoint(toVirtualLocation(new Point2D.Double(e.getX(), e.getY())),
+											16 / MapPanel.this.getZoom());
+							Route.getInstance().calcRoute();
+						} else if ((e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0 || e.getButton() == MouseEvent.BUTTON2) {
+							Route.getInstance().insertPoint(toVirtualLocation(new Point2D.Double(e.getX(), e.getY())));
+							Route.getInstance().calcRoute();
+						} else {
+							Route.getInstance().addPoint(toVirtualLocation(new Point2D.Double(e.getX(), e.getY())));
+							Route.getInstance().calcRoute();
 						}
 					}
-					if (MapPanel.this.maps != null) {
-						try {
-							if (MapPanel.this.zoom >= Const.Zoom.LOAD_ALL) {
-								Route.getInstance().clear();
-								for (final MapData mapData : MapPanel.this.maps.values()) {
-									if (mapData.hasRoadArc() && mapData.hasTyome()) {
-										for (final ArcData arc : mapData.getRoadArc().values()) {
-											Route.getInstance().add(arc.getPath(), Category.UNKNOWN);
-										}
-									}
-								}
-							}
-						} catch (IOException exception) {
-							exception.printStackTrace();
-						}
-					}
-					Route.getInstance().setStart(Route.getInstance().getNearestNode(point));
-					Route.getInstance().calcRoute();
-				} else if (e.getModifiers() == 18) { // Ctrl + Button1
-					final Point2D point = toVirtualLocation(new Point2D.Double(e.getX(), e.getY()));
-					Route.getInstance().setGoal(Route.getInstance().getNearestNode(point));
-					Route.getInstance().calcRoute();
 				}
 			}
 
@@ -807,7 +805,7 @@ public class MapPanel extends JPanel implements Printable {
 		if (zoom < Const.Zoom.LOAD_ALL && zoom >= Const.Zoom.LOAD_FINE_CITIES) {
 			drawKsjRailwayCurveLabels(g, visibleRectangle, zoom, offsetX, offsetY);
 		}
-		// test 5.03 最短経路探索の探索結果、始点、終点を描画してみる。
+		// test 5.03 最短経路探索の探索結果を描画してみる
 		for (final boolean is1st : new boolean[] { true, false }) {
 			for (final Shape shape : Route.getInstance().getRoute()) {
 				if (is1st) {
@@ -823,16 +821,35 @@ public class MapPanel extends JPanel implements Printable {
 				this.draw(g, shape, false, transform);
 			}
 		}
-		for (final String string : new String[] { Route.getInstance().getStart(), Route.getInstance().getGoal() }) {
-			if (string != null) {
-				final Point2D point = toRealLocation(Route.toPoint(string));
-				final Ellipse2D ellipse = new Ellipse2D.Double(point.getX() - 3, point.getY() - 3, 6, 6);
-				g.setStroke(new BasicStroke(1f));
-				g.setColor(string == Route.getInstance().getStart() ? Color.GREEN : Color.RED);
-				g.fill(ellipse);
-				g.setColor(Color.BLACK);
-				g.draw(ellipse);
-			}
+		// test 6.0.0 最短経路探索の経由地を描画してみる
+		for (final Point2D point : Route.getInstance().getPoints()) {
+			final Point2D point2 = toRealLocation(point);
+			final float radius = 4;
+			final GeneralPath path = new GeneralPath();
+			path.moveTo((float) point2.getX() - radius, (float) point2.getY() - radius);
+			path.lineTo((float) point2.getX() + radius, (float) point2.getY() + radius);
+			path.moveTo((float) point2.getX() + radius, (float) point2.getY() - radius);
+			path.lineTo((float) point2.getX() - radius, (float) point2.getY() + radius);
+			g.setStroke(new BasicStroke(3));
+			g.setColor(Color.BLACK);
+			g.draw(path);
+			g.setStroke(new BasicStroke(2));
+			g.setColor(Color.YELLOW);
+			g.draw(path);
+		}
+		// 中心点を描画する
+		if (this.isCenterMark) {
+			final int size = 32;
+			final int diameter = 18;
+			final RoundRectangle2D.Double centerMark = new RoundRectangle2D.Double(this.getWidth() / 2 - size / 2, this
+					.getHeight()
+					/ 2 - size / 2, size, size, diameter, diameter);
+			g.setStroke(new BasicStroke(3));
+			g.setColor(Color.WHITE);
+			g.draw(centerMark);
+			g.setStroke(new BasicStroke(1.5f));
+			g.setColor(Color.RED);
+			g.draw(centerMark);
 		}
 	}
 
@@ -2862,4 +2879,86 @@ public class MapPanel extends JPanel implements Printable {
 	public float getSaturationDifference() {
 		return this.saturationDifference;
 	}
+
+	/**
+	 * @return 中心点を表示するかどうか
+	 * @since 6.0.0
+	 */
+	public boolean isCenterMark() {
+		return this.isCenterMark;
+	}
+
+	/**
+	 * 中心点を表示するかどうかを切り替えます。
+	 * @since 6.0.0
+	 */
+	public void toggleCenterMark() {
+		this.isCenterMark = !this.isCenterMark;
+	}
+
+	/**
+	 * @return ルート探索モードかどうか
+	 * @since 6.0.0
+	 */
+	public boolean isRouteMode() {
+		return this.isRouteMode;
+	}
+
+	/**
+	 * ルート探索モードかどうかを切り替えます。
+	 * @since 6.0.0
+	 */
+	public void toggleRouteMode() {
+		this.isRouteMode = !this.isRouteMode;
+		if (this.isRouteMode) {
+			this.initializeGraph();
+		} else {
+			Route.getInstance().clear();
+			Route.getInstance().clearRoute();
+		}
+	}
+
+	/**
+	 * 最短経路探索用のグラフを初期化します。
+	 * @since 6.0.0
+	 */
+	public void initializeGraph() {
+		if (this.prefectures != null) {
+			try {
+				if (Const.Zoom.LOAD_FINE_CITIES <= this.zoom && this.zoom < Const.Zoom.LOAD_ALL) {
+					Route.getInstance().clear();
+					for (final Prefecture prefecture : this.prefectures) {
+						if (prefecture.hasCities()) {
+							for (final City city : prefecture.getCities()) {
+								if (city.hasKsjFineRoad()) {
+									for (final Railway railway : city.getKsjFineRoad()) {
+										Route.getInstance().add(railway.getShape(), Category.UNKNOWN);
+									}
+								}
+							}
+						}
+					}
+				}
+			} catch (final IOException exception) {
+				exception.printStackTrace();
+			}
+		}
+		if (this.maps != null) {
+			try {
+				if (this.zoom >= Const.Zoom.LOAD_ALL) {
+					Route.getInstance().clear();
+					for (final MapData mapData : this.maps.values()) {
+						if (mapData.hasRoadArc() && mapData.hasTyome()) {
+							for (final ArcData arc : mapData.getRoadArc().values()) {
+								Route.getInstance().add(arc.getPath(), Category.UNKNOWN);
+							}
+						}
+					}
+				}
+			} catch (IOException exception) {
+				exception.printStackTrace();
+			}
+		}
+	}
+
 }

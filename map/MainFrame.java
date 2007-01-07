@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.util.Map;
 
 import javax.print.PrintException;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -19,6 +21,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
@@ -62,7 +65,7 @@ public class MainFrame extends JFrame {
 						return "ラスタ画像ファイル（*.png、*.jpg、*.bmp）";
 					}
 				});
-				chooser.showDialog(MainFrame.this, "エクスポート");
+				chooser.showDialog(MainFrame.this, "出力");
 				final File selectedFile = chooser.getSelectedFile();
 				if (selectedFile != null) {
 					final String fileName = selectedFile.getName();
@@ -116,7 +119,7 @@ public class MainFrame extends JFrame {
 						return "ベクトル画像ファイル（*.svg、*.ps）";
 					}
 				});
-				chooser.showDialog(MainFrame.this, "エクスポート");
+				chooser.showDialog(MainFrame.this, "出力");
 				final File selectedFile = chooser.getSelectedFile();
 				if (selectedFile != null) {
 					final String fileName = selectedFile.getName();
@@ -178,11 +181,11 @@ public class MainFrame extends JFrame {
 		final JMenu fileMenu = new JMenu("ファイル(F)");
 		fileMenu.setMnemonic('F');
 		menuBar.add(fileMenu);
-		final JMenuItem imageExportItem = new JMenuItem("ラスタ画像としてエクスポート（PNG、JPEG、BMPファイル）(I)...");
+		final JMenuItem imageExportItem = new JMenuItem("ラスタ画像として出力（PNG、JPEG、BMPファイル）(I)...");
 		imageExportItem.setMnemonic('I');
 		imageExportItem.addActionListener(new ImageExportListener());
 		fileMenu.add(imageExportItem);
-		final JMenuItem psExportItem = new JMenuItem("ベクトル画像としてエクスポート（SVG、PSファイル）(E)...");
+		final JMenuItem psExportItem = new JMenuItem("ベクトル画像として出力（SVG、PSファイル）(E)...");
 		psExportItem.setMnemonic('E');
 		psExportItem.addActionListener(new PSExportListener());
 		fileMenu.add(psExportItem);
@@ -323,8 +326,7 @@ public class MainFrame extends JFrame {
 			}
 		});
 		viewMenu.add(fontSizeDecrementItem);
-		viewMenu.addSeparator();
-		final JMenuItem fontSizeResetItem = new JMenuItem("文字を標準サイズに(N)");
+		final JMenuItem fontSizeResetItem = new JMenuItem("文字を標準の大きさに(N)");
 		fontSizeResetItem.setMnemonic('N');
 		fontSizeResetItem.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
@@ -352,7 +354,6 @@ public class MainFrame extends JFrame {
 			}
 		});
 		viewMenu.add(brighterItem);
-		viewMenu.addSeparator();
 		final JMenuItem brightnessResetItem = new JMenuItem("標準の色合い(F)");
 		brightnessResetItem.setMnemonic('F');
 		brightnessResetItem.addActionListener(new ActionListener() {
@@ -362,6 +363,61 @@ public class MainFrame extends JFrame {
 			}
 		});
 		viewMenu.add(brightnessResetItem);
+		viewMenu.addSeparator();
+		final JCheckBoxMenuItem centerMarkItem = new JCheckBoxMenuItem("中心点(C)");
+		centerMarkItem.setMnemonic('C');
+		centerMarkItem.addActionListener(new ActionListener(){
+			public void actionPerformed(final ActionEvent e) {
+				panel.toggleCenterMark();
+				centerMarkItem.setSelected(panel.isCenterMark());
+				panel.forceRepaint();
+			}});
+		viewMenu.add(centerMarkItem);
+		final JMenu toolMenu = new JMenu("ツール(T)");
+		toolMenu.setMnemonic('T');
+		menuBar.add(toolMenu);
+		final JCheckBoxMenuItem routeModeMenuItem = new JCheckBoxMenuItem("ルート探索モード(R)");
+		routeModeMenuItem.setMnemonic('R');
+		routeModeMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(final ActionEvent e) {
+				panel.toggleRouteMode();
+				routeModeMenuItem.setSelected(panel.isRouteMode());
+			}
+		});
+		toolMenu.add(routeModeMenuItem);
+		//toolMenu.addSeparator();
+		final ButtonGroup routeButtonGroup = new ButtonGroup();
+		final JRadioButtonMenuItem highwayRouteMenuItem = new JRadioButtonMenuItem("高速道路モード(H)");
+		highwayRouteMenuItem.setMnemonic('H');
+		highwayRouteMenuItem.setSelected(true);
+		highwayRouteMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(final ActionEvent e) {
+				// TODO 未実装
+				System.out.println(this.getClass().getName() + ": 高速道路モードが選ばれました。");
+			}
+		});
+		routeButtonGroup.add(highwayRouteMenuItem);
+		//toolMenu.add(highwayRouteMenuItem);
+		final JRadioButtonMenuItem normalRouteMenuItem = new JRadioButtonMenuItem("一般道モード(N)");
+		normalRouteMenuItem.setMnemonic('N');
+		normalRouteMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(final ActionEvent e) {
+				// TODO 未実装
+				System.out.println(this.getClass().getName() + ": 一般道モードが選ばれました。");
+			}
+		});
+		routeButtonGroup.add(normalRouteMenuItem);
+		//toolMenu.add(normalRouteMenuItem);
+		final JRadioButtonMenuItem walkRouteMenuItem = new JRadioButtonMenuItem("徒歩モード(W)");
+		walkRouteMenuItem.setMnemonic('W');
+		walkRouteMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(final ActionEvent e) {
+				// TODO 未実装
+				System.out.println(this.getClass().getName() + ": 徒歩モードが選ばれました。");
+			}
+		});
+		routeButtonGroup.add(walkRouteMenuItem);
+		//toolMenu.add(walkRouteMenuItem);
 		this.statusBar = new JLabel(panel.getMessage());
 		this.statusPanel = new JPanel();
 		this.statusPanel.setLayout(new BorderLayout());

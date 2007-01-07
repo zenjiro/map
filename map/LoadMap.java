@@ -38,6 +38,18 @@ public class LoadMap {
 	 */
 	private MapPanel panel;
 
+	/**
+	 * 道路が変更されたかどうか
+	 */
+	private boolean isRoadChanged;
+
+	/**
+	 * @return 道路が変更されたかどうか
+	 */
+	public boolean isRoadChanged() {
+		return this.isRoadChanged;
+	}
+	
 	/** 
 	 * 地図を読み込む必要があれば読み込み、開放する必要があれば開放します。
 	 * このメソッドを呼び出した直後に isChanged() を呼び出すと、
@@ -51,6 +63,7 @@ public class LoadMap {
 		this.panel = panel;
 		final double zoom = panel.getZoom();
 		this.isChanged = false;
+		this.isRoadChanged = false;
 		for (final MapData mapData : maps.values()) {
 			final Rectangle2D preLoadRectangle = new Rectangle2D.Double(visibleRectangle.getX()
 					- (visibleRectangle.getWidth() * Const.PRE_LOAD_COEFFICIENT), visibleRectangle.getY()
@@ -115,6 +128,7 @@ public class LoadMap {
 					if (!mapData.hasRoadArc()) {
 						mapData.loadRoadArc();
 						this.isChanged = true;
+						this.isRoadChanged = true;
 					}
 					if (!mapData.hasMizuArc()) {
 						mapData.loadMizuArc();
