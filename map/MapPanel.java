@@ -211,16 +211,6 @@ public class MapPanel extends JPanel implements Printable {
 	private boolean isRouteMode;
 
 	/**
-	 * マウスが押されたx座標
-	 */
-	int lastMousePressedX;
-	
-	/**
-	 * マウスが押されたy座標
-	 */
-	int lastMousePressedY;
-	
-	/**
 	 * 地図を表示するパネルを初期化します。
 	 */
 	public void init() {
@@ -278,6 +268,25 @@ public class MapPanel extends JPanel implements Printable {
 						}
 					}
 					MapPanel.this.forceRepaint();
+				} else {
+					// since 6.0.0
+					if (MapPanel.this.isRouteMode()) {
+						if ((e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) != 0
+								|| e.getButton() == MouseEvent.BUTTON3) {
+							Route.getInstance().removeNearestPoint(
+									toVirtualLocation(new Point2D.Double(e.getX(), e.getY())),
+									16 / MapPanel.this.getZoom());
+							Route.getInstance().calcRoute();
+						} else if ((e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0
+								|| e.getButton() == MouseEvent.BUTTON2) {
+							Route.getInstance().insertPoint(toVirtualLocation(new Point2D.Double(e.getX(), e.getY())));
+							Route.getInstance().calcRoute();
+						} else {
+							Route.getInstance().addPoint(toVirtualLocation(new Point2D.Double(e.getX(), e.getY())));
+							Route.getInstance().calcRoute();
+						}
+						MapPanel.this.forceRepaint();
+					}
 				}
 			}
 
@@ -285,31 +294,12 @@ public class MapPanel extends JPanel implements Printable {
 			public void mousePressed(final MouseEvent e) {
 				MapPanel.this.lastMouseX = e.getX();
 				MapPanel.this.lastMouseY = e.getY();
-				MapPanel.this.lastMousePressedX = e.getX();
-				MapPanel.this.lastMousePressedY = e.getY();
 				MapPanel.this.isAntialias = false;
 			}
 
 			@Override
 			public void mouseReleased(final MouseEvent e) {
 				MapPanel.this.isAntialias = true;
-				// since 6.0.0
-				if (MapPanel.this.isRouteMode()) {
-					if (e.getX() == MapPanel.this.lastMousePressedX && e.getY() == MapPanel.this.lastMousePressedY) {
-						if ((e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) != 0 || e.getButton() == MouseEvent.BUTTON3) {
-							Route.getInstance()
-									.removeNearestPoint(toVirtualLocation(new Point2D.Double(e.getX(), e.getY())),
-											16 / MapPanel.this.getZoom());
-							Route.getInstance().calcRoute();
-						} else if ((e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0 || e.getButton() == MouseEvent.BUTTON2) {
-							Route.getInstance().insertPoint(toVirtualLocation(new Point2D.Double(e.getX(), e.getY())));
-							Route.getInstance().calcRoute();
-						} else {
-							Route.getInstance().addPoint(toVirtualLocation(new Point2D.Double(e.getX(), e.getY())));
-							Route.getInstance().calcRoute();
-						}
-					}
-				}
 			}
 
 		});
@@ -2932,7 +2922,19 @@ public class MapPanel extends JPanel implements Printable {
 							for (final City city : prefecture.getCities()) {
 								if (city.hasKsjFineRoad()) {
 									for (final Railway railway : city.getKsjFineRoad()) {
-										Route.getInstance().add(railway.getShape(), Category.UNKNOWN);
+										switch (railway.getBusiness()) {
+										case ROAD_HIGHWAY:
+											Route.getInstance().add(railway.getShape(), Category.ROAD_HIGHWAY);
+											break;
+										case ROAD_KOKUDO:
+											Route.getInstance().add(railway.getShape(), Category.ROAD_KOKUDO);
+											break;
+										case ROAD_MAJOR:
+											Route.getInstance().add(railway.getShape(), Category.ROAD_MAJOR);
+											break;
+										default:
+											Route.getInstance().add(railway.getShape(), Category.UNKNOWN);
+										}
 									}
 								}
 							}
@@ -2950,7 +2952,28 @@ public class MapPanel extends JPanel implements Printable {
 					for (final MapData mapData : this.maps.values()) {
 						if (mapData.hasRoadArc() && mapData.hasTyome()) {
 							for (final ArcData arc : mapData.getRoadArc().values()) {
-								Route.getInstance().add(arc.getPath(), Category.UNKNOWN);
+								switch (arc.getRoadType()) {
+								case ArcData.ROAD_HIGHWAY:
+									Route.getInstance().add(arc.getPath(), Category.ROAD_HIGHWAY);
+									break;
+								case ArcData.ROAD_KOKUDO:
+									Route.getInstance().add(arc.getPath(), Category.ROAD_KOKUDO);
+									break;
+								case ArcData.ROAD_KENDO:
+									Route.getInstance().add(arc.getPath(), Category.ROAD_KENDO);
+									break;
+								case ArcData.ROAD_CHIHODO:
+									Route.getInstance().add(arc.getPath(), Category.ROAD_CHIHODO);
+									break;
+								case ArcData.ROAD_MAJOR:
+									Route.getInstance().add(arc.getPath(), Category.ROAD_MAJOR);
+									break;
+								case ArcData.ROAD_NORMAL:
+									Route.getInstance().add(arc.getPath(), Category.ROAD_OTHER);
+									break;
+								default:
+									Route.getInstance().add(arc.getPath(), Category.UNKNOWN);
+								}
 							}
 						}
 					}

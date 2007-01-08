@@ -53,6 +53,16 @@ public class BackgroundThread extends TimerTask {
 	private int mapSize;
 
 	/**
+	 * マウスが押されたx座標
+	 */
+	int lastX;
+	
+	/**
+	 * マウスが押されたy座標
+	 */
+	int lastY;
+	
+	/**
 	 * バックグラウンドで行う処理を初期化します。
 	 * @param maps 地図
 	 * @param panel パネル
@@ -67,8 +77,15 @@ public class BackgroundThread extends TimerTask {
 		this.mapSize = maps.size();
 		panel.addMouseListener(new MouseAdapter() {
 			@Override
+			public void mousePressed(MouseEvent e) {
+				BackgroundThread.this.lastX = e.getX();
+				BackgroundThread.this.lastY = e.getY();
+			}
+			@Override
 			public void mouseReleased(final MouseEvent e) {
-				BackgroundThread.this.isChanged = true;
+				if (e.getX() != BackgroundThread.this.lastX && e.getY() != BackgroundThread.this.lastY) {
+					BackgroundThread.this.isChanged = true;
+				}
 			}
 		});
 		panel.addMouseMotionListener(new MouseMotionAdapter() {

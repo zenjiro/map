@@ -96,25 +96,34 @@ public class Route {
 		Shape path;
 
 		/**
+		 * 長さ
+		 */
+		double length;
+
+		/**
 		 * 辺の種類
 		 */
 		@SuppressWarnings("unused")
-		private Category category;
+		Category category;
 
 		/**
 		 * コンストラクタです。
 		 * @param first 頂点1
 		 * @param last 頂点2
 		 * @param path 辺
+		 * @param length 長さ
 		 * @param category 辺の種類
 		 */
-		public Edge(final String first, final String last, final Shape path, final Category category) {
+		public Edge(final String first, final String last, final Shape path, final double length,
+				final Category category) {
 			this.first = first;
 			this.last = last;
 			this.path = path;
+			this.length = length;
 			this.category = category;
 		}
 
+		@Override
 		public String toString() {
 			return this.first + "--" + this.last;
 		}
@@ -150,9 +159,24 @@ public class Route {
 			return this.value < other.value ? -1 : (this.value > other.value ? 1 : 0);
 		}
 
+		@Override
 		public String toString() {
 			return this.node + "(" + this.value + ")";
 		}
+	}
+
+	/**
+	 * カテゴリを指定して速度を取得するためのインターフェイスです。
+	 * @author zenjiro
+	 * @since 6.1.0
+	 */
+	public interface Speed {
+		/**
+		 * カテゴリを指定して速度を取得します。
+		 * @param category カテゴリ
+		 * @return 速度[m/s]
+		 */
+		public double get(final Category category);
 	}
 
 	/**
@@ -169,23 +193,6 @@ public class Route {
 			Route.instance = new Route();
 		}
 		return Route.instance;
-	}
-
-	/**
-	 * @param string 文字列表現
-	 * @return 点
-	 */
-	public Point2D toPoint(final String string) {
-		final String[] items = string.split("_");
-		return new Point2D.Double(Double.parseDouble(items[0]), Double.parseDouble(items[1]));
-	}
-
-	/**
-	 * @param point 点
-	 * @return 文字列表現
-	 */
-	public String toString(final Point2D point) {
-		return (int) point.getX() + "_" + (int) point.getY();
 	}
 
 	/**
@@ -209,6 +216,11 @@ public class Route {
 	private List<Point2D> cachedPoints;
 
 	/**
+	 * 速度
+	 */
+	private Speed speed;
+
+	/**
 	 * シングルトン用のコンストラクタです。
 	 */
 	private Route() {
@@ -216,6 +228,7 @@ public class Route {
 		this.route = new ArrayList<Shape>();
 		this.points = new ArrayList<String>();
 		this.cachedPoints = new ArrayList<Point2D>();
+		this.speed = Route.HIGHWAY_SPEED;
 	}
 
 	/**
@@ -228,7 +241,7 @@ public class Route {
 		Point2D last = null;
 		final PathIterator iterator = path.getPathIterator(new AffineTransform());
 		while (!iterator.isDone()) {
-			float[] coords = new float[6];
+			final float[] coords = new float[6];
 			final int type = iterator.currentSegment(coords);
 			if (type == PathIterator.SEG_MOVETO || type == PathIterator.SEG_LINETO) {
 				if (first == null) {
@@ -250,7 +263,23 @@ public class Route {
 	 * @param category 辺の種類
 	 */
 	public void add(final String first, final String last, final Shape path, final Category category) {
-		final Edge edge = new Edge(first, last, path, category);
+		if (first.equals(last)) {
+			return;
+		}
+		double length = 0;
+		final PathIterator iterator = path.getPathIterator(new AffineTransform());
+		Point2D lastPoint = null;
+		while (!iterator.isDone()) {
+			final float[] coords = new float[6];
+			final int type = iterator.currentSegment(coords);
+			final Point2D point = new Point2D.Float(coords[0], coords[1]);
+			if (type == PathIterator.SEG_LINETO) {
+				length += point.distance(lastPoint);
+			}
+			lastPoint = point;
+			iterator.next();
+		}
+		final Edge edge = new Edge(first, last, path, length, category);
 		for (final String node : new String[] { first, last }) {
 			if (!this.graph.containsKey(node)) {
 				this.graph.put(node, new HashSet<Edge>());
@@ -284,6 +313,20 @@ public class Route {
 	}
 
 	/**
+	 * 最短経路を求め、フィールドに記憶します。
+	 */
+	public void calcRoute() {
+		this.route.clear();
+		String start = null;
+		for (final String string : this.points) {
+			if (start != null) {
+				this.route.addAll(this.calcRoute(start, string));
+			}
+			start = string;
+		}
+	}
+
+	/**
 	 * 最短経路を求めます。
 	 * @param start 始点
 	 * @param goal 終点
@@ -306,11 +349,17 @@ public class Route {
 			//			System.out.println("polled " + node);
 			if (node.node.equals(goal)) {
 				String node2 = goal;
+				double distance = 0;
+				double time = 0;
 				while (parents.containsKey(node2)) {
 					final Edge edge = parents.get(node2);
 					ret.add(edge.path);
-					node2 = (edge.first == node2) ? edge.last : edge.first;
+					distance += edge.length;
+					time += edge.length / this.speed.get(edge.category);
+					node2 = (edge.first.equals(node2)) ? edge.last : edge.first;
 				}
+				System.out.println(this.getClass().getName() + ": 距離は" + distance / 1000 + "km");
+				System.out.println(this.getClass().getName() + ": 時間は" + (time / 60) + "min");
 				break;
 			}
 			doneNodes.add(node.node);
@@ -320,20 +369,18 @@ public class Route {
 			for (final Edge edge : this.graph.get(node.node)) {
 				doneEdges.add(edge);
 				for (final String node2 : new String[] { edge.first, edge.last }) {
-					// TODO とりあえず始点終点間の直線距離を長さとしてみる。
-					final double length = this.toPoint(edge.first).distance(this.toPoint(edge.last));
 					if (!doneNodes.contains(node2)) {
 						if (nodes.containsKey(node2) && queue.contains(nodes.get(node2))) {
 							final Node node3 = nodes.get(node2);
-							if (node3.value > node.value + length) {
-								node3.value = node.value + length;
+							if (node3.value > node.value + edge.length / this.speed.get(edge.category)) {
+								node3.value = node.value + edge.length / this.speed.get(edge.category);
 								queue.remove(node3);
 								queue.add(node3);
 								parents.put(node2, edge);
 								//								System.out.println("removed and added " + node3);
 							}
 						} else {
-							final Node node3 = new Node(node2, node.value + length);
+							final Node node3 = new Node(node2, node.value + edge.length / this.speed.get(edge.category));
 							nodes.put(node2, node3);
 							queue.add(node3);
 							parents.put(node2, edge);
@@ -344,20 +391,6 @@ public class Route {
 			}
 		}
 		return ret;
-	}
-
-	/**
-	 * 最短経路を求め、フィールドに記憶します。
-	 */
-	public void calcRoute() {
-		this.route.clear();
-		String start = null;
-		for (final String string : this.points) {
-			if (start != null) {
-				this.route.addAll(calcRoute(start, string));
-			}
-			start = string;
-		}
 	}
 
 	/**
@@ -487,12 +520,92 @@ public class Route {
 	}
 
 	/**
-	 * 辺の種類毎に速度を設定します。
-	 * @param category 辺の種類
-	 * @param speed 速度[km/h]
+	 * @param speed 速度
 	 */
-	public void setSpeed(final Category category, final double speed) {
-		// TODO 未実装
+	public void setSpeed(final Speed speed) {
+		this.speed = speed;
 	}
+
+	/**
+	 * @param string 文字列表現
+	 * @return 点
+	 */
+	public Point2D toPoint(final String string) {
+		final String[] items = string.split("_");
+		return new Point2D.Double(Double.parseDouble(items[0]), Double.parseDouble(items[1]));
+	}
+
+	/**
+	 * @param point 点
+	 * @return 文字列表現
+	 */
+	public String toString(final Point2D point) {
+		return (int) point.getX() + "_" + (int) point.getY();
+	}
+
+	/**
+	 * 高速道路優先探索の速度
+	 */
+	public static final Speed HIGHWAY_SPEED = new Speed() {
+		public double get(final Category category) {
+			switch (category) {
+			case ROAD_HIGHWAY:
+				return 80 * 1000 / 3600;
+			case ROAD_KOKUDO:
+				return 50 * 1000 / 3600;
+			case ROAD_KENDO:
+			case ROAD_CHIHODO:
+				return 45 * 1000 / 3600;
+			case ROAD_MAJOR:
+				return 40 * 1000 / 3600;
+			case ROAD_OTHER:
+			default:
+				return 25 * 1000 / 3600;
+			}
+		}
+	};
+
+	/**
+	 * 一般道優先探索の速度
+	 */
+	public static final Speed NORMAL_SPEED = new Speed() {
+		public double get(final Category category) {
+			if (category == Category.ROAD_HIGHWAY) {
+				return 1;
+			} else {
+				return Route.HIGHWAY_SPEED.get(category);
+			}
+		}
+	};
+
+	/**
+	 * 自転車の速度
+	 */
+	public static final Speed BIKE_SPEED = new Speed() {
+		public double get(final Category category) {
+			switch (category) {
+			case ROAD_HIGHWAY:
+				return 1;
+			case ROAD_KOKUDO:
+			case ROAD_KENDO:
+			case ROAD_CHIHODO:
+				return 18 * 1000 / 3600;
+			case ROAD_MAJOR:
+				return 16 * 1000 / 3600;
+			case ROAD_OTHER:
+			default:
+				return 12 * 1000 / 3600;
+			}
+		}
+	};
+
+	/**
+	 * 歩行者の速度
+	 */
+	public static final Speed WALK_SPEED = new Speed() {
+		public double get(final Category category) {
+			return 4.8 * 1000 / 3600;
+		}
+	};
 
 }

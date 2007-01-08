@@ -26,6 +26,8 @@ import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
 
+import route.Route;
+
 /**
  * 地図を表示するフレームです。
  * @author zenjiro
@@ -382,42 +384,75 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(final ActionEvent e) {
 				panel.toggleRouteMode();
 				routeModeMenuItem.setSelected(panel.isRouteMode());
+				panel.forceRepaint();
 			}
 		});
 		toolMenu.add(routeModeMenuItem);
-		//toolMenu.addSeparator();
+		toolMenu.addSeparator();
 		final ButtonGroup routeButtonGroup = new ButtonGroup();
 		final JRadioButtonMenuItem highwayRouteMenuItem = new JRadioButtonMenuItem("高速道路モード(H)");
 		highwayRouteMenuItem.setMnemonic('H');
 		highwayRouteMenuItem.setSelected(true);
 		highwayRouteMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
-				// TODO 未実装
-				System.out.println(this.getClass().getName() + ": 高速道路モードが選ばれました。");
+				Route.getInstance().setSpeed(Route.HIGHWAY_SPEED);
+				if (panel.isRouteMode()) {
+					Route.getInstance().calcRoute();
+					panel.forceRepaint();
+				}
 			}
 		});
 		routeButtonGroup.add(highwayRouteMenuItem);
-		//toolMenu.add(highwayRouteMenuItem);
+		toolMenu.add(highwayRouteMenuItem);
 		final JRadioButtonMenuItem normalRouteMenuItem = new JRadioButtonMenuItem("一般道モード(N)");
 		normalRouteMenuItem.setMnemonic('N');
 		normalRouteMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
-				// TODO 未実装
-				System.out.println(this.getClass().getName() + ": 一般道モードが選ばれました。");
+				Route.getInstance().setSpeed(Route.NORMAL_SPEED);
+				if (panel.isRouteMode()) {
+					Route.getInstance().calcRoute();
+					panel.forceRepaint();
+				}
 			}
 		});
 		routeButtonGroup.add(normalRouteMenuItem);
-		//toolMenu.add(normalRouteMenuItem);
+		toolMenu.add(normalRouteMenuItem);
+		final JRadioButtonMenuItem bikeRouteMenuItem = new JRadioButtonMenuItem("自転車モード(B)");
+		bikeRouteMenuItem.setMnemonic('B');
+		bikeRouteMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(final ActionEvent e) {
+				Route.getInstance().setSpeed(Route.BIKE_SPEED);
+				if (panel.isRouteMode()) {
+					Route.getInstance().calcRoute();
+					panel.forceRepaint();
+				}
+			}
+		});
+		routeButtonGroup.add(bikeRouteMenuItem);
+		toolMenu.add(bikeRouteMenuItem);
 		final JRadioButtonMenuItem walkRouteMenuItem = new JRadioButtonMenuItem("徒歩モード(W)");
 		walkRouteMenuItem.setMnemonic('W');
 		walkRouteMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
-				// TODO 未実装
-				System.out.println(this.getClass().getName() + ": 徒歩モードが選ばれました。");
+				Route.getInstance().setSpeed(Route.WALK_SPEED);
+				if (panel.isRouteMode()) {
+					Route.getInstance().calcRoute();
+					panel.forceRepaint();
+				}
 			}
 		});
 		routeButtonGroup.add(walkRouteMenuItem);
-		//toolMenu.add(walkRouteMenuItem);
+		toolMenu.add(walkRouteMenuItem);
+		toolMenu.addSeparator();
+		final JMenuItem clearItem = new JMenuItem("地点とルートを消去(C)");
+		clearItem.setMnemonic('C');
+		clearItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Route.getInstance().clearRoute();
+				panel.forceRepaint();
+			}
+		});
+		toolMenu.add(clearItem);
 		this.statusBar = new JLabel(panel.getMessage());
 		this.statusPanel = new JPanel();
 		this.statusPanel.setLayout(new BorderLayout());
