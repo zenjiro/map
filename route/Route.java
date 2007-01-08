@@ -6,12 +6,14 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Formatter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 最短経路探索を行うクラスです。
@@ -177,12 +179,98 @@ public class Route {
 		 * @return 速度[m/s]
 		 */
 		public double get(final Category category);
+
+		/**
+		 * @return 乗物の表記
+		 */
+		public String getVehicle();
 	}
 
 	/**
 	 * インスタンス
 	 */
 	private static Route instance;
+
+	/**
+	 * 高速道路優先探索の速度
+	 */
+	public static final Speed HIGHWAY_SPEED = new Speed() {
+		public double get(final Category category) {
+			switch (category) {
+			case ROAD_HIGHWAY:
+				return 80 * 1000 / 3600;
+			case ROAD_KOKUDO:
+				return 50 * 1000 / 3600;
+			case ROAD_KENDO:
+			case ROAD_CHIHODO:
+				return 45 * 1000 / 3600;
+			case ROAD_MAJOR:
+				return 40 * 1000 / 3600;
+			case ROAD_OTHER:
+			default:
+				return 25 * 1000 / 3600;
+			}
+		}
+
+		public String getVehicle() {
+			return "車";
+		}
+	};
+
+	/**
+	 * 一般道優先探索の速度
+	 */
+	public static final Speed NORMAL_SPEED = new Speed() {
+		public double get(final Category category) {
+			if (category == Category.ROAD_HIGHWAY) {
+				return 1;
+			} else {
+				return Route.HIGHWAY_SPEED.get(category);
+			}
+		}
+
+		public String getVehicle() {
+			return "車";
+		}
+	};
+
+	/**
+	 * 自転車の速度
+	 */
+	public static final Speed BIKE_SPEED = new Speed() {
+		public double get(final Category category) {
+			switch (category) {
+			case ROAD_HIGHWAY:
+				return 1;
+			case ROAD_KOKUDO:
+			case ROAD_KENDO:
+			case ROAD_CHIHODO:
+				return 18 * 1000 / 3600;
+			case ROAD_MAJOR:
+				return 16 * 1000 / 3600;
+			case ROAD_OTHER:
+			default:
+				return 12 * 1000 / 3600;
+			}
+		}
+
+		public String getVehicle() {
+			return "自転車";
+		}
+	};
+
+	/**
+	 * 歩行者の速度
+	 */
+	public static final Speed WALK_SPEED = new Speed() {
+		public double get(final Category category) {
+			return 4.8 * 1000 / 3600;
+		}
+
+		public String getVehicle() {
+			return "徒歩";
+		}
+	};
 
 	/**
 	 * インスタンスを取得します。
@@ -221,10 +309,20 @@ public class Route {
 	private Speed speed;
 
 	/**
+	 * ルートの文字列
+	 */
+	private String caption;
+
+	/**
+	 * 文字列の描画位置（仮想座標）
+	 */
+	private Point2D captionLocation;
+
+	/**
 	 * シングルトン用のコンストラクタです。
 	 */
 	private Route() {
-		this.graph = new HashMap<String, Collection<Edge>>();
+		this.graph = new ConcurrentHashMap<String, Collection<Edge>>();
 		this.route = new ArrayList<Shape>();
 		this.points = new ArrayList<String>();
 		this.cachedPoints = new ArrayList<Point2D>();
@@ -297,6 +395,9 @@ public class Route {
 	public void addPoint(final Point2D point) {
 		final String nearestNode = this.getNearestNode(point);
 		if (nearestNode != null) {
+			if (this.points.contains(nearestNode)) {
+				return;
+			}
 			if (this.points.isEmpty()) {
 				this.points.add(nearestNode);
 			} else {
@@ -308,6 +409,8 @@ public class Route {
 					this.points.add(nearestNode);
 				}
 			}
+			while (this.removeGhostPoint()) {
+			}
 			this.cachedPoints.clear();
 		}
 	}
@@ -317,6 +420,8 @@ public class Route {
 	 */
 	public void calcRoute() {
 		this.route.clear();
+		this.distance = 0;
+		this.time = 0;
 		String start = null;
 		for (final String string : this.points) {
 			if (start != null) {
@@ -324,7 +429,38 @@ public class Route {
 			}
 			start = string;
 		}
+		final String distance;
+		if (this.distance + .5 < 1000) {
+			distance = (int) (this.distance + .5) + "m";
+		} else if (this.distance / 1000 + .05 < 10) {
+			distance = new Formatter().format("%.1fkm", this.distance / 1000).toString();
+		} else {
+			distance = (int) (this.distance / 1000 + .5) + "km";
+		}
+		final String time;
+		if (this.time / 60 < 60) {
+			time = (int) (this.time / 60 + .5) + "分";
+		} else {
+			if ((int) (this.time / 60 % 60 + .5) == 0) {
+				time = (int) (this.time / 60 / 60) + "時間";
+			} else if ((int) (this.time / 60 % 60 + .5) == 30) {
+				time = (int) (this.time / 60 / 60) + "時間半";
+			} else {
+				time = (int) (this.time / 60 / 60) + "時間" + (int) (this.time / 60 % 60 + .5) + "分";
+			}
+		}
+		this.caption = distance + "（" + this.speed.getVehicle() + "で" + time + "）";
 	}
+
+	/**
+	 * 求められた経路の長さ[m]
+	 */
+	private double distance;
+
+	/**
+	 * 求められた経路の時間[s]
+	 */
+	private double time;
 
 	/**
 	 * 最短経路を求めます。
@@ -358,8 +494,8 @@ public class Route {
 					time += edge.length / this.speed.get(edge.category);
 					node2 = (edge.first.equals(node2)) ? edge.last : edge.first;
 				}
-				System.out.println(this.getClass().getName() + ": 距離は" + distance / 1000 + "km");
-				System.out.println(this.getClass().getName() + ": 時間は" + (time / 60) + "min");
+				this.distance += distance;
+				this.time += time;
 				break;
 			}
 			doneNodes.add(node.node);
@@ -408,6 +544,8 @@ public class Route {
 		this.route.clear();
 		this.points.clear();
 		this.cachedPoints.clear();
+		this.distance = 0;
+		this.time = 0;
 	}
 
 	/**
@@ -497,6 +635,20 @@ public class Route {
 	}
 
 	/**
+	 * 地点をスキャンし、グラフに存在しないものがあれば1つ削除します。
+	 * @return 削除したかどうか
+	 */
+	private boolean removeGhostPoint() {
+		for (int i = 0; i < this.points.size(); i++) {
+			if (!this.graph.containsKey(this.points.get(i))) {
+				this.points.remove(i);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * 指定した点に最も近い経由地を削除します。ある程度近いものしか削除できません。
 	 * @param point 点
 	 * @param radius 削除する地点の最大距離
@@ -544,68 +696,38 @@ public class Route {
 	}
 
 	/**
-	 * 高速道路優先探索の速度
+	 * @return 総経路長
 	 */
-	public static final Speed HIGHWAY_SPEED = new Speed() {
-		public double get(final Category category) {
-			switch (category) {
-			case ROAD_HIGHWAY:
-				return 80 * 1000 / 3600;
-			case ROAD_KOKUDO:
-				return 50 * 1000 / 3600;
-			case ROAD_KENDO:
-			case ROAD_CHIHODO:
-				return 45 * 1000 / 3600;
-			case ROAD_MAJOR:
-				return 40 * 1000 / 3600;
-			case ROAD_OTHER:
-			default:
-				return 25 * 1000 / 3600;
-			}
-		}
-	};
+	public double getDistance() {
+		return this.distance;
+	}
 
 	/**
-	 * 一般道優先探索の速度
+	 * @return 総移動時間
 	 */
-	public static final Speed NORMAL_SPEED = new Speed() {
-		public double get(final Category category) {
-			if (category == Category.ROAD_HIGHWAY) {
-				return 1;
-			} else {
-				return Route.HIGHWAY_SPEED.get(category);
-			}
-		}
-	};
+	public double getTime() {
+		return this.time;
+	}
 
 	/**
-	 * 自転車の速度
+	 * @return 文字列の描画位置（仮想座標）
 	 */
-	public static final Speed BIKE_SPEED = new Speed() {
-		public double get(final Category category) {
-			switch (category) {
-			case ROAD_HIGHWAY:
-				return 1;
-			case ROAD_KOKUDO:
-			case ROAD_KENDO:
-			case ROAD_CHIHODO:
-				return 18 * 1000 / 3600;
-			case ROAD_MAJOR:
-				return 16 * 1000 / 3600;
-			case ROAD_OTHER:
-			default:
-				return 12 * 1000 / 3600;
-			}
-		}
-	};
+	public Point2D getCaptionLocation() {
+		return this.captionLocation;
+	}
 
 	/**
-	 * 歩行者の速度
+	 * @param captionLocation 文字列の描画位置（仮想座標）
 	 */
-	public static final Speed WALK_SPEED = new Speed() {
-		public double get(final Category category) {
-			return 4.8 * 1000 / 3600;
-		}
-	};
+	public void setCaptionLocation(final Point2D captionLocation) {
+		this.captionLocation = captionLocation;
+	}
+
+	/**
+	 * @return ルートの文字列
+	 */
+	public String getCaption() {
+		return this.caption;
+	}
 
 }

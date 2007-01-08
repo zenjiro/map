@@ -239,6 +239,13 @@ public class MapPanel extends JPanel implements Printable {
 			public void mouseClicked(final MouseEvent e) {
 				if (e.getClickCount() > 1) {
 					if (e.getButton() == MouseEvent.BUTTON1) {
+						// since 6.1.0
+						if (MapPanel.this.isRouteMode()) {
+							Route.getInstance().removeNearestPoint(
+									toVirtualLocation(new Point2D.Double(e.getX(), e.getY())),
+									32 / MapPanel.this.getZoom());
+							Route.getInstance().calcRoute();
+						}
 						final Point2D point = MapPanel.this.toVirtualLocation(new Point2D.Double(e.getX(), e.getY()));
 						MapPanel.this.moveTo(point.getX(), point.getY());
 						if (MapPanel.this.getZoom() < Const.Zoom.LOAD_CITIES) {
@@ -275,7 +282,7 @@ public class MapPanel extends JPanel implements Printable {
 								|| e.getButton() == MouseEvent.BUTTON3) {
 							Route.getInstance().removeNearestPoint(
 									toVirtualLocation(new Point2D.Double(e.getX(), e.getY())),
-									16 / MapPanel.this.getZoom());
+									32 / MapPanel.this.getZoom());
 							Route.getInstance().calcRoute();
 						} else if ((e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0
 								|| e.getButton() == MouseEvent.BUTTON2) {
@@ -756,6 +763,42 @@ public class MapPanel extends JPanel implements Printable {
 	private void drawLabels(final Graphics2D g, final Rectangle2D visibleRectangle, final double zoom,
 			final double offsetX, final double offsetY) throws FileNotFoundException, IOException,
 			UnsupportedEncodingException {
+		// 最短経路探索の探索結果を描画する since 5.03
+		if (this.isRouteMode) {
+			for (final boolean is1st : new boolean[] { true, false }) {
+				for (final Shape shape : Route.getInstance().getRoute()) {
+					if (is1st) {
+						g.setStroke(new BasicStroke(this.getMapPreferences().getRoutePreferences().getWidth() + 2));
+						g.setColor(this.getMapPreferences().getRoutePreferences().getBorderColor());
+					} else {
+						g.setStroke(new BasicStroke(this.getMapPreferences().getRoutePreferences().getWidth()));
+						g.setColor(this.getMapPreferences().getRoutePreferences().getFillColor());
+					}
+					final AffineTransform transform = new AffineTransform();
+					transform.translate(-this.offsetX, -this.offsetY);
+					transform.scale(this.zoom, this.zoom);
+					this.draw(g, shape, false, transform);
+				}
+			}
+		}
+		// 最短経路探索の経由地を描画する since 6.0.0
+		if (this.isRouteMode) {
+			for (final Point2D point : Route.getInstance().getPoints()) {
+				final Point2D point2 = toRealLocation(point);
+				final float radius = 4;
+				final GeneralPath path = new GeneralPath();
+				path.moveTo((float) point2.getX() - radius, (float) point2.getY() - radius);
+				path.lineTo((float) point2.getX() + radius, (float) point2.getY() + radius);
+				path.moveTo((float) point2.getX() + radius, (float) point2.getY() - radius);
+				path.lineTo((float) point2.getX() - radius, (float) point2.getY() + radius);
+				g.setStroke(new BasicStroke(3));
+				g.setColor(Color.BLACK);
+				g.draw(path);
+				g.setStroke(new BasicStroke(2));
+				g.setColor(Color.YELLOW);
+				g.draw(path);
+			}
+		}
 		if (this.maps != null & zoom >= Const.Zoom.LOAD_GYOUSEI) {
 			g.setStroke(new BasicStroke(1f));
 			for (final MapData mapData : this.maps.values()) {
@@ -795,37 +838,9 @@ public class MapPanel extends JPanel implements Printable {
 		if (zoom < Const.Zoom.LOAD_ALL && zoom >= Const.Zoom.LOAD_FINE_CITIES) {
 			drawKsjRailwayCurveLabels(g, visibleRectangle, zoom, offsetX, offsetY);
 		}
-		// test 5.03 最短経路探索の探索結果を描画してみる
-		for (final boolean is1st : new boolean[] { true, false }) {
-			for (final Shape shape : Route.getInstance().getRoute()) {
-				if (is1st) {
-					g.setStroke(new BasicStroke(6f));
-					g.setColor(Color.YELLOW.darker());
-				} else {
-					g.setStroke(new BasicStroke(4f));
-					g.setColor(Color.YELLOW);
-				}
-				final AffineTransform transform = new AffineTransform();
-				transform.translate(-this.offsetX, -this.offsetY);
-				transform.scale(this.zoom, this.zoom);
-				this.draw(g, shape, false, transform);
-			}
-		}
-		// test 6.0.0 最短経路探索の経由地を描画してみる
-		for (final Point2D point : Route.getInstance().getPoints()) {
-			final Point2D point2 = toRealLocation(point);
-			final float radius = 4;
-			final GeneralPath path = new GeneralPath();
-			path.moveTo((float) point2.getX() - radius, (float) point2.getY() - radius);
-			path.lineTo((float) point2.getX() + radius, (float) point2.getY() + radius);
-			path.moveTo((float) point2.getX() + radius, (float) point2.getY() - radius);
-			path.lineTo((float) point2.getX() - radius, (float) point2.getY() + radius);
-			g.setStroke(new BasicStroke(3));
-			g.setColor(Color.BLACK);
-			g.draw(path);
-			g.setStroke(new BasicStroke(2));
-			g.setColor(Color.YELLOW);
-			g.draw(path);
+		// ルートの文字列を描画する
+		if (Route.getInstance().getCaption() != null && Route.getInstance().getCaptionLocation() != null) {
+			drawRouteLabel(g, visibleRectangle, zoom, offsetX, offsetY);
 		}
 		// 中心点を描画する
 		if (this.isCenterMark) {
@@ -871,6 +886,25 @@ public class MapPanel extends JPanel implements Printable {
 				}
 			}
 		}
+	}
+
+	/**
+	 * ルートの文字列を描画します。
+	 * @param g 描画対象
+	 * @param visibleRectangle 表示されている範囲（仮想座標）
+	 * @param zoom 表示倍率
+	 * @param offsetX 平行移動するx座標（実座標）
+	 * @param offsetY 平行移動するy座標（実座標）
+	 */
+	private void drawRouteLabel(final Graphics2D g, final Rectangle2D visibleRectangle, final double zoom,
+			final double offsetX, final double offsetY) {
+		g.setFont(this.mapPreferences.getRoutePreferences().getFont());
+		final int descent = this.getFontMetrics(g.getFont()).getDescent();
+		g.setColor(this.mapPreferences.getRoutePreferences().getAttributeColor());
+		g.drawString(Route.getInstance().getCaption(),
+				(float) (Route.getInstance().getCaptionLocation().getX() * zoom - offsetX), (float) (Route
+						.getInstance().getCaptionLocation().getY()
+						* zoom - offsetY - descent));
 	}
 
 	/**

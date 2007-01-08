@@ -180,6 +180,11 @@ public interface MapPreferences {
     Preferences getKsjRoadMajorPreferences();
 
     /**
+     * @return ルートの設定
+     */
+    Preferences getRoutePreferences();
+    
+    /**
      * 弧とポリゴンの設定を扱うクラスです。
      * @author zenjiro
      */

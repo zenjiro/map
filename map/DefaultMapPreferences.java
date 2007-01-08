@@ -24,28 +24,6 @@ public class DefaultMapPreferences implements MapPreferences {
 			Fonts.GOTHIC, Font.PLAIN, 30));
 
 	/**
-	 * 文字の大きさを変更します。
-	 * @param zoom 文字の大きさ
-	 */
-	public void setFontZoom(final double zoom) {
-		this.normalRoadPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (15 * zoom)));
-		this.railwayPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (16 * zoom)));
-		this.mizuPreferences.setFont(new Font(Fonts.MINCHO, Font.PLAIN, (int) (14 * zoom)));
-		this.zyoutiPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (15 * zoom)));
-		this.parkPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (15 * zoom)));
-		this.tatemonoPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (12 * zoom)));
-		this.ekiPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (20 * zoom)));
-		this.si_tyoPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (40 * zoom)));
-		this.cityPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (20 * zoom)));
-		this.prefecturePreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (30 * zoom)));
-		this.isjPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (10 * zoom)));
-		this.tyomePreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (9 * zoom)));
-		this.ksjRailwayPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (13 * zoom)));
-		this.ksjRailwayStationPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (15 * zoom)));
-		this.ksjRoadMajorPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (15 * zoom)));
-	}
-
-	/**
 	 * 高速道路の設定
 	 */
 	private final Preferences highwayPreferences = new Preferences(new Color(160, 220, 160), new Color(160, 220, 160)
@@ -145,6 +123,156 @@ public class DefaultMapPreferences implements MapPreferences {
 			Fonts.GOTHIC, Font.PLAIN, 10));
 
 	/**
+	 * 国土数値情報の鉄道データのうち、JRの設定
+	 */
+	private Preferences ksjRailwayJRPreferences = new Preferences(Color.WHITE, Color.GRAY, 1.5f, null, null);
+
+	/**
+	 * 国土数値情報の鉄道データのうち、JR以外の設定
+	 */
+	private Preferences ksjRailwayPreferences = new Preferences(Color.WHITE, Color.GRAY, 1, Color.BLUE, new Font(
+			Fonts.GOTHIC, Font.PLAIN, 13));
+
+	/**
+	 * 国土数値情報の鉄道データのうち、駅の設定
+	 */
+	private Preferences ksjRailwayStationPreferences = new Preferences(Color.RED, Color.GRAY, 3, Color.BLACK, new Font(
+			Fonts.GOTHIC, Font.PLAIN, 15));
+
+	/**
+	 * 国土数値情報の道路データのうち、高速道路の設定
+	 */
+	private Preferences ksjRoadHighawyPreferences = new Preferences(this.highwayPreferences.getFillColor(),
+			this.highwayPreferences.getBorderColor(), 2f, null, null);
+
+	/**
+	 * 国土数値情報の道路データのうち、国道の設定
+	 */
+	private Preferences ksjRoadKokudoPreferences = new Preferences(this.kokudoPreferences.getFillColor(),
+			this.kokudoPreferences.getBorderColor(), 1.5f, null, null);
+
+	/**
+	 * 国土数値情報の道路データのうち、主要道路の設定
+	 */
+	private Preferences ksjRoadMajorPreferences = new Preferences(this.chihodoPreferences.getFillColor(),
+			this.chihodoPreferences.getBorderColor(), 1.5f, Color.BLUE.darker(), new Font(Fonts.GOTHIC, Font.PLAIN, 15));
+
+	/**
+	 * ルートの設定
+	 */
+	private Preferences routePreferences = new Preferences(Color.YELLOW, Color.YELLOW.darker(), 4, Color.BLUE,
+			new Font(Fonts.GOTHIC, Font.PLAIN, 15));
+
+	public Color getBackGroundColor() {
+		return Color.WHITE;
+	}
+
+	public Preferences getChihodoPreferences() {
+		return this.chihodoPreferences;
+	}
+
+	public Preferences getCityPreferences() {
+		return this.cityPreferences;
+	}
+
+	public Preferences getEkiPreferences() {
+		return this.ekiPreferences;
+	}
+
+	public Preferences getHighwayPreferences() {
+		return this.highwayPreferences;
+	}
+
+	public Preferences getIsjPreferences() {
+		return this.isjPreferences;
+	}
+
+	public Preferences getJRPreferences() {
+		return this.jrPreferences;
+	}
+
+	public Preferences getJRShinkansenPreferences() {
+		return this.jrShinkansenPreferences;
+	}
+
+	public Preferences getKendoPreferences() {
+		return this.kendoPreferences;
+	}
+
+	public Preferences getKokudoPreferences() {
+		return this.kokudoPreferences;
+	}
+
+	public Preferences getKsjRailwayJRPreferences() {
+		return this.ksjRailwayJRPreferences;
+	}
+
+	public Preferences getKsjRailwayPreferences() {
+		return this.ksjRailwayPreferences;
+	}
+
+	public Preferences getKsjRailwayStationPreferences() {
+		return this.ksjRailwayStationPreferences;
+	}
+
+	/**
+	 * 国土数値情報の道路データのうち、高速道路の設定を取得します。
+	 */
+	public Preferences getKsjRoadHighwayPreferences() {
+		return this.ksjRoadHighawyPreferences;
+	}
+
+	/**
+	 * 国土数値情報の道路データのうち、国道の設定を取得します。
+	 */
+	public Preferences getKsjRoadKokudoPreferences() {
+		return this.ksjRoadKokudoPreferences;
+	}
+
+	/**
+	 * 国土数値情報の道路データのうち、主要な道路の設定を取得します。
+	 */
+	public Preferences getKsjRoadMajorPreferences() {
+		return this.ksjRoadMajorPreferences;
+	}
+
+	public Preferences getMajorRoadPreferences() {
+		return this.majorRoadPreferences;
+	}
+
+	public Color getMapBoundsColor() {
+		return Color.BLACK;
+	}
+
+	public Preferences getMizuPreferences() {
+		return this.mizuPreferences;
+	}
+
+	public Preferences getNormalRoadPreferences() {
+		return this.normalRoadPreferences;
+	}
+
+	public Preferences getParkPreferences() {
+		return this.parkPreferences;
+	}
+
+	public Preferences getPrefecturePreferences() {
+		return this.prefecturePreferences;
+	}
+
+	public Preferences getRailwayPreferences() {
+		return this.railwayPreferences;
+	}
+
+	public Preferences getSi_tyoPreferences() {
+		return this.si_tyoPreferences;
+	}
+
+	public Preferences getTatemonoPreferences() {
+		return this.tatemonoPreferences;
+	}
+
+	/**
 	 * 丁目を塗り分ける色を取得します。
 	 * @param index 何色目か
 	 * @return 色
@@ -171,154 +299,39 @@ public class DefaultMapPreferences implements MapPreferences {
 		}
 	}
 
-	public Color getBackGroundColor() {
-		return Color.WHITE;
-	}
-
-	public Color getMapBoundsColor() {
-		return Color.BLACK;
-	}
-
-	public Preferences getChihodoPreferences() {
-		return this.chihodoPreferences;
-	}
-
-	public Preferences getSi_tyoPreferences() {
-		return this.si_tyoPreferences;
-	}
-
-	public Preferences getHighwayPreferences() {
-		return this.highwayPreferences;
-	}
-
-	public Preferences getJRPreferences() {
-		return this.jrPreferences;
-	}
-
-	public Preferences getJRShinkansenPreferences() {
-		return this.jrShinkansenPreferences;
-	}
-
-	public Preferences getKendoPreferences() {
-		return this.kendoPreferences;
-	}
-
-	public Preferences getKokudoPreferences() {
-		return this.kokudoPreferences;
-	}
-
-	public Preferences getMajorRoadPreferences() {
-		return this.majorRoadPreferences;
-	}
-
-	public Preferences getNormalRoadPreferences() {
-		return this.normalRoadPreferences;
-	}
-
-	public Preferences getParkPreferences() {
-		return this.parkPreferences;
-	}
-
-	public Preferences getRailwayPreferences() {
-		return this.railwayPreferences;
-	}
-
-	public Preferences getTatemonoPreferences() {
-		return this.tatemonoPreferences;
-	}
-
 	public Preferences getTyomePreferences() {
 		return this.tyomePreferences;
-	}
-
-	public Preferences getMizuPreferences() {
-		return this.mizuPreferences;
 	}
 
 	public Preferences getZyoutiPreferences() {
 		return this.zyoutiPreferences;
 	}
 
-	public Preferences getEkiPreferences() {
-		return this.ekiPreferences;
-	}
-
-	public Preferences getCityPreferences() {
-		return this.cityPreferences;
-	}
-
-	public Preferences getPrefecturePreferences() {
-		return this.prefecturePreferences;
-	}
-
-	public Preferences getIsjPreferences() {
-		return this.isjPreferences;
-	}
-
 	/**
-	 * 国土数値情報の鉄道データのうち、JRの設定
+	 * 文字の大きさを変更します。
+	 * @param zoom 文字の大きさ
 	 */
-	private Preferences ksjRailwayJRPreferences = new Preferences(Color.WHITE, Color.GRAY, 1.5f, null, null);
-
-	/**
-	 * 国土数値情報の鉄道データのうち、JR以外の設定
-	 */
-	private Preferences ksjRailwayPreferences = new Preferences(Color.WHITE, Color.GRAY, 1, Color.BLUE, new Font(
-			Fonts.GOTHIC, Font.PLAIN, 13));
-
-	/**
-	 * 国土数値情報の鉄道データのうち、駅の設定
-	 */
-	private Preferences ksjRailwayStationPreferences = new Preferences(Color.RED, Color.GRAY, 3, Color.BLACK, new Font(
-			Fonts.GOTHIC, Font.PLAIN, 15));
-
-	public Preferences getKsjRailwayJRPreferences() {
-		return this.ksjRailwayJRPreferences;
+	public void setFontZoom(final double zoom) {
+		this.normalRoadPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (15 * zoom)));
+		this.railwayPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (16 * zoom)));
+		this.mizuPreferences.setFont(new Font(Fonts.MINCHO, Font.PLAIN, (int) (14 * zoom)));
+		this.zyoutiPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (15 * zoom)));
+		this.parkPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (15 * zoom)));
+		this.tatemonoPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (12 * zoom)));
+		this.ekiPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (20 * zoom)));
+		this.si_tyoPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (40 * zoom)));
+		this.cityPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (20 * zoom)));
+		this.prefecturePreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (30 * zoom)));
+		this.isjPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (10 * zoom)));
+		this.tyomePreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (9 * zoom)));
+		this.ksjRailwayPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (13 * zoom)));
+		this.ksjRailwayStationPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (15 * zoom)));
+		this.ksjRoadMajorPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (15 * zoom)));
+		this.routePreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (15 * zoom)));
 	}
 
-	public Preferences getKsjRailwayPreferences() {
-		return this.ksjRailwayPreferences;
+	public Preferences getRoutePreferences() {
+		return this.routePreferences;
 	}
 
-	public Preferences getKsjRailwayStationPreferences() {
-		return this.ksjRailwayStationPreferences;
-	}
-
-	/**
-	 * 国土数値情報の道路データのうち、高速道路の設定
-	 */
-	private Preferences ksjRoadHighawyPreferences = new Preferences(this.highwayPreferences.getFillColor(),
-			this.highwayPreferences.getBorderColor(), 2f, null, null);
-	/**
-	 * 国土数値情報の道路データのうち、国道の設定
-	 */
-	private Preferences ksjRoadKokudoPreferences = new Preferences(this.kokudoPreferences.getFillColor(),
-			this.kokudoPreferences.getBorderColor(), 1.5f, null, null);
-	/**
-	 * 国土数値情報の道路データのうち、主要道路の設定
-	 */
-	private Preferences ksjRoadMajorPreferences = new Preferences(this.chihodoPreferences.getFillColor(),
-			this.chihodoPreferences.getBorderColor(), 1.5f, Color.BLUE.darker(), new Font(Fonts.GOTHIC, Font.PLAIN, 15));
-
-	/**
-	 * 国土数値情報の道路データのうち、高速道路の設定を取得します。
-	 */
-	public Preferences getKsjRoadHighwayPreferences() {
-		return this.ksjRoadHighawyPreferences;
-	}
-
-	/**
-	 * 国土数値情報の道路データのうち、国道の設定を取得します。
-	 */
-	public Preferences getKsjRoadKokudoPreferences() {
-		return this.ksjRoadKokudoPreferences;
-	}
-
-	/**
-	 * 国土数値情報の道路データのうち、主要な道路の設定を取得します。
-	 */
-	public Preferences getKsjRoadMajorPreferences() {
-		return this.ksjRoadMajorPreferences;
-	}
-	
 }

@@ -3,6 +3,7 @@ package map;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Point;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
@@ -15,6 +16,7 @@ import java.util.Map;
 import map.Const.Fonts;
 import map.KsjRailway.Railway;
 import map.KsjRailway.Station;
+import route.Route;
 import search.CellSearch;
 import search.Search;
 
@@ -77,6 +79,22 @@ class FixAttributeLocation {
 				}
 			}
 		}
+		// ルートの文字列の表示位置を計算する since 6.1.0
+		if (Route.getInstance().getCaption() != null) {
+			Route.getInstance().setCaptionLocation(null);
+			final FontMetrics metrics = panel.getFontMetrics(panel.getMapPreferences().getRoutePreferences().getFont());
+			final double captionHeight = metrics.getHeight() / zoom;
+			final Collection<String> fixedAttributes = new HashSet<String>();
+			for (final Shape shape : Route.getInstance().getRoute()) {
+				final Railway railway = new Railway(shape, Route.getInstance().getCaption());
+				fixKsjRailwayAttributeLocation(railway, search, visibleRectangle, zoom, metrics, captionHeight,
+						fixedAttributes, false);
+				if (railway.getCaptionLocation() != null) {
+					Route.getInstance().setCaptionLocation(railway.getCaptionLocation());
+					break;
+				}
+			}
+		}
 		// 国土数値情報の駅の表示位置を計算する
 		if (zoom < Const.Zoom.LOAD_ALL && zoom >= Const.Zoom.LOAD_FINE_CITIES) {
 			final FontMetrics metrics = panel.getFontMetrics(panel.getMapPreferences()
@@ -107,14 +125,14 @@ class FixAttributeLocation {
 							fixedCaptions, false);
 				}
 				if (prefecture.hasCities()) {
-						for (final City city : prefecture.getCities()) {
-							if (city.hasKsjFineRoad()) {
-								for (final Railway road : city.getKsjFineRoad()) {
-									fixKsjRailwayAttributeLocation(road, search, visibleRectangle, zoom, metrics,
-											captionHeight, fixedCaptions, true);
-								}
+					for (final City city : prefecture.getCities()) {
+						if (city.hasKsjFineRoad()) {
+							for (final Railway road : city.getKsjFineRoad()) {
+								fixKsjRailwayAttributeLocation(road, search, visibleRectangle, zoom, metrics,
+										captionHeight, fixedCaptions, true);
 							}
 						}
+					}
 				}
 			}
 		}
@@ -357,7 +375,7 @@ class FixAttributeLocation {
 			final double[] coords = new double[6];
 			while (!iterator.isDone()) {
 				final int segment = iterator.currentSegment(coords);
-				if (segment == (isFast ? PathIterator.SEG_MOVETO : PathIterator.SEG_LINETO)) {
+				if (segment == PathIterator.SEG_MOVETO || (!isFast && segment == PathIterator.SEG_LINETO)) {
 					final double x = coords[0];
 					final double y = coords[1];
 					final Rectangle2D captionRectangle = new Rectangle2D.Double(x - captionWidth / 2,
