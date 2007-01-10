@@ -316,5 +316,10 @@ public interface MapPreferences {
 	 * @param zoom 文字の大きさ
 	 */
 	public void setFontZoom(final double zoom);
+
+	/**
+	 * @return ルート探索の地点の幅、高さ（実座標）
+	 */
+	public float getRoutePointSize();
 	
 }

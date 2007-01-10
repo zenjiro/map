@@ -52,6 +52,12 @@ class FixAttributeLocation {
 		final double tatemonoPointSize = 4; // 建物に表示する点の直径
 		final double ekiPointSize = 8; // 駅に表示する点の直径
 		final double zoom = panel.getZoom();
+		// ルートの地点を検索エンジンに追加する since 6.1.1
+		for (Point2D point : Route.getInstance().getPoints()) {
+			search.insert(new Rectangle2D.Double(point.getX() - panel.getMapPreferences().getRoutePointSize() / 2,
+					point.getY() - panel.getMapPreferences().getRoutePointSize() / 2, panel.getMapPreferences()
+							.getRoutePointSize(), panel.getMapPreferences().getRoutePointSize()), null);
+		}
 		if (zoom >= Const.Zoom.LOAD_ALL) {
 			// 駅の属性の表示位置を計算する
 			for (final MapData mapData : maps.values()) {

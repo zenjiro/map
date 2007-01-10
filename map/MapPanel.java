@@ -785,7 +785,7 @@ public class MapPanel extends JPanel implements Printable {
 		if (this.isRouteMode) {
 			for (final Point2D point : Route.getInstance().getPoints()) {
 				final Point2D point2 = toRealLocation(point);
-				final float radius = 4;
+				final float radius = this.mapPreferences.getRoutePointSize() / 2;
 				final GeneralPath path = new GeneralPath();
 				path.moveTo((float) point2.getX() - radius, (float) point2.getY() - radius);
 				path.lineTo((float) point2.getX() + radius, (float) point2.getY() + radius);

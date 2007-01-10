@@ -334,4 +334,8 @@ public class DefaultMapPreferences implements MapPreferences {
 		return this.routePreferences;
 	}
 
+	public float getRoutePointSize() {
+		return 8;
+	}
+
 }
