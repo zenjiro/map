@@ -87,6 +87,7 @@ public abstract class AbstractGraphics2D extends Graphics2D implements Cloneable
 
     /**
      * This private constructor is used in create
+     * @param g 
      *
      * @see #create
      */
@@ -1021,7 +1022,6 @@ public abstract class AbstractGraphics2D extends Graphics2D implements Cloneable
      *         used to render to the screen and a security manager
      *         is set and its <code>checkPermission</code> method
      *         does not allow the operation.
-     * @param comp the <code>Composite</code> object to be used for rendering
      * @see java.awt.Graphics#setXORMode
      * @see java.awt.Graphics#setPaintMode
      * @see java.awt.AlphaComposite

@@ -292,6 +292,7 @@ public class MapPanel extends JPanel implements Printable {
 							Route.getInstance().addPoint(toVirtualLocation(new Point2D.Double(e.getX(), e.getY())));
 							Route.getInstance().calcRoute();
 						}
+						MapPanel.this.setChanged();
 						MapPanel.this.forceRepaint();
 					}
 				}
@@ -593,7 +594,8 @@ public class MapPanel extends JPanel implements Printable {
 			if (this.prefectures != null) {
 				for (final Prefecture prefecture : this.prefectures) {
 					if (prefecture.hasCities()) {
-						this.setFixedStroke(g, this.mapPreferences.getCityPreferences().getWidth(), isTransform, zoom);
+						this.setFixedStroke(g, this.mapPreferences.getCityPreferences().getWidth(), isTransform, zoom,
+								false);
 						for (final City city : prefecture.getCities()) {
 							final Shape shape = city.hasFineShape() ? city.getFineShape() : city.getShape();
 							if (shape.intersects(x, y, w, h)) {
@@ -616,7 +618,7 @@ public class MapPanel extends JPanel implements Printable {
 						}
 						if (!isDark) {
 							this.setFixedStroke(g, this.mapPreferences.getPrefecturePreferences().getWidth(),
-									isTransform, zoom);
+									isTransform, zoom, false);
 							this.draw(g, prefecture.hasFine() ? prefecture.getFineShape() : prefecture.getShape(),
 									isTransform, transform);
 						}
@@ -669,26 +671,32 @@ public class MapPanel extends JPanel implements Printable {
 	 * @param transform 座標変換
 	 * @param mapData 地図
 	 * @param zoom 表示倍率
+	 * @param isSi_tyo 市区町村界のみを描画するかどうか
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
 	private void drawGyousei(final Graphics2D g, final boolean isTransform, final AffineTransform transform,
-			final MapData mapData, final double zoom) throws FileNotFoundException, IOException {
+			final MapData mapData, final double zoom, final boolean isSi_tyo) throws FileNotFoundException, IOException {
 		if (mapData.hasGyousei() && mapData.hasTyome()) {
 			for (final ArcData arc : mapData.getGyousei().values()) {
 				if (arc.getTag() == ArcData.TAG_NORMAL) {
-					if ((arc.getClassification() == ArcData.TYPE_GYOUSEI_PREFECTURE)
-							|| (arc.getClassification() == ArcData.TYPE_GYOUSEI_CITY)
-							|| (arc.getClassification() == ArcData.TYPE_GYOUSEI_VILLAGE)) {
-						g.setColor(this.mapPreferences.getSi_tyoPreferences().getBorderColor());
-						this.setVariableStroke(g, this.mapPreferences.getSi_tyoPreferences().getWidth(), isTransform,
-								zoom);
+					if (arc.getClassification() == ArcData.TYPE_GYOUSEI_PREFECTURE
+							|| arc.getClassification() == ArcData.TYPE_GYOUSEI_CITY
+							|| arc.getClassification() == ArcData.TYPE_GYOUSEI_VILLAGE) {
+						if (isSi_tyo) {
+							g.setColor(this.mapPreferences.getSi_tyoPreferences().getBorderColor());
+							this.setVariableStroke(g, this.mapPreferences.getSi_tyoPreferences().getWidth(),
+									isTransform, zoom, false);
+							this.draw(g, arc.getPath(), isTransform, transform);
+						}
 					} else {
-						g.setColor(this.mapPreferences.getTyomePreferences().getBorderColor());
-						this.setVariableStroke(g, this.mapPreferences.getTyomePreferences().getWidth(), isTransform,
-								zoom);
+						if (!isSi_tyo) {
+							g.setColor(this.mapPreferences.getTyomePreferences().getBorderColor());
+							this.setVariableStroke(g, this.mapPreferences.getTyomePreferences().getWidth(),
+									isTransform, zoom, false);
+							this.draw(g, arc.getPath(), isTransform, transform);
+						}
 					}
-					this.draw(g, arc.getPath(), isTransform, transform);
 				}
 			}
 		}
@@ -1104,7 +1112,8 @@ public class MapPanel extends JPanel implements Printable {
 			final double x, final double y, final double w, final double h, final double zoom) {
 		if (this.prefectures != null) {
 			for (final Prefecture prefecture : this.prefectures) {
-				this.setFixedStroke(g, this.mapPreferences.getPrefecturePreferences().getWidth(), isTransform, zoom);
+				this.setFixedStroke(g, this.mapPreferences.getPrefecturePreferences().getWidth(), isTransform, zoom,
+						false);
 				if (prefecture.getBounds().intersects(x, y, w, h)) {
 					final Shape shape = prefecture.hasFine() ? prefecture.getFineShape() : prefecture.getShape();
 					if (shape.intersects(x, y, w, h)) {
@@ -1165,11 +1174,11 @@ public class MapPanel extends JPanel implements Printable {
 					}
 				}
 				this.setFixedStroke(g, this.mapPreferences.getKsjRailwayStationPreferences().getWidth() + 2,
-						isTransform, zoom);
+						isTransform, zoom, false);
 				g.setColor(this.mapPreferences.getKsjRailwayStationPreferences().getBorderColor());
 				drawKsjStation(g, isTransform, transform, x, y, w, h);
 				this.setFixedStroke(g, this.mapPreferences.getKsjRailwayStationPreferences().getWidth(), isTransform,
-						zoom);
+						zoom, false);
 				g.setColor(this.mapPreferences.getKsjRailwayStationPreferences().getFillColor());
 				drawKsjStation(g, isTransform, transform, x, y, w, h);
 				for (final Prefecture prefecture : this.prefectures) {
@@ -1203,33 +1212,33 @@ public class MapPanel extends JPanel implements Printable {
 		case ROAD_MAJOR:
 			if (isBorder) {
 				this.setFixedStroke(g, this.getMapPreferences().getKsjRoadMajorPreferences().getWidth() + 2,
-						isTransform, zoom);
+						isTransform, zoom, true);
 				g.setColor(this.getMapPreferences().getKsjRoadMajorPreferences().getBorderColor());
 			} else {
 				this.setFixedStroke(g, this.getMapPreferences().getKsjRoadMajorPreferences().getWidth(), isTransform,
-						zoom);
+						zoom, true);
 				g.setColor(this.getMapPreferences().getKsjRoadMajorPreferences().getFillColor());
 			}
 			break;
 		case ROAD_KOKUDO:
 			if (isBorder) {
 				this.setFixedStroke(g, this.getMapPreferences().getKsjRoadKokudoPreferences().getWidth() + 2,
-						isTransform, zoom);
+						isTransform, zoom, true);
 				g.setColor(this.getMapPreferences().getKsjRoadKokudoPreferences().getBorderColor());
 			} else {
 				this.setFixedStroke(g, this.getMapPreferences().getKsjRoadKokudoPreferences().getWidth(), isTransform,
-						zoom);
+						zoom, true);
 				g.setColor(this.getMapPreferences().getKsjRoadKokudoPreferences().getFillColor());
 			}
 			break;
 		case ROAD_HIGHWAY:
 			if (isBorder) {
 				this.setFixedStroke(g, this.getMapPreferences().getKsjRoadHighwayPreferences().getWidth() + 2,
-						isTransform, zoom);
+						isTransform, zoom, true);
 				g.setColor(this.getMapPreferences().getKsjRoadHighwayPreferences().getBorderColor());
 			} else {
 				this.setFixedStroke(g, this.getMapPreferences().getKsjRoadHighwayPreferences().getWidth(), isTransform,
-						zoom);
+						zoom, true);
 				g.setColor(this.getMapPreferences().getKsjRoadHighwayPreferences().getFillColor());
 			}
 			break;
@@ -1306,21 +1315,23 @@ public class MapPanel extends JPanel implements Printable {
 			final Collection<? extends Railway> railways, final boolean isTransform, final AffineTransform transform,
 			final double zoom) {
 		if (business == KsjRailway.Business.JR || business == KsjRailway.Business.SHINKANSEN) {
-			this.setFixedStroke(g, this.mapPreferences.getKsjRailwayJRPreferences().getWidth() + 2, isTransform, zoom);
+			this.setFixedStroke(g, this.mapPreferences.getKsjRailwayJRPreferences().getWidth() + 2, isTransform, zoom,
+					false);
 			g.setColor(this.mapPreferences.getKsjRailwayJRPreferences().getBorderColor());
 		} else if (business == KsjRailway.Business.ROAD_HIGHWAY) {
-			this
-					.setFixedStroke(g, this.mapPreferences.getKsjRoadHighwayPreferences().getWidth() + 2, isTransform,
-							zoom);
+			this.setFixedStroke(g, this.mapPreferences.getKsjRoadHighwayPreferences().getWidth() + 2, isTransform,
+					zoom, true);
 			g.setColor(this.mapPreferences.getKsjRoadHighwayPreferences().getBorderColor());
 		} else if (business == KsjRailway.Business.ROAD_KOKUDO) {
-			this.setFixedStroke(g, this.mapPreferences.getKsjRoadKokudoPreferences().getWidth() + 2, isTransform, zoom);
+			this.setFixedStroke(g, this.mapPreferences.getKsjRoadKokudoPreferences().getWidth() + 2, isTransform, zoom,
+					true);
 			g.setColor(this.mapPreferences.getKsjRoadKokudoPreferences().getBorderColor());
 		} else if (business == KsjRailway.Business.ROAD_MAJOR) {
-			this.setFixedStroke(g, this.mapPreferences.getKsjRoadMajorPreferences().getWidth() + 2, isTransform, zoom);
+			this.setFixedStroke(g, this.mapPreferences.getKsjRoadMajorPreferences().getWidth() + 2, isTransform, zoom,
+					true);
 			g.setColor(this.mapPreferences.getKsjRoadMajorPreferences().getBorderColor());
 		} else {
-			this.setFixedStroke(g, this.mapPreferences.getKsjRailwayPreferences().getWidth(), isTransform, zoom);
+			this.setFixedStroke(g, this.mapPreferences.getKsjRailwayPreferences().getWidth(), isTransform, zoom, false);
 			g.setColor(this.mapPreferences.getKsjRailwayPreferences().getBorderColor());
 		}
 		for (final Railway railway : railways) {
@@ -1333,13 +1344,17 @@ public class MapPanel extends JPanel implements Printable {
 			setFixedJRStroke(g, this.mapPreferences.getKsjRailwayJRPreferences().getWidth(), 15, isTransform);
 			g.setColor(this.mapPreferences.getKsjRailwayJRPreferences().getFillColor());
 		} else if (business == KsjRailway.Business.ROAD_HIGHWAY) {
-			this.setFixedStroke(g, this.mapPreferences.getKsjRoadHighwayPreferences().getWidth(), isTransform, zoom);
+			this.setFixedStroke(g, this.mapPreferences.getKsjRoadHighwayPreferences().getWidth(), isTransform, zoom,
+					true);
 			g.setColor(this.mapPreferences.getKsjRoadHighwayPreferences().getFillColor());
 		} else if (business == KsjRailway.Business.ROAD_KOKUDO) {
-			this.setFixedStroke(g, this.mapPreferences.getKsjRoadKokudoPreferences().getWidth(), isTransform, zoom);
+			this.setFixedStroke(g, this.mapPreferences.getKsjRoadKokudoPreferences().getWidth(), isTransform, zoom,
+					true);
 			g.setColor(this.mapPreferences.getKsjRoadKokudoPreferences().getFillColor());
 		} else if (business == KsjRailway.Business.ROAD_MAJOR) {
-			this.setFixedStroke(g, this.mapPreferences.getKsjRoadMajorPreferences().getWidth(), isTransform, zoom);
+			this
+					.setFixedStroke(g, this.mapPreferences.getKsjRoadMajorPreferences().getWidth(), isTransform, zoom,
+							true);
 			g.setColor(this.mapPreferences.getKsjRoadMajorPreferences().getFillColor());
 		} else {
 			return;
@@ -1406,7 +1421,7 @@ public class MapPanel extends JPanel implements Printable {
 	private void drawRailway(final Graphics2D g, final boolean isTransform, final AffineTransform transform,
 			final MapData mapData, final double zoom) throws FileNotFoundException, IOException {
 		if (mapData.hasOthers() && mapData.hasTyome()) {
-			this.setVariableStroke(g, this.mapPreferences.getJRPreferences().getWidth() + 4, isTransform, zoom);
+			this.setVariableStroke(g, this.mapPreferences.getJRPreferences().getWidth() + 4, isTransform, zoom, false);
 			for (final ArcData arc : mapData.getOthers().values()) {
 				if (arc.getClassification() == ArcData.TYPE_RAILWAY) {
 					if (arc.getRailwayType() == ArcData.RAILWAY_JR) {
@@ -1449,7 +1464,7 @@ public class MapPanel extends JPanel implements Printable {
 						this.draw(g, arc.getPath(), isTransform, transform);
 					} else {
 						this.setVariableStroke(g, this.mapPreferences.getRailwayPreferences().getWidth(), isTransform,
-								zoom);
+								zoom, false);
 						g.setColor(this.mapPreferences.getRailwayPreferences().getBorderColor());
 						this.draw(g, arc.getPath(), isTransform, transform);
 					}
@@ -1504,32 +1519,32 @@ public class MapPanel extends JPanel implements Printable {
 			for (final ArcData arc : mapData.getRoadArc().values()) {
 				if (arc.getRoadType() == ArcData.ROAD_HIGHWAY) {
 					this.setVariableFatStroke(g, this.mapPreferences.getHighwayPreferences().getWidth(), isTransform,
-							zoom);
+							zoom, true);
 					g.setColor(this.mapPreferences.getHighwayPreferences().getBorderColor());
 					this.draw(g, arc.getPath(), isTransform, transform);
 				} else if (arc.getRoadType() == ArcData.ROAD_KOKUDO) {
 					this.setVariableFatStroke(g, this.mapPreferences.getKokudoPreferences().getWidth(), isTransform,
-							zoom);
+							zoom, true);
 					g.setColor(this.mapPreferences.getKokudoPreferences().getBorderColor());
 					this.draw(g, arc.getPath(), isTransform, transform);
 				} else if (arc.getRoadType() == ArcData.ROAD_KENDO) {
 					this.setVariableFatStroke(g, this.mapPreferences.getKendoPreferences().getWidth(), isTransform,
-							zoom);
+							zoom, true);
 					g.setColor(this.mapPreferences.getKendoPreferences().getBorderColor());
 					this.draw(g, arc.getPath(), isTransform, transform);
 				} else if (arc.getRoadType() == ArcData.ROAD_CHIHODO) {
 					this.setVariableFatStroke(g, this.mapPreferences.getChihodoPreferences().getWidth(), isTransform,
-							zoom);
+							zoom, true);
 					g.setColor(this.mapPreferences.getChihodoPreferences().getBorderColor());
 					this.draw(g, arc.getPath(), isTransform, transform);
 				} else if (arc.getRoadType() == ArcData.ROAD_MAJOR) {
 					this.setVariableFatStroke(g, this.mapPreferences.getMajorRoadPreferences().getWidth(), isTransform,
-							zoom);
+							zoom, true);
 					g.setColor(this.mapPreferences.getMajorRoadPreferences().getBorderColor());
 					this.draw(g, arc.getPath(), isTransform, transform);
 				} else {
 					this.setVariableFatStroke(g, this.mapPreferences.getNormalRoadPreferences().getWidth(),
-							isTransform, zoom);
+							isTransform, zoom, true);
 					g.setColor(this.mapPreferences.getNormalRoadPreferences().getBorderColor());
 					this.draw(g, arc.getPath(), isTransform, transform);
 				}
@@ -1622,7 +1637,8 @@ public class MapPanel extends JPanel implements Printable {
 						this.fillTatemono(g, isTransform, transform, mapData);
 					}
 				}
-				this.setVariableStroke(g, this.mapPreferences.getZyoutiPreferences().getWidth(), isTransform, zoom);
+				this.setVariableStroke(g, this.mapPreferences.getZyoutiPreferences().getWidth(), isTransform, zoom,
+						false);
 				for (final MapData mapData : this.maps.values()) {
 					if (mapData.getBounds().intersects(x, y, w, h)) {
 						// 場地界を描画する
@@ -1639,6 +1655,14 @@ public class MapPanel extends JPanel implements Printable {
 						this.drawRoad(g, isTransform, transform, mapData, zoom);
 					}
 				}
+			}
+			for (final MapData mapData : this.maps.values()) {
+				if (mapData.getBounds().intersects(x, y, w, h)) {
+					// 町丁目界を描画する
+					this.drawGyousei(g, isTransform, transform, mapData, zoom, false);
+				}
+			}
+			if (zoom >= Const.Zoom.LOAD_ALL) {
 				for (final MapData mapData : this.maps.values()) {
 					if (mapData.getBounds().intersects(x, y, w, h)) {
 						// 道路の塗りつぶし部を描画する
@@ -1648,8 +1672,8 @@ public class MapPanel extends JPanel implements Printable {
 			}
 			for (final MapData mapData : this.maps.values()) {
 				if (mapData.getBounds().intersects(x, y, w, h)) {
-					// 行政界を描画する
-					this.drawGyousei(g, isTransform, transform, mapData, zoom);
+					// 市区町村界を描画する
+					this.drawGyousei(g, isTransform, transform, mapData, zoom, true);
 				}
 			}
 			if (zoom >= Const.Zoom.LOAD_ALL) {
@@ -1963,31 +1987,31 @@ public class MapPanel extends JPanel implements Printable {
 				if (arc.getRoadType() == ArcData.ROAD_NORMAL) {
 					g.setColor(this.mapPreferences.getNormalRoadPreferences().getFillColor());
 					this.setVariableStroke(g, this.mapPreferences.getNormalRoadPreferences().getWidth(), isTransform,
-							zoom);
+							zoom, true);
 					this.draw(g, arc.getPath(), isTransform, transform);
 				} else if (arc.getRoadType() == ArcData.ROAD_MAJOR) {
 					g.setColor(this.mapPreferences.getMajorRoadPreferences().getFillColor());
 					this.setVariableStroke(g, this.mapPreferences.getMajorRoadPreferences().getWidth(), isTransform,
-							zoom);
+							zoom, true);
 					this.draw(g, arc.getPath(), isTransform, transform);
 				}
 			}
 			// 主要地方道、県道を描画する
 			for (final ArcData arc : mapData.getRoadArc().values()) {
 				if (arc.getRoadType() == ArcData.ROAD_KENDO) {
-					this.setVariableStroke(g, this.mapPreferences.getKendoPreferences().getWidth(), isTransform, zoom);
+					this.setVariableStroke(g, this.mapPreferences.getKendoPreferences().getWidth(), isTransform, zoom,
+							true);
 					g.setColor(this.mapPreferences.getKendoPreferences().getFillColor());
 					this.draw(g, arc.getPath(), isTransform, transform);
 				} else if (arc.getRoadType() == ArcData.ROAD_CHIHODO) {
-					this
-							.setVariableStroke(g, this.mapPreferences.getChihodoPreferences().getWidth(), isTransform,
-									zoom);
+					this.setVariableStroke(g, this.mapPreferences.getChihodoPreferences().getWidth(), isTransform,
+							zoom, true);
 					g.setColor(this.mapPreferences.getChihodoPreferences().getFillColor());
 					this.draw(g, arc.getPath(), isTransform, transform);
 				}
 			}
 			// 国道を描画する
-			this.setVariableStroke(g, this.mapPreferences.getKokudoPreferences().getWidth(), isTransform, zoom);
+			this.setVariableStroke(g, this.mapPreferences.getKokudoPreferences().getWidth(), isTransform, zoom, true);
 			g.setColor(this.mapPreferences.getKokudoPreferences().getFillColor());
 			for (final ArcData arc : mapData.getRoadArc().values()) {
 				if (arc.getRoadType() == ArcData.ROAD_KOKUDO) {
@@ -1995,7 +2019,7 @@ public class MapPanel extends JPanel implements Printable {
 				}
 			}
 			// 高速道路を描画する
-			this.setVariableStroke(g, this.mapPreferences.getHighwayPreferences().getWidth(), isTransform, zoom);
+			this.setVariableStroke(g, this.mapPreferences.getHighwayPreferences().getWidth(), isTransform, zoom, true);
 			g.setColor(this.mapPreferences.getHighwayPreferences().getFillColor());
 			for (final ArcData arc : mapData.getRoadArc().values()) {
 				if (arc.getRoadType() == ArcData.ROAD_HIGHWAY) {
@@ -2420,55 +2444,63 @@ public class MapPanel extends JPanel implements Printable {
 					g.drawImage(this.image, 0, 0, this);
 				}
 			} else {
-				Progress.getInstance().setRepaintProgress(0);
-				final int width = MapPanel.this.size == null ? MapPanel.this.getWidth() : MapPanel.this.size.width;
-				final int height = MapPanel.this.size == null ? MapPanel.this.getHeight() : MapPanel.this.size.height;
-				final Image image = this.createImage(width, height);
-				final Graphics2D g2 = (Graphics2D) image.getGraphics();
-				new File(Const.BitmapCache.CACHE_DIR).mkdirs();
-				final Area clip = new Area();
-				final Rectangle2D visibleRectangle = this.getVisibleRectangle(true);
-				final double zoom = this.getZoom();
-				final double offsetX = this.getOffsetX();
-				final double offsetY = this.getOffsetY();
-				final double saturationDifference = this.getSaturationDifference();
-				Progress.getInstance().setRepaintProgress(20);
-				for (int y = (int) (Math.floor(offsetY / Const.BitmapCache.HEIGHT)) * Const.BitmapCache.HEIGHT; y
-						- offsetY < height; y += Const.BitmapCache.HEIGHT) {
-					for (int x = (int) (Math.floor(offsetX / Const.BitmapCache.WIDTH)) * Const.BitmapCache.WIDTH; x
-							- offsetX < width; x += Const.BitmapCache.WIDTH) {
-						final File file = new File(new Formatter().format("%s%s%d_%d_%f_%f_%d_%d.png",
-								Const.BitmapCache.CACHE_DIR + File.separator, Const.BitmapCache.PREFIX,
-								Const.BitmapCache.WIDTH, Const.BitmapCache.HEIGHT, saturationDifference, zoom, x, y)
-								.toString());
-						if (file.exists()) {
-							final Image image2 = ImageIO.read(file);
-							g2.drawImage(image2, x - (int) offsetX, y - (int) offsetY, this);
-						} else {
-							clip.add(new Area(new Rectangle2D.Double(x - (int) offsetX, y - (int) offsetY,
-									Const.BitmapCache.WIDTH, Const.BitmapCache.HEIGHT)));
+				if (this.isChanged) {
+					Progress.getInstance().setRepaintProgress(0);
+					final int width = MapPanel.this.size == null ? MapPanel.this.getWidth() : MapPanel.this.size.width;
+					final int height = MapPanel.this.size == null ? MapPanel.this.getHeight()
+							: MapPanel.this.size.height;
+					final Image image = this.createImage(width, height);
+					final Graphics2D g2 = (Graphics2D) image.getGraphics();
+					new File(Const.BitmapCache.CACHE_DIR).mkdirs();
+					final Area clip = new Area();
+					final Rectangle2D visibleRectangle = this.getVisibleRectangle(true);
+					final double zoom = this.getZoom();
+					final double offsetX = this.getOffsetX();
+					final double offsetY = this.getOffsetY();
+					final double saturationDifference = this.getSaturationDifference();
+					Progress.getInstance().setRepaintProgress(20);
+					for (int y = (int) (Math.floor(offsetY / Const.BitmapCache.HEIGHT)) * Const.BitmapCache.HEIGHT; y
+							- offsetY < height; y += Const.BitmapCache.HEIGHT) {
+						for (int x = (int) (Math.floor(offsetX / Const.BitmapCache.WIDTH)) * Const.BitmapCache.WIDTH; x
+								- offsetX < width; x += Const.BitmapCache.WIDTH) {
+							final File file = new File(new Formatter()
+									.format("%s%s%d_%d_%f_%f_%d_%d.png", Const.BitmapCache.CACHE_DIR + File.separator,
+											Const.BitmapCache.PREFIX, Const.BitmapCache.WIDTH,
+											Const.BitmapCache.HEIGHT, saturationDifference, zoom, x, y).toString());
+							if (file.exists()) {
+								final Image image2 = ImageIO.read(file);
+								g2.drawImage(image2, x - (int) offsetX, y - (int) offsetY, this);
+							} else {
+								clip.add(new Area(new Rectangle2D.Double(x - (int) offsetX, y - (int) offsetY,
+										Const.BitmapCache.WIDTH, Const.BitmapCache.HEIGHT)));
+							}
 						}
 					}
+					Progress.getInstance().setRepaintProgress(40);
+					if (!clip.isEmpty()) {
+						final Shape originalClip = g2.getClip();
+						g2.clip(clip);
+						this.drawBackground(g2, true);
+						g2.setClip(originalClip);
+					}
+					Progress.getInstance().setRepaintProgress(60);
+					if (this.prefectures != null) {
+						new FixAttributeLocation().fixAttributeLocation(this.maps, this.prefectures, this);
+					}
+					g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+					if (Const.Fonts.HAS_MS_FONTS) {
+						g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+								RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+					}
+					Progress.getInstance().setRepaintProgress(80);
+					this.drawLabels(g2, visibleRectangle, zoom, offsetX, offsetY);
+					g2.dispose();
+					g.drawImage(image, 0, 0, this);
+					this.image = image;
+					this.isChanged = false;
+				} else {
+					g.drawImage(this.image, 0, 0, this);
 				}
-				Progress.getInstance().setRepaintProgress(40);
-				if (!clip.isEmpty()) {
-					final Shape originalClip = g2.getClip();
-					g2.clip(clip);
-					this.drawBackground(g2, true);
-					g2.setClip(originalClip);
-				}
-				Progress.getInstance().setRepaintProgress(60);
-				if (this.prefectures != null) {
-					new FixAttributeLocation().fixAttributeLocation(this.maps, this.prefectures, this);
-				}
-				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-				if (Const.Fonts.HAS_MS_FONTS) {
-					g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
-				}
-				Progress.getInstance().setRepaintProgress(80);
-				this.drawLabels(g2, visibleRectangle, zoom, offsetX, offsetY);
-				g2.dispose();
-				g.drawImage(image, 0, 0, this);
 				Progress.getInstance().setRepaintProgress(100);
 			}
 		} catch (final IndexOutOfBoundsException e) {
@@ -2632,13 +2664,16 @@ public class MapPanel extends JPanel implements Printable {
 	 * @param strokeWidth 線の幅
 	 * @param isTransform 描画対象全体を座標変換するかどうか
 	 * @param zoom 表示倍率
+	 * @param isRound 丸く描画するかどうか
 	 */
 	private void setFixedStroke(final Graphics2D g, final float strokeWidth, final boolean isTransform,
-			final double zoom) {
+			final double zoom, boolean isRound) {
 		if (isTransform) {
-			g.setStroke(new BasicStroke((float) (strokeWidth / zoom)));
+			g.setStroke(isRound ? new BasicStroke((float) (strokeWidth / zoom), BasicStroke.CAP_ROUND,
+					BasicStroke.JOIN_ROUND) : new BasicStroke((float) (strokeWidth / zoom)));
 		} else {
-			g.setStroke(new BasicStroke(strokeWidth));
+			g.setStroke(isRound ? new BasicStroke(strokeWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
+					: new BasicStroke(strokeWidth));
 		}
 	}
 
@@ -2677,13 +2712,16 @@ public class MapPanel extends JPanel implements Printable {
 	 * @param strokeWidth 線の幅
 	 * @param isTransform 描画対象全体を座標変換するかどうか
 	 * @param zoom 表示倍率
+	 * @param isRound 丸く描画するかどうか
 	 */
 	private void setVariableFatStroke(final Graphics2D g, final float strokeWidth, final boolean isTransform,
-			final double zoom) {
+			final double zoom, final boolean isRound) {
 		if (isTransform) {
-			g.setStroke(new BasicStroke(strokeWidth + (float) (2 / zoom)));
+			g.setStroke(isRound ? new BasicStroke(strokeWidth + (float) (2 / zoom), BasicStroke.CAP_ROUND,
+					BasicStroke.JOIN_ROUND) : new BasicStroke(strokeWidth + (float) (2 / zoom)));
 		} else {
-			g.setStroke(new BasicStroke((float) (strokeWidth * zoom) + 2));
+			g.setStroke(isRound ? new BasicStroke((float) (strokeWidth * zoom) + 2, BasicStroke.CAP_ROUND,
+					BasicStroke.JOIN_ROUND) : new BasicStroke((float) (strokeWidth * zoom) + 2));
 		}
 	}
 
@@ -2693,13 +2731,16 @@ public class MapPanel extends JPanel implements Printable {
 	 * @param strokeWidth 線の幅
 	 * @param isTransform 描画対象全体を座標変換するかどうか
 	 * @param zoom 表示倍率
+	 * @param isRound 丸く描画するかどうか
 	 */
 	private void setVariableStroke(final Graphics2D g, final float strokeWidth, final boolean isTransform,
-			final double zoom) {
+			final double zoom, final boolean isRound) {
 		if (isTransform) {
-			g.setStroke(new BasicStroke(strokeWidth));
+			g.setStroke(isRound ? new BasicStroke(strokeWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
+					: new BasicStroke(strokeWidth));
 		} else {
-			g.setStroke(new BasicStroke((float) (strokeWidth * zoom)));
+			g.setStroke(isRound ? new BasicStroke((float) (strokeWidth * zoom), BasicStroke.CAP_ROUND,
+					BasicStroke.JOIN_ROUND) : new BasicStroke((float) (strokeWidth * zoom)));
 		}
 	}
 

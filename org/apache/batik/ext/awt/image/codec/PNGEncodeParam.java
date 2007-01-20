@@ -78,6 +78,8 @@ public abstract class PNGEncodeParam implements ImageEncodeParam {
      * the given image will be successfully encoded by the PNG
      * encoder, as it only performs a very superficial analysis of
      * the image structure. 
+     * @param im 
+     * @return parameters
      */
     public static PNGEncodeParam getDefaultEncodeParam(final RenderedImage im) {
         final ColorModel colorModel = im.getColorModel();
@@ -95,6 +97,8 @@ public abstract class PNGEncodeParam implements ImageEncodeParam {
         }
     }
 
+    /**
+     */
     public static class Palette extends PNGEncodeParam {
 
         /** Constructs an instance of <code>PNGEncodeParam.Palette</code>. */
@@ -102,6 +106,9 @@ public abstract class PNGEncodeParam implements ImageEncodeParam {
 
         // bKGD chunk
         
+        /**
+         * 
+         */
         private boolean backgroundSet = false;
         
         /**
@@ -134,7 +141,13 @@ public abstract class PNGEncodeParam implements ImageEncodeParam {
     
         // PLTE chunk
 
+        /**
+         * 
+         */
         private int[] palette = null;
+        /**
+         * 
+         */
         private boolean paletteSet = false;
 
         /**
@@ -189,6 +202,7 @@ public abstract class PNGEncodeParam implements ImageEncodeParam {
         
         /**
          * Returns true if a 'PLTE' chunk will be output.
+         * @return is palette set
          */
         public boolean isPaletteSet() {
             return this.paletteSet;
@@ -196,12 +210,16 @@ public abstract class PNGEncodeParam implements ImageEncodeParam {
 
         // bKGD chunk
         
+        /**
+         * 
+         */
         private int backgroundPaletteIndex;
         
         /**
          * Sets the palette index of the suggested background color.
          *
          * <p> The 'bKGD' chunk will encode this information.
+         * @param index 
          */
         public void setBackgroundPaletteIndex(final int index) {
             this.backgroundPaletteIndex = index;
@@ -214,6 +232,7 @@ public abstract class PNGEncodeParam implements ImageEncodeParam {
          * <p> If the background palette index has not previously been
          * set, or has been unset, an
          * <code>IllegalStateException</code> will be thrown.
+         * @return palette index
          *
          * @throws IllegalStateException if the palette index is not set.
          */
@@ -226,6 +245,9 @@ public abstract class PNGEncodeParam implements ImageEncodeParam {
 
         // tRNS chunk
 
+        /**
+         * 
+         */
         private int[] transparency;
 
         /**
@@ -234,6 +256,7 @@ public abstract class PNGEncodeParam implements ImageEncodeParam {
          * as there are RGB triples in the palette.
          *
          * <p> The 'tRNS' chunk will encode this information.
+         * @param alpha 
          */
         public void setPaletteTransparency(final byte[] alpha) {
             this.transparency = new int[alpha.length];
@@ -249,6 +272,7 @@ public abstract class PNGEncodeParam implements ImageEncodeParam {
          * <p> If the palette transparency has not previously been
          * set, or has been unset, an
          * <code>IllegalStateException</code> will be thrown.
+         * @return transparency
          *
          * @throws IllegalStateException if the palette transparency is
          *        not set.
@@ -265,6 +289,8 @@ public abstract class PNGEncodeParam implements ImageEncodeParam {
         }
     }
 
+    /**
+     */
     public static class Gray extends PNGEncodeParam {
 
         /** Constructs an instance of <code>PNGEncodeParam.Gray</code>. */
@@ -272,6 +298,9 @@ public abstract class PNGEncodeParam implements ImageEncodeParam {
 
         // bKGD chunk
         
+        /**
+         * 
+         */
         private boolean backgroundSet = false;
         
         /**
@@ -309,12 +338,16 @@ public abstract class PNGEncodeParam implements ImageEncodeParam {
     
         // bKGD chunk
         
+        /**
+         * 
+         */
         private int backgroundPaletteGray;
 
         /**
          * Sets the suggested gray level of the background.
          *
          * <p> The 'bKGD' chunk will encode this information.
+         * @param gray 
          */
         public void setBackgroundGray(final int gray) {
             this.backgroundPaletteGray = gray;
@@ -327,6 +360,7 @@ public abstract class PNGEncodeParam implements ImageEncodeParam {
          * <p> If the background gray level has not previously been
          * set, or has been unset, an
          * <code>IllegalStateException</code> will be thrown.
+         * @return gray
          *
          * @throws IllegalStateException if the background gray level
          *        is not set.
@@ -340,6 +374,9 @@ public abstract class PNGEncodeParam implements ImageEncodeParam {
 
         // tRNS chunk
 
+        /**
+         * 
+         */
         private int[] transparency;
 
         /**

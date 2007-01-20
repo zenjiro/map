@@ -98,13 +98,13 @@ public class Const {
 		 * @since 5.01
 		 */
 		public static final String ROAD_SIMPLE_PREFIX = "ksj_road_simple_";
-		
+
 		/**
 		 * 道路データの接尾語
 		 * @since 5.01
 		 */
 		public static final String ROAD_SUFFIX = ".csv";
-		
+
 		/**
 		 * 国土数値情報の標高・傾斜度3次メッシュに関する定数を集めたクラスです。
 		 * @author zenjiro
@@ -120,27 +120,27 @@ public class Const {
 			 * 高さ
 			 */
 			public static final int HEIGHT = 200;
-			
+
 			/**
 			 * 接頭語
 			 */
 			public static final String PREFIX = "height_";
-			
+
 			/**
 			 * 倍率1
 			 */
 			public static final double zoom1 = .0005;
-			
+
 			/**
 			 * 倍率2
 			 */
 			public static final double zoom2 = .001;
-			
+
 			/**
 			 * 倍率3
 			 */
 			public static final double zoom3 = .002;
-			
+
 			/**
 			 * 倍率4
 			 */
@@ -320,7 +320,7 @@ public class Const {
 		/**
 		 * ビットマップキャッシュの接頭辞
 		 */
-		public static final String PREFIX = "bitmap_5.04_";
+		public static final String PREFIX = "bitmap_6.1.3_";
 	}
 
 	/**
@@ -365,26 +365,26 @@ public class Const {
 		 * サイドパネルの幅
 		 */
 		public static final int SIDE_PANEL_WIDTH = 200;
-		
+
 		/**
 		 * フレームの幅
 		 */
 		public static final int FRAME_WIDTH = 640;
-		
+
 		/**
 		 * フレームの高さ
 		 */
 		public static final int FRAME_HEIGHT = 480;
-		
+
 		/**
 		 * プログレスバーの高さ
 		 */
 		public static final int PROGRESS_BAR_HEIGHT = 10;
-		
+
 		/**
 		 * プログレスバーの幅
 		 */
 		public static final int PROGRESS_BAR_WIDTH = 150;
 	}
-	
+
 }

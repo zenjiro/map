@@ -38,6 +38,7 @@ public interface ImageEncoder {
      * interface will return corresponding concrete implementations of
      * the ImageEncodeParam interface.  For example, a JPEGImageEncoder
      * will return an instance of JPEGEncodeParam.
+     * @return parameters
      */
     public ImageEncodeParam getParam();
 
@@ -48,21 +49,28 @@ public interface ImageEncoder {
      * params argument is not an instance of the appropriate
      * subclass or subinterface.  For example, a JPEGImageEncoder
      * will expect param to be an instance of JPEGEncodeParam.
+     * @param param parameters
      */
     public void setParam(ImageEncodeParam param);
 
-    /** Returns the OutputStream associated with this ImageEncoder. */
+    /** Returns the OutputStream associated with this ImageEncoder. 
+     * @return output stream*/
     public OutputStream getOutputStream();
     
     /**
      * Encodes a Raster with a given ColorModel and writes the output
      * to the OutputStream associated with this ImageEncoder.
+     * @param ras 
+     * @param cm 
+     * @throws IOException 
      */
     public void encode(Raster ras, ColorModel cm) throws IOException;
 
     /**
      * Encodes a RenderedImage and writes the output to the
      * OutputStream associated with this ImageEncoder.
+     * @param im 
+     * @throws IOException 
      */
     public void encode(RenderedImage im) throws IOException;
 }

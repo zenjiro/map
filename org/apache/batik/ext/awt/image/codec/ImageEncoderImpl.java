@@ -41,6 +41,8 @@ public abstract class ImageEncoderImpl implements ImageEncoder {
     /**
      * Constructs an ImageEncoderImpl with a given OutputStream
      * and ImageEncoderParam instance.
+     * @param output 
+     * @param param 
      */
     public ImageEncoderImpl(final OutputStream output,
                             final ImageEncodeParam param) {

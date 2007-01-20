@@ -76,11 +76,15 @@ public class PNGDecodeParam implements ImageDecodeParam {
      */
     public PNGDecodeParam() {}
 
+    /**
+     * 
+     */
     private boolean suppressAlpha = false;
 
     /**
      * Returns <code>true</code> if alpha (transparency) will
      * be prevented from appearing in the output.
+     * @return alpha
      */
     public boolean getSuppressAlpha() {
         return this.suppressAlpha;
@@ -92,16 +96,21 @@ public class PNGDecodeParam implements ImageDecodeParam {
      *
      * <p> The default is to allow transparency to appear in the
      * output image.
+     * @param suppressAlpha 
      */
     public void setSuppressAlpha(final boolean suppressAlpha) {
         this.suppressAlpha = suppressAlpha;
     }
 
+    /**
+     * 
+     */
     private boolean expandPalette = false;
 
     /**
      * Returns true if palette-color images will be expanded to
      * produce full-color output.
+     * @return palette
      */
     public boolean getExpandPalette() {
         return this.expandPalette;
@@ -116,15 +125,20 @@ public class PNGDecodeParam implements ImageDecodeParam {
      * <p> The default is to output palette images using a single
      * channel.  The palette information is used to construct the
      * output image's <code>ColorModel</code>.
+     * @param expandPalette 
      */
     public void setExpandPalette(final boolean expandPalette) {
         this.expandPalette = expandPalette;
     }
 
+    /**
+     * 
+     */
     private boolean output8BitGray = false;
 
     /**
      * Returns the current value of the 8-bit gray output parameter.
+     * @return gray
      */
     public boolean getOutput8BitGray() {
         return this.output8BitGray;
@@ -144,11 +158,15 @@ public class PNGDecodeParam implements ImageDecodeParam {
      * with a depth of 1, 2, or 4 bits will be represented using
      * a <code>MultiPixelPackedSampleModel</code> and an
      * <code>IndexColorModel</code>.
+     * @param output8BitGray 
      */
     public void setOutput8BitGray(final boolean output8BitGray) {
         this.output8BitGray = output8BitGray;
     }
 
+    /**
+     * 
+     */
     private boolean performGammaCorrection = true;
 
     /**
@@ -164,6 +182,7 @@ public class PNGDecodeParam implements ImageDecodeParam {
      * <pre>
      * decoding_exponent = user_exponent/(gamma_from_file * display_exponent)
      * </pre>
+     * @return correction
      */
     public boolean getPerformGammaCorrection() {
         return this.performGammaCorrection;
@@ -171,16 +190,21 @@ public class PNGDecodeParam implements ImageDecodeParam {
 
     /**
      * Turns gamma corection of the image data on or off.
+     * @param performGammaCorrection 
      */
     public void setPerformGammaCorrection(final boolean performGammaCorrection) {
         this.performGammaCorrection = performGammaCorrection;
     }
 
+    /**
+     * 
+     */
     private float userExponent = 1.0F;
 
     /**
      * Returns the current value of the user exponent parameter.
      * By default, the user exponent is equal to 1.0F.
+     * @return exponent
      */
     public float getUserExponent() {
         return this.userExponent;
@@ -218,6 +242,7 @@ public class PNGDecodeParam implements ImageDecodeParam {
      * as changing the file gamma.
      *
      * <p> This parameter affects the decoding of all image types.
+     * @param userExponent 
      *
      * @throws IllegalArgumentException if <code>userExponent</code> is 
      * negative.
@@ -229,11 +254,15 @@ public class PNGDecodeParam implements ImageDecodeParam {
         this.userExponent = userExponent;
     }
 
+    /**
+     * 
+     */
     private float displayExponent = 2.2F;
 
     /**
      * Returns the current value of the display exponent parameter.
      * By default, the display exponent is equal to 2.2F.
+     * @return exponent
      */
     public float getDisplayExponent() {
         return this.displayExponent;
@@ -267,6 +296,7 @@ public class PNGDecodeParam implements ImageDecodeParam {
      * to produce a linear output image.
      *
      * <p> This parameter affects the decoding of all image types.
+     * @param displayExponent 
      *
      * @throws IllegalArgumentException if <code>userExponent</code> is 
      * negative.
@@ -278,10 +308,14 @@ public class PNGDecodeParam implements ImageDecodeParam {
         this.displayExponent = displayExponent;
     }
 
+    /**
+     * 
+     */
     private boolean expandGrayAlpha = false;
 
     /**
      * Returns the current setting of the gray/alpha expansion.
+     * @return alpha
      */
     public boolean getExpandGrayAlpha() {
         return this.expandGrayAlpha;
@@ -297,19 +331,27 @@ public class PNGDecodeParam implements ImageDecodeParam {
      * transparency information.
      *
      * <p> By default, no expansion is performed.
+     * @param expandGrayAlpha 
      */
     public void setExpandGrayAlpha(final boolean expandGrayAlpha) {
         this.expandGrayAlpha = expandGrayAlpha;
     }
 
+    /**
+     * 
+     */
     private boolean generateEncodeParam = false;
 
+    /**
+     * 
+     */
     private PNGEncodeParam encodeParam = null;
 
     /**
      * Returns <code>true</code> if an instance of
      * <code>PNGEncodeParam</code> will be available after an image
      * has been decoded via the <code>getEncodeParam</code> method.
+     * @return parameters
      */
     public boolean getGenerateEncodeParam() {
         return this.generateEncodeParam;
@@ -322,6 +364,7 @@ public class PNGDecodeParam implements ImageDecodeParam {
      * about the contents of the PNG file.  If not set, this information
      * will not be recorded and <code>getEncodeParam()</code> will
      * return <code>null</code>.
+     * @param generateEncodeParam 
      */
     public void setGenerateEncodeParam(final boolean generateEncodeParam) {
         this.generateEncodeParam = generateEncodeParam;
@@ -332,6 +375,7 @@ public class PNGDecodeParam implements ImageDecodeParam {
      * this method may be called after decoding has completed, and
      * will return an instance of <code>PNGEncodeParam</code> containing
      * information about the contents of the PNG file just decoded. 
+     * @return parameters
      */
     public PNGEncodeParam getEncodeParam() {
         return this.encodeParam;
@@ -341,6 +385,7 @@ public class PNGDecodeParam implements ImageDecodeParam {
      * Sets the current encoder param instance.  This method is
      * intended to be called by the PNG decoder and will overwrite the
      * current instance returned by <code>getEncodeParam</code>.
+     * @param encodeParam 
      */
     public void setEncodeParam(final PNGEncodeParam encodeParam) {
         this.encodeParam = encodeParam;

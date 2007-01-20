@@ -28,45 +28,83 @@ public class TransformType{
     /*
      * Transform type constants
      */
+    /**
+     * translate
+     */
     public static final int TRANSFORM_TRANSLATE = 0;
+    /**
+     * rotate
+     */
     public static final int TRANSFORM_ROTATE = 1;
+    /**
+     * scale
+     */
     public static final int TRANSFORM_SCALE = 2;
+    /**
+     * shear
+     */
     public static final int TRANSFORM_SHEAR = 3;
+    /**
+     * general
+     */
     public static final int TRANSFORM_GENERAL = 4;
 
     /**
      * Strings describing the elementary transforms
      */
     public static final String TRANSLATE_STRING = "translate";
+    /**
+     * rotate string
+     */
     public static final String ROTATE_STRING = "rotate";
+    /**
+     * scale string
+     */
     public static final String SCALE_STRING = "scale";
+    /**
+     * shear string
+     */
     public static final String SHEAR_STRING = "shear";
+    /**
+     * general string
+     */
     public static final String GENERAL_STRING = "general";
 
     /**
      * TransformType values
      */
     public static final TransformType TRANSLATE = new TransformType(TRANSFORM_TRANSLATE, TRANSLATE_STRING);
+    /**
+     * rotate
+     */
     public static final TransformType ROTATE = new TransformType(TRANSFORM_ROTATE, ROTATE_STRING);
+    /**
+     * scale
+     */
     public static final TransformType SCALE = new TransformType(TRANSFORM_SCALE, SCALE_STRING);
+    /**
+     * shear
+     */
     public static final TransformType SHEAR = new TransformType(TRANSFORM_SHEAR, SHEAR_STRING);
+    /**
+     * general
+     */
     public static final TransformType GENERAL = new TransformType(TRANSFORM_GENERAL, GENERAL_STRING);
 
     /**
-     * All values
+     * desc
      */
-    private static final TransformType[] enumValues = { TRANSLATE,
-                                                        ROTATE,
-                                                        SCALE,
-                                                        SHEAR,
-                                                        GENERAL };
-
     private String desc;
+    /**
+     * val
+     */
     private int val;
 
     /**
      * Constructor is private so that no instances other than
      * the ones in the enumeration can be created.
+     * @param val 
+     * @param desc 
      * @see #readResolve
      */
     private TransformType(final int val, final String desc){
@@ -90,6 +128,7 @@ public class TransformType{
      *        ....
      *       case TransformType.TRANSFORM_ROTATE:
      * </pre>
+     * @return to int value
      */
     public int toInt(){
         return this.val;
@@ -99,6 +138,7 @@ public class TransformType{
      *  This is called by the serialization code before it returns an unserialized
      * object. To provide for unicity of instances, the instance that was read
      * is replaced by its static equivalent
+     * @return type
      */
     public Object readResolve() {
         switch(this.val){

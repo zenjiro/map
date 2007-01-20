@@ -372,6 +372,7 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(final ActionEvent e) {
 				panel.toggleCenterMark();
 				centerMarkItem.setSelected(panel.isCenterMark());
+				panel.setChanged();
 				panel.forceRepaint();
 			}});
 		viewMenu.add(centerMarkItem);
@@ -384,6 +385,7 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(final ActionEvent e) {
 				panel.toggleRouteMode();
 				routeModeMenuItem.setSelected(panel.isRouteMode());
+				panel.setChanged();
 				panel.forceRepaint();
 			}
 		});
@@ -398,6 +400,7 @@ public class MainFrame extends JFrame {
 				Route.getInstance().setSpeed(Route.HIGHWAY_SPEED);
 				if (panel.isRouteMode()) {
 					Route.getInstance().calcRoute();
+					panel.setChanged();
 					panel.forceRepaint();
 				}
 			}
@@ -411,6 +414,7 @@ public class MainFrame extends JFrame {
 				Route.getInstance().setSpeed(Route.NORMAL_SPEED);
 				if (panel.isRouteMode()) {
 					Route.getInstance().calcRoute();
+					panel.setChanged();
 					panel.forceRepaint();
 				}
 			}
@@ -424,6 +428,7 @@ public class MainFrame extends JFrame {
 				Route.getInstance().setSpeed(Route.BIKE_SPEED);
 				if (panel.isRouteMode()) {
 					Route.getInstance().calcRoute();
+					panel.setChanged();
 					panel.forceRepaint();
 				}
 			}
@@ -437,6 +442,7 @@ public class MainFrame extends JFrame {
 				Route.getInstance().setSpeed(Route.WALK_SPEED);
 				if (panel.isRouteMode()) {
 					Route.getInstance().calcRoute();
+					panel.setChanged();
 					panel.forceRepaint();
 				}
 			}
@@ -449,6 +455,7 @@ public class MainFrame extends JFrame {
 		clearItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Route.getInstance().clearRoute();
+				panel.setChanged();
 				panel.forceRepaint();
 			}
 		});

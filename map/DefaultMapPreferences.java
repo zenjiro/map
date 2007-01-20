@@ -27,30 +27,30 @@ public class DefaultMapPreferences implements MapPreferences {
 	 * 高速道路の設定
 	 */
 	private final Preferences highwayPreferences = new Preferences(new Color(160, 220, 160), new Color(160, 220, 160)
-			.darker(), 17, null, null);
+			.darker(), 19, null, null);
 
 	/**
 	 * 国道の設定
 	 */
 	private final Preferences kokudoPreferences = new Preferences(new Color(250, 180, 180), new Color(250, 180, 180)
-			.darker(), 13, null, null);
+			.darker(), 15, null, null);
 
 	/**
 	 * 県道の設定
 	 */
 	private final Preferences kendoPreferences = new Preferences(new Color(255, 255, 180), new Color(255, 255, 180)
-			.darker(), 7, null, null);
+			.darker(), 9, null, null);
 
 	/**
 	 * 主要地方道の設定
 	 */
 	private final Preferences chihodoPreferences = new Preferences(new Color(255, 255, 180), new Color(255, 255, 180)
-			.darker(), 13, null, null);
+			.darker(), 15, null, null);
 
 	/**
 	 * 名前のある道路の設定
 	 */
-	private final Preferences majorRoadPreferences = new Preferences(Color.WHITE, Color.GRAY, 13, null, null);
+	private final Preferences majorRoadPreferences = new Preferences(Color.WHITE, Color.GRAY, 15, null, null);
 
 	/**
 	 * 生活道路の設定

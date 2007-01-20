@@ -53,7 +53,7 @@ public abstract class TransformStackElement implements Cloneable{
     /**
      * @return an object which is a deep copy of this one
      */
-    public Object clone() {
+    public TransformStackElement clone() {
         TransformStackElement newElement = null;
 
         // start with a shallow copy to get our implementations right
@@ -72,6 +72,11 @@ public abstract class TransformStackElement implements Cloneable{
      * Factory methods
      */
 
+    /**
+     * @param tx
+     * @param ty
+     * @return translate element
+     */
     public static TransformStackElement createTranslateElement(final double tx, 
                                                                final double ty){
         return new TransformStackElement(TransformType.TRANSLATE, 
@@ -82,6 +87,10 @@ public abstract class TransformStackElement implements Cloneable{
             };
     }
 
+    /**
+     * @param theta
+     * @return rotate element
+     */
     public static TransformStackElement createRotateElement(final double theta){
         return new TransformStackElement(TransformType.ROTATE, 
                                          new double[]{ theta }) {
@@ -91,6 +100,11 @@ public abstract class TransformStackElement implements Cloneable{
             };
     }
 
+    /**
+     * @param scaleX
+     * @param scaleY
+     * @return scale element
+     */
     public static TransformStackElement createScaleElement(final double scaleX, 
                                                            final double scaleY){
         return new TransformStackElement(TransformType.SCALE, 
@@ -101,6 +115,11 @@ public abstract class TransformStackElement implements Cloneable{
             };
     }
     
+    /**
+     * @param shearX
+     * @param shearY
+     * @return shear element
+     */
     public static TransformStackElement createShearElement(final double shearX, 
                                                            final double shearY){
         return new TransformStackElement(TransformType.SHEAR, 
@@ -111,6 +130,10 @@ public abstract class TransformStackElement implements Cloneable{
             };
     }
 
+    /**
+     * @param txf
+     * @return transform element
+     */
     public static TransformStackElement createGeneralTransformElement
         (final AffineTransform txf){
         final double matrix[] = new double[6];
@@ -126,6 +149,8 @@ public abstract class TransformStackElement implements Cloneable{
     /**
      * Implementation should determine if the parameter list represents
      * an identity transform, for the instance transform type.
+     * @param parameters 
+     * @return is identity
      */
     abstract boolean isIdentity(double[] parameters);
     
@@ -150,7 +175,7 @@ public abstract class TransformStackElement implements Cloneable{
         return this.type;
     }
 
-    /*
+    /**
      * Concatenation utility. Requests this transform stack element
      * to concatenate with the input stack element. Only elements
      * of the same types are concatenated. For example, if this
@@ -193,6 +218,9 @@ public abstract class TransformStackElement implements Cloneable{
 
     /**
      *  Multiplies two 2x3 matrices of double precision values
+     * @param matrix1 
+     * @param matrix2 
+     * @return result
      */
     private double[] matrixMultiply(final double[] matrix1, final double[] matrix2) {
         final double[] product = new double[6];

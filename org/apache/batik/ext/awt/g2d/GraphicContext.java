@@ -66,7 +66,7 @@ public class GraphicContext implements Cloneable{
     /**
      * Transform stack
      */
-    protected Vector transformStack = new Vector();
+    protected Vector<TransformStackElement> transformStack = new Vector<TransformStackElement>();
 
     /**
      * Defines whether the transform stack is valide or not.
@@ -156,10 +156,10 @@ public class GraphicContext implements Cloneable{
         copyGc.transform = new AffineTransform(this.transform);
 
         // Transform stack
-        copyGc.transformStack = new Vector();
+        copyGc.transformStack = new Vector<TransformStackElement>();
         for(int i=0; i<this.transformStack.size(); i++){
             final TransformStackElement stackElement =
-                (TransformStackElement)this.transformStack.elementAt(i);
+                this.transformStack.elementAt(i);
             copyGc.transformStack.addElement(stackElement.clone());
         }
 
@@ -373,12 +373,12 @@ public class GraphicContext implements Cloneable{
      * there is a security manager, its <code>checkPermission</code>
      * method is called with an <code>AWTPermission("readDisplayPixels")</code>
      * permission.
+     * @param comp the <code>Composite</code> object to be used for rendering
      * @throws SecurityException
      *         if a custom <code>Composite</code> object is being
      *         used to render to the screen and a security manager
      *         is set and its <code>checkPermission</code> method
      *         does not allow the operation.
-     * @param comp the <code>Composite</code> object to be used for rendering
      * @see java.awt.Graphics#setXORMode
      * @see java.awt.Graphics#setPaintMode
      * @see java.awt.AlphaComposite
@@ -466,7 +466,8 @@ public class GraphicContext implements Cloneable{
      * @param hints the rendering hints to be set
      * @see RenderingHints
      */
-    public void setRenderingHints(final Map hints){
+    @SuppressWarnings("unchecked")
+	public void setRenderingHints(final Map hints){
         this.hints = new RenderingHints(hints);
     }
 
@@ -689,6 +690,7 @@ public class GraphicContext implements Cloneable{
 
     /**
      * Checks the status of the transform stack
+     * @return is valid
      */
     public boolean isTransformStackValid(){
         return this.transformStackValid;
