@@ -17,6 +17,7 @@ import java.util.concurrent.ExecutionException;
 
 import ksj.ShapeIO;
 import map.KsjRailway.Railway;
+import map.KsjRailway.Station;
 import shop.Shop;
 
 /**
@@ -112,6 +113,9 @@ public class City {
 		this.prefecture = prefecture;
 		this.isjLabels = new ConcurrentHashMap<Point2D, String>();
 		this.ksjFineRoad = new ConcurrentLinkedQueue<Railway>();
+		// since 6.1.2
+		this.ksjRailwayCurves = new ConcurrentLinkedQueue<Railway>();
+		this.ksjRailwayStations = new ConcurrentLinkedQueue<Station>();
 	}
 
 	/**
@@ -310,6 +314,22 @@ public class City {
 	}
 
 	/**
+	 * @return 国土数値情報の駅を持っているかどうか
+	 * @since 6.1.2
+	 */
+	public boolean hasKsjRailwayStations() {
+		return !this.ksjRailwayStations.isEmpty();
+	}
+
+	/**
+	 * @return 国土数値情報の鉄道データを持っているかどうか
+	 * @since 6.1.2
+	 */
+	public boolean hasKsjRailwayCurves() {
+		return !this.ksjRailwayCurves.isEmpty();
+	}
+
+	/**
 	 * 高精度な国土数値情報の道路データを読み込みます。
 	 * @return 読み込んだかどうか
 	 * @since 5.04
@@ -329,4 +349,96 @@ public class City {
 		}
 	}
 
+	/**
+	 * 国土数値情報の鉄道データの曲線
+	 * @since 6.2.2
+	 */
+	final private Collection<Railway> ksjRailwayCurves;
+
+	/**
+	 * 国土数値情報の鉄道データの駅
+	 * @since 6.2.2
+	 */
+	final private Collection<Station> ksjRailwayStations;
+
+	/**
+	 * 鉄道データの曲線を読み込みます。
+	 * @return 読み込んだかどうか
+	 * @since 6.2.2
+	 */
+	public boolean loadKsjRailwayCurves() {
+		if (this.ksjRailwayCurves.isEmpty()) {
+			final InputStream in = Prefecture.class.getResourceAsStream(Const.DIR + Const.Ksj.RAILWAY_CURVES_PREFIX
+					+ this.id + Const.Ksj.RAILWAY_SUFFIX);
+			if (in != null) {
+				for (final Map.Entry<Shape, String> entry : ShapeIO.readShapes(in).entrySet()) {
+					this.ksjRailwayCurves.add(new Railway(entry.getKey(), entry.getValue()));
+				}
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * 鉄道データの駅を読み込みます。
+	 * @return 読み込んだかどうか
+	 * @since 6.2.2
+	 */
+	public boolean loadKsjRailwayStations() {
+		if (this.ksjRailwayStations.isEmpty()) {
+			final InputStream in = Prefecture.class.getResourceAsStream(Const.DIR + Const.Ksj.RAILWAY_STATIONS_PREFIX
+					+ this.id + Const.Ksj.RAILWAY_SUFFIX);
+			if (in != null) {
+				for (final Map.Entry<Shape, String> entry : ShapeIO.readShapes(in).entrySet()) {
+					this.ksjRailwayStations.add(new Station(entry.getKey(), entry.getValue()));
+				}
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * 鉄道データの曲線を開放します。
+	 * @since 6.2.2
+	 */
+	public void freeKsjRailwayCurves() {
+		freeKsjRailway(this.ksjRailwayCurves);
+	}
+
+	/**
+	 * 鉄道データの駅を開放します。
+	 * @since 6.2.2
+	 */
+	public void freeKsjRailwayStations() {
+		freeKsjRailway(this.ksjRailwayStations);
+	}
+
+	/**
+	 * 鉄道データを開放します。
+	 * @param railways 鉄道データ
+	 * @since 4.17
+	 */
+	private void freeKsjRailway(final Collection<? extends Railway> railways) {
+		if (!railways.isEmpty()) {
+			railways.clear();
+		}
+	}
+
+	/**
+	 * @return 鉄道データの曲線
+	 */
+	public Collection<Railway> getKsjRailwayCurves() {
+		return this.ksjRailwayCurves;
+	}
+
+	/**
+	 * @return 鉄道データの駅
+	 */
+	public Collection<Station> getKsjRailwayStations() {
+		return this.ksjRailwayStations;
+	}
 }

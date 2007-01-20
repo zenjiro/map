@@ -61,12 +61,12 @@ public class Shop {
 		try {
 			for (final AddressParser parser : parsers) {
 				new Thread(new ShopThread(parser, cityID, cityLabel, prefectureLabel, tempIsj, ret, doneSet)).start();
-				Thread.sleep(100);
+				Thread.sleep(10);
 			}
 			while (doneSet.size() > 1) {
 				Thread.sleep(100);
 			}
-			Thread.sleep(100);
+			Thread.sleep(10);
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -79,6 +79,7 @@ public class Shop {
 				new LatLongUniqlo(), new LatLongTsutaya(), new LatLongBookOff(), new LatLongYellowHat(),
 				new LatLongTeng(), new LatLongNissan(), new LatLongTimes() }) {
 			futures.add(service.submit(new LatLongCallable(parser, cityID, cityLabel, prefectureLabel)));
+			Thread.sleep(10);
 		}
 		service.shutdown();
 		for (final Future<Map<Point2D, String>> future : futures) {

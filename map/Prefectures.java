@@ -132,11 +132,24 @@ public class Prefectures {
 										if (city.loadKsjFineRoad()) {
 											ret = true;
 										}
+										// since 6.1.2
+										if (city.loadKsjRailwayStations()) {
+											ret = true;
+										}
+										if (city.loadKsjRailwayCurves()) {
+											ret = true;
+										}
 									} else {
 										city.freeKsjFineRoad();
+										// since 6.1.2
+										city.freeKsjRailwayCurves();
+										city.freeKsjRailwayStations();
 									}
 								} else {
 									city.freeKsjFineRoad();
+									// since 6.1.2
+									city.freeKsjRailwayCurves();
+									city.freeKsjRailwayStations();
 								}
 							}
 						}
@@ -144,6 +157,9 @@ public class Prefectures {
 						if (prefecture.hasCities()) {
 							for (final City city : prefecture.getCities()) {
 								city.freeKsjFineRoad();
+								// since 6.1.2
+								city.freeKsjRailwayCurves();
+								city.freeKsjRailwayStations();
 							}
 						}
 					}
@@ -151,6 +167,9 @@ public class Prefectures {
 					if (prefecture.hasCities()) {
 						for (final City city : prefecture.getCities()) {
 							city.freeKsjFineRoad();
+							// since 6.1.2
+							city.freeKsjRailwayCurves();
+							city.freeKsjRailwayStations();
 						}
 					}
 				}

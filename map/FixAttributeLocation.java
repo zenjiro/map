@@ -107,14 +107,20 @@ class FixAttributeLocation {
 					.getKsjRailwayStationPreferences().getFont());
 			final double attributeHeight = metrics.getHeight() / zoom;
 			for (final Prefecture prefecture : panel.getPrefectures()) {
-				for (final Station station : prefecture.getKsjRailwayStations()) {
-					if (panel.isVisible(station.getShape())) {
-						final PointData point = new PointData(null, -1, station.getShape().getBounds2D().getCenterX(),
-								station.getShape().getBounds2D().getCenterY());
-						point.setAttribute(station.getStation());
-						this.fixPointAttributeLocation(point, usedPoints, visibleRectangle, zoom, attributeHeight,
-								metrics, ekiPointSize, search);
-						station.setCaptionLocation(new Point2D.Double(point.getAttributeX(), point.getAttributeY()));
+				if (prefecture.hasCities()) {
+					for (final City city : prefecture.getCities()) {
+						if (city.hasKsjRailwayStations()) {
+							for (final Station station : city.getKsjRailwayStations()) {
+								if (panel.isVisible(station.getShape())) {
+									final PointData point = new PointData(null, -1, station.getShape().getBounds2D().getCenterX(),
+											station.getShape().getBounds2D().getCenterY());
+									point.setAttribute(station.getStation());
+									this.fixPointAttributeLocation(point, usedPoints, visibleRectangle, zoom, attributeHeight,
+											metrics, ekiPointSize, search);
+									station.setCaptionLocation(new Point2D.Double(point.getAttributeX(), point.getAttributeY()));
+								}
+							}
+						}
 					}
 				}
 			}
@@ -126,12 +132,14 @@ class FixAttributeLocation {
 			final double captionHeight = metrics.getHeight() / zoom;
 			final Collection<String> fixedCaptions = new HashSet<String>();
 			for (final Prefecture prefecture : panel.getPrefectures()) {
-				for (final Railway railway : prefecture.getKsjRailwayCurves()) {
-					fixKsjRailwayAttributeLocation(railway, search, visibleRectangle, zoom, metrics, captionHeight,
-							fixedCaptions, false);
-				}
 				if (prefecture.hasCities()) {
 					for (final City city : prefecture.getCities()) {
+						if (city.hasKsjRailwayCurves()) {
+							for (final Railway railway : city.getKsjRailwayCurves()) {
+								fixKsjRailwayAttributeLocation(railway, search, visibleRectangle, zoom, metrics,
+										captionHeight, fixedCaptions, false);
+							}
+						}
 						if (city.hasKsjFineRoad()) {
 							for (final Railway road : city.getKsjFineRoad()) {
 								fixKsjRailwayAttributeLocation(road, search, visibleRectangle, zoom, metrics,
@@ -267,7 +275,7 @@ class FixAttributeLocation {
 				}
 			}
 			// 町丁目の読みの表示位置を計算する
-			if (zoom >= Const.Zoom.LOAD_ALL) {
+			if (zoom >= Const.Zoom.LOAD_GYOUSEI) {
 				for (final MapData mapData : maps.values()) {
 					if (mapData.hasTyome()) {
 						if (panel.isVisible(mapData.getBounds())) {

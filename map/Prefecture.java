@@ -17,8 +17,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import map.Const.Sdf2500;
-import map.KsjRailway.Railway;
-import map.KsjRailway.Station;
 
 import ksj.LoadKsj;
 import ksj.ShapeIO;
@@ -70,16 +68,6 @@ public class Prefecture {
 	private final MapPanel panel;
 
 	/**
-	 * 国土数値情報の鉄道データの曲線
-	 */
-	final private Collection<Railway> ksjRailwayCurves;
-
-	/**
-	 * 国土数値情報の鉄道データの駅
-	 */
-	final private Collection<Station> ksjRailwayStations;
-
-	/**
 	 * 新しい都道府県を初期化します。
 	 * @param shape 領域
 	 * @param label 都道府県名
@@ -95,8 +83,6 @@ public class Prefecture {
 		this.id = id;
 		this.color = color;
 		this.cities = new ConcurrentLinkedQueue<City>();
-		this.ksjRailwayCurves = new ConcurrentLinkedQueue<Railway>();
-		this.ksjRailwayStations = new ConcurrentLinkedQueue<Station>();
 	}
 
 	/**
@@ -114,38 +100,12 @@ public class Prefecture {
 	public void freeFine() {
 		for (final City city : this.cities) {
 			city.freeFineShape();
+			city.freeKsjFineRoad();
+			// since 6.1.2
+			city.freeKsjRailwayCurves();
+			city.freeKsjRailwayStations();
 		}
 		this.fineShape = null;
-		// since 4.17
-		this.freeKsjRailwayCurves();
-		this.freeKsjRailwayStations();
-	}
-
-	/**
-	 * 鉄道データを開放します。
-	 * @param railways 鉄道データ
-	 * @since 4.17
-	 */
-	private void freeKsjRailway(final Collection<? extends Railway> railways) {
-		if (!railways.isEmpty()) {
-			railways.clear();
-		}
-	}
-
-	/**
-	 * 鉄道データの曲線を開放します。
-	 * @since 4.17
-	 */
-	private void freeKsjRailwayCurves() {
-		freeKsjRailway(this.ksjRailwayCurves);
-	}
-
-	/**
-	 * 鉄道データの駅を開放します。
-	 * @since 4.17
-	 */
-	private void freeKsjRailwayStations() {
-		freeKsjRailway(this.ksjRailwayStations);
 	}
 
 	/**
@@ -186,20 +146,6 @@ public class Prefecture {
 	 */
 	public String getId() {
 		return this.id;
-	}
-
-	/**
-	 * @return 鉄道データの曲線
-	 */
-	public Collection<Railway> getKsjRailwayCurves() {
-		return this.ksjRailwayCurves;
-	}
-
-	/**
-	 * @return 鉄道データの駅
-	 */
-	public Collection<Station> getKsjRailwayStations() {
-		return this.ksjRailwayStations;
 	}
 
 	/**
@@ -280,9 +226,6 @@ public class Prefecture {
 	public void loadFine() throws IOException {
 		this.loadFineShape();
 		this.loadFineCities();
-		// since 4.17
-		this.loadKsjRailwayStations();
-		this.loadKsjRailwayCurves();
 	}
 
 	/**
@@ -336,33 +279,4 @@ public class Prefecture {
 			}
 		}
 	}
-
-	/**
-	 * 鉄道データの曲線を読み込みます。
-	 * @since 4.17
-	 */
-	private void loadKsjRailwayCurves() {
-		if (this.ksjRailwayCurves.isEmpty()) {
-			for (final Map.Entry<Shape, String> entry : ShapeIO.readShapes(
-					Prefecture.class.getResourceAsStream(Const.DIR + Const.Ksj.RAILWAY_CURVES_PREFIX + this.id
-							+ Const.Ksj.RAILWAY_SUFFIX)).entrySet()) {
-				this.ksjRailwayCurves.add(new Railway(entry.getKey(), entry.getValue()));
-			}
-		}
-	}
-
-	/**
-	 * 鉄道データの駅を読み込みます。
-	 * @since 4.17
-	 */
-	private void loadKsjRailwayStations() {
-		if (this.ksjRailwayStations.isEmpty()) {
-			for (final Map.Entry<Shape, String> entry : ShapeIO.readShapes(
-					Prefecture.class.getResourceAsStream(Const.DIR + Const.Ksj.RAILWAY_STATIONS_PREFIX + this.id
-							+ Const.Ksj.RAILWAY_SUFFIX)).entrySet()) {
-				this.ksjRailwayStations.add(new Station(entry.getKey(), entry.getValue()));
-			}
-		}
-	}
-
 }

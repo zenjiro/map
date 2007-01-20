@@ -70,22 +70,16 @@ public class Const {
 		public static final String CACHE_SUFFIX_FINE = ".csv";
 
 		/**
-		 * 鉄道データの直線の接頭語
-		 * @since 4.17
-		 */
-		public static final String RAILWAY_LINES_PREFIX = "ksj_railway_lines_";
-
-		/**
 		 * 鉄道データの曲線の接頭語
 		 * @since 4.17
 		 */
-		public static final String RAILWAY_CURVES_PREFIX = "ksj_railway_curves_";
+		public static final String RAILWAY_CURVES_PREFIX = "ksj_railway_curves_city_";
 
 		/**
 		 * 鉄道データの駅の接頭語
 		 * @since 4.17
 		 */
-		public static final String RAILWAY_STATIONS_PREFIX = "ksj_railway_stations_";
+		public static final String RAILWAY_STATIONS_PREFIX = "ksj_railway_stations_city_";
 
 		/**
 		 * 鉄道データの接尾語
