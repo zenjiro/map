@@ -89,5 +89,7 @@ public class Main {
 		final Timer timer = new Timer();
 		timer.schedule(new BackgroundThread(maps, panel, loadMap), 0, 200);
 		panel.removeMessage();
+		// test
+		panel.moveToAkashi();
 	}
 }

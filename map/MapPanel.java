@@ -791,10 +791,10 @@ public class MapPanel extends JPanel implements Printable {
 				path.lineTo((float) point2.getX() + radius, (float) point2.getY() + radius);
 				path.moveTo((float) point2.getX() + radius, (float) point2.getY() - radius);
 				path.lineTo((float) point2.getX() - radius, (float) point2.getY() + radius);
-				g.setStroke(new BasicStroke(3));
+				g.setStroke(new BasicStroke(3.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL));
 				g.setColor(Color.BLACK);
 				g.draw(path);
-				g.setStroke(new BasicStroke(2));
+				g.setStroke(new BasicStroke(2.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL));
 				g.setColor(Color.YELLOW);
 				g.draw(path);
 			}
@@ -899,12 +899,18 @@ public class MapPanel extends JPanel implements Printable {
 	private void drawRouteLabel(final Graphics2D g, final Rectangle2D visibleRectangle, final double zoom,
 			final double offsetX, final double offsetY) {
 		g.setFont(this.mapPreferences.getRoutePreferences().getFont());
+		g.setStroke(new BasicStroke(3));
+		final Composite composite = g.getComposite();
 		final int descent = this.getFontMetrics(g.getFont()).getDescent();
+		final String string = Route.getInstance().getCaption();
+		final float x = (float) (Route.getInstance().getCaptionLocation().getX() * zoom - offsetX);
+		final float y = (float) (Route.getInstance().getCaptionLocation().getY() * zoom - offsetY - descent);
+		g.setColor(Color.WHITE);
+		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .8f));
+		g.draw(g.getFont().createGlyphVector(g.getFontRenderContext(), string).getOutline(x, y));
 		g.setColor(this.mapPreferences.getRoutePreferences().getAttributeColor());
-		g.drawString(Route.getInstance().getCaption(),
-				(float) (Route.getInstance().getCaptionLocation().getX() * zoom - offsetX), (float) (Route
-						.getInstance().getCaptionLocation().getY()
-						* zoom - offsetY - descent));
+		g.setComposite(composite);
+		g.drawString(string, x, y);
 	}
 
 	/**

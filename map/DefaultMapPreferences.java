@@ -160,8 +160,8 @@ public class DefaultMapPreferences implements MapPreferences {
 	/**
 	 * ルートの設定
 	 */
-	private Preferences routePreferences = new Preferences(Color.YELLOW, Color.YELLOW.darker(), 4, Color.BLUE,
-			new Font(Fonts.GOTHIC, Font.PLAIN, 15));
+	private Preferences routePreferences = new Preferences(new Color(140, 140, 220), new Color(100, 100, 180), 2,
+			Color.BLUE, new Font(Fonts.GOTHIC, Font.BOLD, 15));
 
 	public Color getBackGroundColor() {
 		return Color.WHITE;
@@ -327,7 +327,7 @@ public class DefaultMapPreferences implements MapPreferences {
 		this.ksjRailwayPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (13 * zoom)));
 		this.ksjRailwayStationPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (15 * zoom)));
 		this.ksjRoadMajorPreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (15 * zoom)));
-		this.routePreferences.setFont(new Font(Fonts.GOTHIC, Font.PLAIN, (int) (15 * zoom)));
+		this.routePreferences.setFont(new Font(Fonts.GOTHIC, Font.BOLD, (int) (15 * zoom)));
 	}
 
 	public Preferences getRoutePreferences() {
@@ -335,7 +335,7 @@ public class DefaultMapPreferences implements MapPreferences {
 	}
 
 	public float getRoutePointSize() {
-		return 8;
+		return 10;
 	}
 
 }
