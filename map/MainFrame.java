@@ -213,7 +213,7 @@ public class MainFrame extends JFrame {
 		zoomInItem.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
 				panel.zoomIn();
-				panel.forceRepaint();
+				panel.repaint();
 			}
 		});
 		viewMenu.add(zoomInItem);
@@ -223,7 +223,7 @@ public class MainFrame extends JFrame {
 		zoomOutItem.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
 				panel.zoomOut();
-				panel.forceRepaint();
+				panel.repaint();
 			}
 		});
 		viewMenu.add(zoomOutItem);
@@ -234,7 +234,7 @@ public class MainFrame extends JFrame {
 		zoomWholeItem.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
 				panel.zoomWhole();
-				panel.forceRepaint();
+				panel.repaint();
 			}
 		});
 		viewMenu.add(zoomWholeItem);
@@ -244,7 +244,7 @@ public class MainFrame extends JFrame {
 		zoomWideItem.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
 				panel.zoomWide();
-				panel.forceRepaint();
+				panel.repaint();
 			}
 		});
 		viewMenu.add(zoomWideItem);
@@ -254,7 +254,7 @@ public class MainFrame extends JFrame {
 		zoomMiddleItem.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
 				panel.zoomMiddle();
-				panel.forceRepaint();
+				panel.repaint();
 			}
 		});
 		viewMenu.add(zoomMiddleItem);
@@ -264,7 +264,7 @@ public class MainFrame extends JFrame {
 		zoomDetailItem.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
 				panel.zoomDetail();
-				panel.forceRepaint();
+				panel.repaint();
 			}
 		});
 		viewMenu.add(zoomDetailItem);
@@ -275,7 +275,7 @@ public class MainFrame extends JFrame {
 		moveNorthItem.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
 				panel.scroll(0, -MainFrame.this.getHeight() / 4);
-				panel.forceRepaint();
+				panel.repaint();
 			}
 		});
 		viewMenu.add(moveNorthItem);
@@ -285,7 +285,7 @@ public class MainFrame extends JFrame {
 		moveSouthItem.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
 				panel.scroll(0, MainFrame.this.getHeight() / 4);
-				panel.forceRepaint();
+				panel.repaint();
 			}
 		});
 		viewMenu.add(moveSouthItem);
@@ -295,7 +295,7 @@ public class MainFrame extends JFrame {
 		moveWestItem.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
 				panel.scroll(-MainFrame.this.getWidth() / 4, 0);
-				panel.forceRepaint();
+				panel.repaint();
 			}
 		});
 		viewMenu.add(moveWestItem);
@@ -305,7 +305,7 @@ public class MainFrame extends JFrame {
 		moveEastItem.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
 				panel.scroll(MainFrame.this.getWidth() / 4, 0);
-				panel.forceRepaint();
+				panel.repaint();
 			}
 		});
 		viewMenu.add(moveEastItem);
@@ -315,7 +315,7 @@ public class MainFrame extends JFrame {
 		fontSizeIncrementItem.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
 				panel.increaseFontSize();
-				panel.forceRepaint();
+				panel.repaint();
 			}
 		});
 		viewMenu.add(fontSizeIncrementItem);
@@ -324,7 +324,7 @@ public class MainFrame extends JFrame {
 		fontSizeDecrementItem.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
 				panel.decreaseFontSize();
-				panel.forceRepaint();
+				panel.repaint();
 			}
 		});
 		viewMenu.add(fontSizeDecrementItem);
@@ -333,7 +333,7 @@ public class MainFrame extends JFrame {
 		fontSizeResetItem.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
 				panel.resetFontSize();
-				panel.forceRepaint();
+				panel.repaint();
 			}
 		});
 		viewMenu.add(fontSizeResetItem);
@@ -343,7 +343,7 @@ public class MainFrame extends JFrame {
 		darkerItem.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
 				panel.increaseSaturation();
-				panel.forceRepaint();
+				panel.repaint();
 			}
 		});
 		viewMenu.add(darkerItem);
@@ -352,7 +352,7 @@ public class MainFrame extends JFrame {
 		brighterItem.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
 				panel.decreaseSaturation();
-				panel.forceRepaint();
+				panel.repaint();
 			}
 		});
 		viewMenu.add(brighterItem);
@@ -361,7 +361,7 @@ public class MainFrame extends JFrame {
 		brightnessResetItem.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
 				panel.resetSaturation();
-				panel.forceRepaint();
+				panel.repaint();
 			}
 		});
 		viewMenu.add(brightnessResetItem);
@@ -373,7 +373,7 @@ public class MainFrame extends JFrame {
 				panel.toggleCenterMark();
 				centerMarkItem.setSelected(panel.isCenterMark());
 				panel.setChanged();
-				panel.forceRepaint();
+				panel.repaint();
 			}});
 		viewMenu.add(centerMarkItem);
 		final JMenu toolMenu = new JMenu("ツール(T)");
@@ -386,7 +386,7 @@ public class MainFrame extends JFrame {
 				panel.toggleRouteMode();
 				routeModeMenuItem.setSelected(panel.isRouteMode());
 				panel.setChanged();
-				panel.forceRepaint();
+				panel.repaint();
 			}
 		});
 		toolMenu.add(routeModeMenuItem);
@@ -401,7 +401,7 @@ public class MainFrame extends JFrame {
 				if (panel.isRouteMode()) {
 					Route.getInstance().calcRoute();
 					panel.setChanged();
-					panel.forceRepaint();
+					panel.repaint();
 				}
 			}
 		});
@@ -415,7 +415,7 @@ public class MainFrame extends JFrame {
 				if (panel.isRouteMode()) {
 					Route.getInstance().calcRoute();
 					panel.setChanged();
-					panel.forceRepaint();
+					panel.repaint();
 				}
 			}
 		});
@@ -429,7 +429,7 @@ public class MainFrame extends JFrame {
 				if (panel.isRouteMode()) {
 					Route.getInstance().calcRoute();
 					panel.setChanged();
-					panel.forceRepaint();
+					panel.repaint();
 				}
 			}
 		});
@@ -443,7 +443,7 @@ public class MainFrame extends JFrame {
 				if (panel.isRouteMode()) {
 					Route.getInstance().calcRoute();
 					panel.setChanged();
-					panel.forceRepaint();
+					panel.repaint();
 				}
 			}
 		});
@@ -456,7 +456,7 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				Route.getInstance().clearRoute();
 				panel.setChanged();
-				panel.forceRepaint();
+				panel.repaint();
 			}
 		});
 		toolMenu.add(clearItem);

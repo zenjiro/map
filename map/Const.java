@@ -386,5 +386,13 @@ public class Const {
 		 */
 		public static final int PROGRESS_BAR_WIDTH = 150;
 	}
+	
+	/**
+	 * 地図の種類を列挙するクラスです。
+	 * @author zenjiro
+	 * @since 6.2.0
+	 */
+	public static class MapCategory {
+	}
 
 }

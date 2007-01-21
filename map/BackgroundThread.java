@@ -87,6 +87,12 @@ public class BackgroundThread extends TimerTask {
 					BackgroundThread.this.isChanged = true;
 				}
 			}
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() > 1) {
+					BackgroundThread.this.isChanged = true;
+				}
+			}
 		});
 		panel.addMouseMotionListener(new MouseMotionAdapter() {
 			@Override

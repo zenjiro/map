@@ -776,10 +776,10 @@ public class MapPanel extends JPanel implements Printable {
 			for (final boolean is1st : new boolean[] { true, false }) {
 				for (final Shape shape : Route.getInstance().getRoute()) {
 					if (is1st) {
-						g.setStroke(new BasicStroke(this.getMapPreferences().getRoutePreferences().getWidth() + 2));
+						g.setStroke(new BasicStroke(this.getMapPreferences().getRoutePreferences().getWidth() + 2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 						g.setColor(this.getMapPreferences().getRoutePreferences().getBorderColor());
 					} else {
-						g.setStroke(new BasicStroke(this.getMapPreferences().getRoutePreferences().getWidth()));
+						g.setStroke(new BasicStroke(this.getMapPreferences().getRoutePreferences().getWidth(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 						g.setColor(this.getMapPreferences().getRoutePreferences().getFillColor());
 					}
 					final AffineTransform transform = new AffineTransform();
@@ -920,7 +920,7 @@ public class MapPanel extends JPanel implements Printable {
 		final float x = (float) (Route.getInstance().getCaptionLocation().getX() * zoom - offsetX);
 		final float y = (float) (Route.getInstance().getCaptionLocation().getY() * zoom - offsetY - descent);
 		g.setColor(Color.WHITE);
-		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .8f));
+		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .6f));
 		g.draw(g.getFont().createGlyphVector(g.getFontRenderContext(), string).getOutline(x, y));
 		g.setColor(this.mapPreferences.getRoutePreferences().getAttributeColor());
 		g.setComposite(composite);
@@ -1151,7 +1151,7 @@ public class MapPanel extends JPanel implements Printable {
 	private void drawKsjRailway(final Graphics2D g, final boolean isTransform, final AffineTransform transform,
 			final double x, final double y, final double w, final double h, final double zoom) throws IOException {
 		if (this.prefectures != null) {
-			if (this.zoom < Const.Zoom.LOAD_ALL && Const.Zoom.LOAD_FINE_CITIES <= this.zoom) {
+			if (zoom < Const.Zoom.LOAD_ALL && Const.Zoom.LOAD_FINE_CITIES <= zoom) {
 				for (final Prefecture prefecture : this.prefectures) {
 					if (prefecture.hasCities()) {
 						for (final boolean isBorder : new boolean[] { true, false }) {
