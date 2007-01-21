@@ -145,9 +145,6 @@ public class LoadMap {
 						this.isChanged = true;
 					}
 				}
-				if (zoom >= Zoom.LOAD_FINE_ROAD) {
-					// since 5.01 何もしない。
-				}
 			} else if (!mapData.getBounds().intersects(keepRectangle)) {
 				// データを開放する
 				if (mapData.hasGyousei()) {
@@ -195,7 +192,7 @@ public class LoadMap {
 	public Collection<String> loadMaps(final Collection<URL> selectedURLs, final Map<String, MapData> maps)
 			throws IOException, FileNotFoundException {
 		final Collection<File> cachedFiles = new HashSet<File>();
-		final String cacheDir = Const.Sdf2500.CACHE_DIR;
+		final String cacheDir = Const.SDF2500.CACHE_DIR;
 		final Collection<String> loadedMaps = new ArrayList<String>();
 		final Set<String> baseDirs = new HashSet<String>();
 		for (final URL url : selectedURLs) {
@@ -221,8 +218,8 @@ public class LoadMap {
 		}
 		final Map<String, Set<String>> extractedFiles = new ConcurrentHashMap<String, Set<String>>();
 		final Map<String, String> mapCityTable = new ConcurrentHashMap<String, String>();
-		if (new File(Const.Sdf2500.EXTRACTED_LOG_FILE).isFile()) {
-			final Scanner scanner = new Scanner(new File(Const.Sdf2500.EXTRACTED_LOG_FILE));
+		if (new File(Const.SDF2500.EXTRACTED_LOG_FILE).isFile()) {
+			final Scanner scanner = new Scanner(new File(Const.SDF2500.EXTRACTED_LOG_FILE));
 			while (scanner.hasNextLine()) {
 				final String[] mapNames = scanner.nextLine().split("\t");
 				if (mapNames.length > 1) {
@@ -263,7 +260,7 @@ public class LoadMap {
 							}
 						}
 					}
-					final PrintWriter out = new PrintWriter(new FileWriter(new File(Const.Sdf2500.EXTRACTED_LOG_FILE),
+					final PrintWriter out = new PrintWriter(new FileWriter(new File(Const.SDF2500.EXTRACTED_LOG_FILE),
 							true));
 					out.print(file.getPath());
 					for (final String map : mapStrings) {

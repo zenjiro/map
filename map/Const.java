@@ -18,7 +18,7 @@ public class Const {
 	 * @author zenjiro
 	 * 2005/11/14
 	 */
-	public static class Ksj {
+	public static class KSJ {
 		/**
 		 * 国土数値情報の配布URL
 		 */
@@ -154,7 +154,7 @@ public class Const {
 	 * @author zenjiro
 	 * 2005/11/14
 	 */
-	public static class Sdf2500 {
+	public static class SDF2500 {
 		/**
 		 * 数値地図2500（空間データ基盤）の配布URL 
 		 */
@@ -195,17 +195,12 @@ public class Const {
 		/**
 		 * 国土数値情報の市区町村データを読み込む倍率
 		 */
-		public static final double LOAD_CITIES = Const.Zoom.RESOLUTION / 2.5 * 100 / 900000;
+		public static final double LOAD_KSJ_CITIES = Const.Zoom.RESOLUTION / 2.5 * 100 / 900000;
 
 		/**
-		 * 高精度の国土数値情報の市区町村データを読み込む倍率
+		 * 国土数値情報の道路、鉄道データを読み込む倍率
 		 */
-		public static final double LOAD_FINE_CITIES = Const.Zoom.RESOLUTION / 2.5 * 100 / 150000;
-
-		/**
-		 * 高精度の国土数値情報の道路データを読み込む表示倍率
-		 */
-		public static final double LOAD_FINE_ROAD = Const.Zoom.RESOLUTION / 2.5 * 100 / 75000;
+		public static final double LOAD_KSJ_RAILWAY = Const.Zoom.RESOLUTION / 2.5 * 100 / 150000;
 
 		/**
 		 * 丁目のポリゴンデータを読み込む表示倍率
@@ -386,13 +381,4 @@ public class Const {
 		 */
 		public static final int PROGRESS_BAR_WIDTH = 150;
 	}
-	
-	/**
-	 * 地図の種類を列挙するクラスです。
-	 * @author zenjiro
-	 * @since 6.2.0
-	 */
-	public static class MapCategory {
-	}
-
 }

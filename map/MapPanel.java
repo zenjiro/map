@@ -248,11 +248,9 @@ public class MapPanel extends JPanel implements Printable {
 						}
 						final Point2D point = MapPanel.this.toVirtualLocation(new Point2D.Double(e.getX(), e.getY()));
 						MapPanel.this.moveTo(point.getX(), point.getY());
-						if (MapPanel.this.getZoom() < Const.Zoom.LOAD_CITIES) {
+						if (MapPanel.this.getZoom() < Const.Zoom.LOAD_KSJ_CITIES) {
 							MapPanel.this.zoomCities();
-						} else if (MapPanel.this.getZoom() < Const.Zoom.LOAD_FINE_CITIES) {
-							MapPanel.this.zoomFineCities();
-						} else if (MapPanel.this.getZoom() < Const.Zoom.LOAD_FINE_ROAD) {
+						} else if (MapPanel.this.getZoom() < Const.Zoom.LOAD_KSJ_RAILWAY) {
 							MapPanel.this.zoomWide();
 						} else if (MapPanel.this.getZoom() < Const.Zoom.LOAD_GYOUSEI) {
 							MapPanel.this.zoomMiddle();
@@ -264,11 +262,9 @@ public class MapPanel extends JPanel implements Printable {
 							MapPanel.this.zoomDetail();
 						} else if (MapPanel.this.getZoom() > Const.Zoom.LOAD_GYOUSEI) {
 							MapPanel.this.zoomMiddle();
-						} else if (MapPanel.this.getZoom() > Const.Zoom.LOAD_FINE_ROAD) {
+						} else if (MapPanel.this.getZoom() > Const.Zoom.LOAD_KSJ_RAILWAY) {
 							MapPanel.this.zoomWide();
-						} else if (MapPanel.this.getZoom() > Const.Zoom.LOAD_FINE_CITIES) {
-							MapPanel.this.zoomFineCities();
-						} else if (MapPanel.this.getZoom() > Const.Zoom.LOAD_CITIES) {
+						} else if (MapPanel.this.getZoom() > Const.Zoom.LOAD_KSJ_CITIES) {
 							MapPanel.this.zoomCities();
 						} else {
 							MapPanel.this.zoomWhole();
@@ -590,7 +586,7 @@ public class MapPanel extends JPanel implements Printable {
 	private void drawCities(final Graphics2D g, final boolean isTransform, final AffineTransform transform,
 			final double x, final double y, final double w, final double h, final Point2D center, final double zoom,
 			final boolean isDark) throws UnsupportedEncodingException, IOException {
-		if (this.zoom >= Const.Zoom.LOAD_CITIES) {
+		if (this.mapPreferences.getCityKSJMapCategory().isShow(zoom) && this.mapPreferences.getKSJMapCategory().isShow(zoom)) {
 			if (this.prefectures != null) {
 				for (final Prefecture prefecture : this.prefectures) {
 					if (prefecture.hasCities()) {
@@ -751,10 +747,12 @@ public class MapPanel extends JPanel implements Printable {
 	private void drawKsj(final Graphics2D g, final boolean isTransform, final AffineTransform transform,
 			final double x, final double y, final double w, final double h, final Point2D center, final double zoom)
 			throws UnsupportedEncodingException, IOException {
-		// 都道府県を描画する
-		this.drawPrefectures(g, isTransform, transform, x, y, w, h, zoom);
-		// 市区町村を描画する
-		this.drawCities(g, isTransform, transform, x, y, w, h, center, zoom, false);
+		if (this.mapPreferences.getKSJMapCategory().isShow(zoom)) {
+			// 都道府県を描画する
+			this.drawPrefectures(g, isTransform, transform, x, y, w, h, zoom);
+			// 市区町村を描画する
+			this.drawCities(g, isTransform, transform, x, y, w, h, center, zoom, false);
+		}
 	}
 
 	/**
@@ -776,10 +774,12 @@ public class MapPanel extends JPanel implements Printable {
 			for (final boolean is1st : new boolean[] { true, false }) {
 				for (final Shape shape : Route.getInstance().getRoute()) {
 					if (is1st) {
-						g.setStroke(new BasicStroke(this.getMapPreferences().getRoutePreferences().getWidth() + 2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+						g.setStroke(new BasicStroke(this.getMapPreferences().getRoutePreferences().getWidth() + 2,
+								BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 						g.setColor(this.getMapPreferences().getRoutePreferences().getBorderColor());
 					} else {
-						g.setStroke(new BasicStroke(this.getMapPreferences().getRoutePreferences().getWidth(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+						g.setStroke(new BasicStroke(this.getMapPreferences().getRoutePreferences().getWidth(),
+								BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 						g.setColor(this.getMapPreferences().getRoutePreferences().getFillColor());
 					}
 					final AffineTransform transform = new AffineTransform();
@@ -807,11 +807,11 @@ public class MapPanel extends JPanel implements Printable {
 				g.draw(path);
 			}
 		}
-		if (this.maps != null & zoom >= Const.Zoom.LOAD_GYOUSEI) {
+		if (this.maps != null && this.mapPreferences.getSDF2500MapCateogry().isShow(zoom)) {
 			g.setStroke(new BasicStroke(1f));
 			for (final MapData mapData : this.maps.values()) {
 				if (mapData.getBounds().intersects(visibleRectangle)) {
-					if (zoom >= Const.Zoom.LOAD_ALL) {
+					if (this.mapPreferences.getDetailSDF2500MapCategory().isShow(zoom)) {
 						// 建物のラベルを描画する
 						this.drawTatemonoLabel(g, mapData, visibleRectangle, zoom, offsetX, offsetY);
 						// 場地のラベルを描画する
@@ -823,7 +823,7 @@ public class MapPanel extends JPanel implements Printable {
 					this.drawTyomeLabel(g, mapData, visibleRectangle, zoom, offsetX, offsetY);
 					// 町丁目の読みを描画する
 					this.drawTyomeYomi(g, mapData, visibleRectangle, zoom, offsetX, offsetY);
-					if (zoom >= Const.Zoom.LOAD_ALL) {
+					if (this.mapPreferences.getDetailSDF2500MapCategory().isShow(zoom)) {
 						// 駅のラベルを描画する
 						this.drawEkiLabel(g, mapData, visibleRectangle, zoom, offsetX, offsetY);
 						// 道路のラベルを描画する
@@ -834,21 +834,21 @@ public class MapPanel extends JPanel implements Printable {
 				}
 			}
 			// 銀行、コンビニ、ファストフード店を描画する
-			if (zoom >= Const.Zoom.LOAD_ALL) {
+			if (this.mapPreferences.getISJMapCategory().isShow(zoom)) {
 				this.drawShops(g, visibleRectangle, zoom, offsetX, offsetY);
 			}
 			// 街区レベル位置参照情報を描画する
-			if (zoom >= Const.Zoom.LOAD_ALL) {
+			if (this.mapPreferences.getISJMapCategory().isShow(zoom)) {
 				this.drawIsj(g, visibleRectangle, zoom, offsetX, offsetY);
 			}
 		}
-		// 国土数値情報の駅名を描画する
-		if (zoom < Const.Zoom.LOAD_ALL && zoom >= Const.Zoom.LOAD_FINE_CITIES) {
-			drawKsjRailwayStationLabels(g, visibleRectangle, zoom, offsetX, offsetY);
-		}
-		// 国土数値情報の鉄道の文字列を描画する
-		if (zoom < Const.Zoom.LOAD_ALL && zoom >= Const.Zoom.LOAD_FINE_CITIES) {
-			drawKsjRailwayCurveLabels(g, visibleRectangle, zoom, offsetX, offsetY);
+		if (this.mapPreferences.getKSJMapCategory().isShow(zoom)) {
+			if (this.mapPreferences.getRailwayKSJMapCateogry().isShow(zoom)) {
+				// 国土数値情報の駅名を描画する
+				drawKsjRailwayStationLabels(g, visibleRectangle, zoom, offsetX, offsetY);
+				// 国土数値情報の鉄道の文字列を描画する
+				drawKsjRailwayCurveLabels(g, visibleRectangle, zoom, offsetX, offsetY);
+			}
 		}
 		// ルートの文字列を描画する
 		if (Route.getInstance().getCaption() != null && Route.getInstance().getCaptionLocation() != null) {
@@ -1068,29 +1068,29 @@ public class MapPanel extends JPanel implements Printable {
 	private void drawHeight(final Graphics2D g, final double offsetX, final double offsetY, final double width,
 			final double height, final double zoom) throws IOException {
 		final double z2;
-		if (zoom < Const.Ksj.Height.zoom2) {
-			z2 = Const.Ksj.Height.zoom1;
-		} else if (zoom < Const.Ksj.Height.zoom3) {
-			z2 = Const.Ksj.Height.zoom2;
-		} else if (zoom < Const.Ksj.Height.zoom4) {
-			z2 = Const.Ksj.Height.zoom3;
+		if (zoom < Const.KSJ.Height.zoom2) {
+			z2 = Const.KSJ.Height.zoom1;
+		} else if (zoom < Const.KSJ.Height.zoom3) {
+			z2 = Const.KSJ.Height.zoom2;
+		} else if (zoom < Const.KSJ.Height.zoom4) {
+			z2 = Const.KSJ.Height.zoom3;
 		} else {
-			z2 = Const.Ksj.Height.zoom4;
+			z2 = Const.KSJ.Height.zoom4;
 		}
 		final double x2 = offsetX / zoom * z2;
 		final double y2 = offsetY / zoom * z2;
 		final double w2 = width / zoom * z2;
 		final double h2 = height / zoom * z2;
-		for (int y = (int) (Math.floor(y2 / Const.Ksj.Height.HEIGHT)) * Const.Ksj.Height.HEIGHT; y - y2 < h2; y += Const.Ksj.Height.HEIGHT) {
-			for (int x = (int) (Math.floor(x2 / Const.Ksj.Height.WIDTH)) * Const.Ksj.Height.WIDTH; x - x2 < w2; x += Const.Ksj.Height.WIDTH) {
+		for (int y = (int) (Math.floor(y2 / Const.KSJ.Height.HEIGHT)) * Const.KSJ.Height.HEIGHT; y - y2 < h2; y += Const.KSJ.Height.HEIGHT) {
+			for (int x = (int) (Math.floor(x2 / Const.KSJ.Height.WIDTH)) * Const.KSJ.Height.WIDTH; x - x2 < w2; x += Const.KSJ.Height.WIDTH) {
 				final InputStream in = this.getClass().getResourceAsStream(
-						new Formatter().format("%s%s%d_%d_%f_%d_%d.png", Const.DIR, Const.Ksj.Height.PREFIX,
-								Const.Ksj.Height.WIDTH, Const.Ksj.Height.HEIGHT, z2, x, y).toString());
+						new Formatter().format("%s%s%d_%d_%f_%d_%d.png", Const.DIR, Const.KSJ.Height.PREFIX,
+								Const.KSJ.Height.WIDTH, Const.KSJ.Height.HEIGHT, z2, x, y).toString());
 				if (in != null) {
 					final Image image = ImageIO.read(in);
 					g.drawImage(image, (int) (x * zoom / z2 - offsetX), (int) (y * zoom / z2 - offsetY),
-							(int) (Const.Ksj.Height.WIDTH * zoom / z2 + 1),
-							(int) (Const.Ksj.Height.HEIGHT * zoom / z2 + 1), this);
+							(int) (Const.KSJ.Height.WIDTH * zoom / z2 + 1),
+							(int) (Const.KSJ.Height.HEIGHT * zoom / z2 + 1), this);
 					in.close();
 				}
 			}
@@ -1150,8 +1150,8 @@ public class MapPanel extends JPanel implements Printable {
 	 */
 	private void drawKsjRailway(final Graphics2D g, final boolean isTransform, final AffineTransform transform,
 			final double x, final double y, final double w, final double h, final double zoom) throws IOException {
-		if (this.prefectures != null) {
-			if (zoom < Const.Zoom.LOAD_ALL && Const.Zoom.LOAD_FINE_CITIES <= zoom) {
+		if (this.prefectures != null && this.mapPreferences.getKSJMapCategory().isShow(zoom)) {
+			if (this.mapPreferences.getRailwayKSJMapCateogry().isShow(zoom)) {
 				for (final Prefecture prefecture : this.prefectures) {
 					if (prefecture.hasCities()) {
 						for (final boolean isBorder : new boolean[] { true, false }) {
@@ -1612,7 +1612,7 @@ public class MapPanel extends JPanel implements Printable {
 	private void drawSdf(final Graphics2D g, final boolean isTransform, final double x, final double y, final double w,
 			final double h, final Point2D center, final AffineTransform transform, final double zoom)
 			throws FileNotFoundException, IOException {
-		if (this.maps != null & zoom >= Const.Zoom.LOAD_GYOUSEI) {
+		if (this.maps != null && this.mapPreferences.getSDF2500MapCateogry().isShow(zoom)) {
 			g.setStroke(new BasicStroke(1f));
 			// 海を描画する
 			this.drawSeas(g, isTransform, transform, x, y, w, h);
@@ -1622,7 +1622,7 @@ public class MapPanel extends JPanel implements Printable {
 					this.fillTyome(g, isTransform, transform, center, mapData);
 				}
 			}
-			if (zoom >= Const.Zoom.LOAD_ALL) {
+			if (this.mapPreferences.getDetailSDF2500MapCategory().isShow(zoom)) {
 				for (final MapData mapData : this.maps.values()) {
 					if (mapData.getBounds().intersects(x, y, w, h)) {
 						// 場地を描画する
@@ -1662,7 +1662,7 @@ public class MapPanel extends JPanel implements Printable {
 					this.drawGyousei(g, isTransform, transform, mapData, zoom, false);
 				}
 			}
-			if (zoom >= Const.Zoom.LOAD_ALL) {
+			if (this.mapPreferences.getDetailSDF2500MapCategory().isShow(zoom)) {
 				for (final MapData mapData : this.maps.values()) {
 					if (mapData.getBounds().intersects(x, y, w, h)) {
 						// 道路の塗りつぶし部を描画する
@@ -1676,7 +1676,7 @@ public class MapPanel extends JPanel implements Printable {
 					this.drawGyousei(g, isTransform, transform, mapData, zoom, true);
 				}
 			}
-			if (zoom >= Const.Zoom.LOAD_ALL) {
+			if (this.mapPreferences.getDetailSDF2500MapCategory().isShow(zoom)) {
 				for (final MapData mapData : this.maps.values()) {
 					if (mapData.getBounds().intersects(x, y, w, h)) {
 						// 鉄道を描画する
@@ -1858,7 +1858,7 @@ public class MapPanel extends JPanel implements Printable {
 	 */
 	private void drawTyomeYomi(final Graphics2D g, final MapData mapData, final Rectangle2D visibleRectangle,
 			final double zoom, final double offsetX, final double offsetY) throws FileNotFoundException, IOException {
-		if (zoom >= Const.Zoom.LOAD_GYOUSEI) {
+		if (this.mapPreferences.getYomiMapCategory().isShow(zoom)) {
 			if (mapData.hasTyome()) {
 				g.setColor(this.mapPreferences.getTyomePreferences().getAttributeColor());
 				final Font yomiFont = this.mapPreferences.getTyomePreferences().getFont();
@@ -2127,11 +2127,14 @@ public class MapPanel extends JPanel implements Printable {
 
 	/**
 	 * 強制的に再描画します。
+	 * since 6.1.5 一時的に無効にしています。
 	 */
 	public synchronized void forceRepaint() {
-		final Graphics g = MapPanel.this.getGraphics();
-		MapPanel.this.paintComponent(g);
-		g.dispose();
+		// test since 6.1.5
+//		final Graphics g = MapPanel.this.getGraphics();
+//		MapPanel.this.paintComponent(g);
+//		g.dispose();
+		this.repaint();
 	}
 
 	/**
@@ -2333,7 +2336,7 @@ public class MapPanel extends JPanel implements Printable {
 	 * @throws IOException
 	 */
 	public void loadYomi() throws IOException {
-		if (this.getZoom() >= Const.Zoom.LOAD_GYOUSEI) {
+		if (this.mapPreferences.getYomiMapCategory().isShow(this.zoom)) {
 			final Map<String, ZipCode> zipCodes = new ConcurrentHashMap<String, ZipCode>();
 			for (final Prefecture prefecture : this.prefectures) {
 				if (prefecture.hasFine()) {
@@ -2800,7 +2803,7 @@ public class MapPanel extends JPanel implements Printable {
 	 * 国土数値情報の荒い市区町村界を読み込む縮尺にします。
 	 */
 	public void zoomCities() {
-		this.zoom(Const.Zoom.LOAD_CITIES, this.getWidth() / 2, this.getHeight() / 2);
+		this.zoom(Const.Zoom.LOAD_KSJ_CITIES, this.getWidth() / 2, this.getHeight() / 2);
 		if (this.listener != null) {
 			this.listener.actionPerformed(new ActionEvent(this, this.hashCode(), "zoom cities"));
 		}
@@ -2813,16 +2816,6 @@ public class MapPanel extends JPanel implements Printable {
 		this.zoom(Const.Zoom.LOAD_ALL, this.getWidth() / 2, this.getHeight() / 2);
 		if (this.listener != null) {
 			this.listener.actionPerformed(new ActionEvent(this, this.hashCode(), "zoom detail"));
-		}
-	}
-
-	/**
-	 * 国土数値情報の細かい市区町村界を読み込む縮尺にします。
-	 */
-	public void zoomFineCities() {
-		this.zoom(Const.Zoom.LOAD_FINE_CITIES, this.getWidth() / 2, this.getHeight() / 2);
-		if (this.listener != null) {
-			this.listener.actionPerformed(new ActionEvent(this, this.hashCode(), "zoom fine cities"));
 		}
 	}
 
@@ -2871,7 +2864,7 @@ public class MapPanel extends JPanel implements Printable {
 	 * 広域表示します。
 	 */
 	public void zoomWide() {
-		this.zoom(Const.Zoom.LOAD_FINE_ROAD, this.getWidth() / 2, this.getHeight() / 2);
+		this.zoom(Const.Zoom.LOAD_KSJ_RAILWAY, this.getWidth() / 2, this.getHeight() / 2);
 		if (this.listener != null) {
 			this.listener.actionPerformed(new ActionEvent(this, this.hashCode(), "zoom wide"));
 		}
@@ -2929,7 +2922,7 @@ public class MapPanel extends JPanel implements Printable {
 	public void initializeGraph() {
 		if (this.prefectures != null) {
 			try {
-				if (Const.Zoom.LOAD_FINE_CITIES <= this.zoom && this.zoom < Const.Zoom.LOAD_ALL) {
+				if (this.mapPreferences.getRailwayKSJMapCateogry().isShow(this.zoom)) {
 					Route.getInstance().clear();
 					for (final Prefecture prefecture : this.prefectures) {
 						if (prefecture.hasCities()) {
@@ -2961,7 +2954,7 @@ public class MapPanel extends JPanel implements Printable {
 		}
 		if (this.maps != null) {
 			try {
-				if (this.zoom >= Const.Zoom.LOAD_ALL) {
+				if (this.mapPreferences.getDetailSDF2500MapCategory().isShow(this.zoom)) {
 					Route.getInstance().clear();
 					for (final MapData mapData : this.maps.values()) {
 						if (mapData.hasRoadArc() && mapData.hasTyome()) {

@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import map.Const.Sdf2500;
+import map.Const.SDF2500;
 
 import ksj.LoadKsj;
 import ksj.ShapeIO;
@@ -182,11 +182,11 @@ public class Prefecture {
 	 * @throws UnsupportedEncodingException サポート外エンコーディング例外
 	 */
 	public void loadCities() throws UnsupportedEncodingException, IOException {
-		final Map<Shape, String> shapes = LoadKsj.loadShapesUTM(new File(Const.Ksj.CACHE_DIR), Const.Ksj.TXT_PREFIX
-				+ this.id + Const.Ksj.TXT_SUFFIX, Const.Ksj.CACHE_DIR + File.separator + Const.Ksj.CACHE_PREFIX
-				+ this.id + Const.Ksj.CACHE_SUFFIX, true, this.panel);
+		final Map<Shape, String> shapes = LoadKsj.loadShapesUTM(new File(Const.KSJ.CACHE_DIR), Const.KSJ.TXT_PREFIX
+				+ this.id + Const.KSJ.TXT_SUFFIX, Const.KSJ.CACHE_DIR + File.separator + Const.KSJ.CACHE_PREFIX
+				+ this.id + Const.KSJ.CACHE_SUFFIX, true, this.panel);
 		final Map<String, URL> urls = new ConcurrentHashMap<String, URL>();
-		final java.util.Scanner scanner = new java.util.Scanner(new InputStreamReader(Sdf2500.FILE_LIST.openStream(),
+		final java.util.Scanner scanner = new java.util.Scanner(new InputStreamReader(SDF2500.FILE_LIST.openStream(),
 				"SJIS"));
 		while (scanner.hasNextLine()) {
 			final String line = scanner.nextLine();
@@ -198,7 +198,7 @@ public class Prefecture {
 					final Matcher matcher = pattern.matcher(filename);
 					if (matcher.matches()) {
 						final String cityID = matcher.group(1);
-						final URL url = new URL(Const.Sdf2500.BASE_URL + filename);
+						final URL url = new URL(Const.SDF2500.BASE_URL + filename);
 						urls.put(cityID, url);
 					} else {
 						System.out.println("WARNING: ファイル名の形式が不正です。" + filename);
@@ -240,9 +240,9 @@ public class Prefecture {
 			}
 			citiesMap.get(city.getId()).add(city);
 		}
-		final Map<Shape, String> shapes = LoadKsj.loadShapesUTM(new File(Const.Ksj.CACHE_DIR), Const.Ksj.TXT_PREFIX
-				+ this.id + Const.Ksj.TXT_SUFFIX, Const.Ksj.CACHE_DIR + File.separator + Const.Ksj.CACHE_PREFIX_FINE
-				+ this.id + Const.Ksj.CACHE_SUFFIX_FINE, false, this.panel);
+		final Map<Shape, String> shapes = LoadKsj.loadShapesUTM(new File(Const.KSJ.CACHE_DIR), Const.KSJ.TXT_PREFIX
+				+ this.id + Const.KSJ.TXT_SUFFIX, Const.KSJ.CACHE_DIR + File.separator + Const.KSJ.CACHE_PREFIX_FINE
+				+ this.id + Const.KSJ.CACHE_SUFFIX_FINE, false, this.panel);
 		for (final Map.Entry<Shape, String> entry : shapes.entrySet()) {
 			final String[] values = entry.getValue().split("_");
 			if (values.length == 4) {

@@ -26,7 +26,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
-import map.Const.Sdf2500;
+import map.Const.SDF2500;
 
 import web.WebUtilities;
 
@@ -70,7 +70,7 @@ public class LoadMapPanel extends JPanel {
 						Const.GAP, Const.GAP, Const.GAP), 0, 0));
 		this.add(loadButton, new GridBagConstraints(0, 2, 1, 1, 1, 0, GridBagConstraints.NORTHWEST,
 				GridBagConstraints.BOTH, new Insets(0, Const.GAP, Const.GAP, Const.GAP), 0, 0));
-		final Map<String, Map<String, String>> files = WebUtilities.loadFileList(Sdf2500.FILE_LIST);
+		final Map<String, Map<String, String>> files = WebUtilities.loadFileList(SDF2500.FILE_LIST);
 		keywordField.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
 				searchButton.doClick(200);
@@ -128,7 +128,7 @@ public class LoadMapPanel extends JPanel {
 					}
 					// test to here 4.12
 					final Pattern pattern = Pattern.compile(keyword);
-					final String baseURL = Const.Sdf2500.BASE_URL;
+					final String baseURL = Const.SDF2500.BASE_URL;
 					LoadMapPanel.this.urls.clear();
 					for (final Map.Entry<String, Map<String, String>> entry : files.entrySet()) {
 						final String prefecture = entry.getKey();
@@ -178,7 +178,7 @@ public class LoadMapPanel extends JPanel {
 					final Collection<String> loadedMaps;
 						loadedMaps = loadMap.loadMaps(selectedURLs, maps);
 					panel.moveTo(panel.getBounds(loadedMaps));
-					if (panel.getZoom() < Const.Zoom.LOAD_FINE_ROAD) {
+					if (panel.getZoom() < Const.Zoom.LOAD_KSJ_RAILWAY) {
 						panel.zoomWide();
 					}
 					panel.getActionListener().actionPerformed(

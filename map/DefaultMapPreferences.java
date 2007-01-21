@@ -3,6 +3,15 @@ package map;
 import java.awt.Color;
 import java.awt.Font;
 
+import category.CityKSJMapCategory;
+import category.DetailSDF2500MapCategory;
+import category.ISJMapCategory;
+import category.KSJMapCategory;
+import category.MapCategory;
+import category.RailwayKSJMapCategory;
+import category.SDF2500MapCategory;
+import category.YomiMapCateogry;
+
 import map.Const.Fonts;
 
 /**
@@ -336,6 +345,69 @@ public class DefaultMapPreferences implements MapPreferences {
 
 	public float getRoutePointSize() {
 		return 10;
+	}
+
+	/**
+	 * 街区レベル位置参照情報の設定
+	 */
+	private final MapCategory isjMapCategory = new ISJMapCategory();
+	
+	/**
+	 * 国土数値情報の設定
+	 */
+	private final MapCategory ksjMapCategory = new KSJMapCategory();
+	
+	/**
+	 * 数値地図2500（空間データ基盤）の設定
+	 */
+	private final MapCategory sdf2500MapCategory = new SDF2500MapCategory();
+	
+	/**
+	 * 読みの設定
+	 */
+	private final MapCategory yomiMapCategory = new YomiMapCateogry();
+	
+	/**
+	 * 詳細な数値地図2500（空間データ基盤）の設定
+	 */
+	private final MapCategory detailSDF2500MapCategory = new DetailSDF2500MapCategory();
+	
+	/**
+	 * 国土数値情報の市区町村の設定
+	 */
+	private final MapCategory cityKSJMapCategory = new CityKSJMapCategory();
+	
+	/**
+	 * 国土数値情報の鉄道の設定
+	 */
+	private final MapCategory railwayKSJMapCategory = new RailwayKSJMapCategory();
+	
+	public MapCategory getISJMapCategory() {
+		return this.isjMapCategory;
+	}
+
+	public MapCategory getKSJMapCategory() {
+		return this.ksjMapCategory;
+	}
+
+	public MapCategory getSDF2500MapCateogry() {
+		return this.sdf2500MapCategory;
+	}
+
+	public MapCategory getYomiMapCategory() {
+		return this.yomiMapCategory;
+	}
+
+	public MapCategory getCityKSJMapCategory() {
+		return this.cityKSJMapCategory;
+	}
+
+	public MapCategory getDetailSDF2500MapCategory() {
+		return this.detailSDF2500MapCategory;
+	}
+
+	public MapCategory getRailwayKSJMapCateogry() {
+		return this.railwayKSJMapCategory;
 	}
 
 }

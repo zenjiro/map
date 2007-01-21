@@ -2,6 +2,8 @@ package map;
 import java.awt.Color;
 import java.awt.Font;
 
+import category.MapCategory;
+
 /**
  * 地図の設定を扱うクラスのインターフェイスです。
  * @author zenjiro
@@ -321,5 +323,47 @@ public interface MapPreferences {
 	 * @return ルート探索の地点の幅、高さ（実座標）
 	 */
 	public float getRoutePointSize();
+
+	/**
+	 * @return 街区レベル位置参照情報の設定
+	 * @since 6.1.5
+	 */
+	public MapCategory getISJMapCategory();
+
+	/**
+	 * @return 国土数値情報の設定
+	 * @since 6.1.5
+	 */
+	public MapCategory getKSJMapCategory();
+	
+	/**
+	 * @return 数値地図2500（空間データ基盤）の設定
+	 * @since 6.1.5
+	 */
+	public MapCategory getSDF2500MapCateogry();
+	
+	/**
+	 * @return 読みの設定
+	 * @since 6.1.5
+	 */
+	public MapCategory getYomiMapCategory();
+
+	/**
+	 * @return 国土数値情報の市区町村の設定
+	 * @since 6.1.5
+	 */
+	public MapCategory getCityKSJMapCategory();
+	
+	/**
+	 * @return 国土数値情報の鉄道、道路の設定
+	 * @since 6.1.5
+	 */
+	public MapCategory getRailwayKSJMapCateogry();
+	
+	/**
+	 * @return 詳細な数値地図2500（空間データ基盤）の設定
+	 * @since 6.1.5
+	 */
+	public MapCategory getDetailSDF2500MapCategory();
 	
 }

@@ -336,8 +336,8 @@ public class City {
 	 */
 	public boolean loadKsjFineRoad() {
 		if (this.ksjFineRoad.isEmpty()) {
-			final InputStream in = City.class.getResourceAsStream(Const.DIR + Const.Ksj.ROAD_FINE_PREFIX + this.id
-					+ Const.Ksj.ROAD_SUFFIX);
+			final InputStream in = City.class.getResourceAsStream(Const.DIR + Const.KSJ.ROAD_FINE_PREFIX + this.id
+					+ Const.KSJ.ROAD_SUFFIX);
 			if (in != null) {
 				for (final Map.Entry<Shape, String> entry : ShapeIO.readShapes(in).entrySet()) {
 					this.ksjFineRoad.add(new Railway(entry.getKey(), entry.getValue()));
@@ -368,8 +368,8 @@ public class City {
 	 */
 	public boolean loadKsjRailwayCurves() {
 		if (this.ksjRailwayCurves.isEmpty()) {
-			final InputStream in = Prefecture.class.getResourceAsStream(Const.DIR + Const.Ksj.RAILWAY_CURVES_PREFIX
-					+ this.id + Const.Ksj.RAILWAY_SUFFIX);
+			final InputStream in = Prefecture.class.getResourceAsStream(Const.DIR + Const.KSJ.RAILWAY_CURVES_PREFIX
+					+ this.id + Const.KSJ.RAILWAY_SUFFIX);
 			if (in != null) {
 				for (final Map.Entry<Shape, String> entry : ShapeIO.readShapes(in).entrySet()) {
 					this.ksjRailwayCurves.add(new Railway(entry.getKey(), entry.getValue()));
@@ -388,8 +388,8 @@ public class City {
 	 */
 	public boolean loadKsjRailwayStations() {
 		if (this.ksjRailwayStations.isEmpty()) {
-			final InputStream in = Prefecture.class.getResourceAsStream(Const.DIR + Const.Ksj.RAILWAY_STATIONS_PREFIX
-					+ this.id + Const.Ksj.RAILWAY_SUFFIX);
+			final InputStream in = Prefecture.class.getResourceAsStream(Const.DIR + Const.KSJ.RAILWAY_STATIONS_PREFIX
+					+ this.id + Const.KSJ.RAILWAY_SUFFIX);
 			if (in != null) {
 				for (final Map.Entry<Shape, String> entry : ShapeIO.readShapes(in).entrySet()) {
 					this.ksjRailwayStations.add(new Station(entry.getKey(), entry.getValue()));

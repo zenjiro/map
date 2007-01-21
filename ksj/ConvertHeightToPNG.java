@@ -137,26 +137,26 @@ public class ConvertHeightToPNG {
 			frame.add(panel);
 			frame.setVisible(true);
 		} else {
-			for (final double zoom : new double[] { Const.Ksj.Height.zoom1, Const.Ksj.Height.zoom2,
-					Const.Ksj.Height.zoom3, Const.Ksj.Height.zoom4 }) {
+			for (final double zoom : new double[] { Const.KSJ.Height.zoom1, Const.KSJ.Height.zoom2,
+					Const.KSJ.Height.zoom3, Const.KSJ.Height.zoom4 }) {
 				final double offsetX = minX * zoom;
 				final double offsetY = minY * zoom;
 				final double width = (maxX - minX) * zoom;
 				final double height = (maxY - minY) * zoom;
-				final BufferedImage image = new BufferedImage(Const.Ksj.Height.WIDTH, Const.Ksj.Height.HEIGHT,
+				final BufferedImage image = new BufferedImage(Const.KSJ.Height.WIDTH, Const.KSJ.Height.HEIGHT,
 						BufferedImage.TYPE_INT_BGR);
 				final Graphics2D g = (Graphics2D) image.getGraphics();
 				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-				for (int y = (int) (Math.floor(offsetY / Const.Ksj.Height.HEIGHT)) * Const.Ksj.Height.HEIGHT; y
-						- offsetY < height; y += Const.Ksj.Height.HEIGHT) {
-					for (int x = (int) (Math.floor(offsetX / Const.Ksj.Height.WIDTH)) * Const.Ksj.Height.WIDTH; x
-							- offsetX < width; x += Const.Ksj.Height.WIDTH) {
+				for (int y = (int) (Math.floor(offsetY / Const.KSJ.Height.HEIGHT)) * Const.KSJ.Height.HEIGHT; y
+						- offsetY < height; y += Const.KSJ.Height.HEIGHT) {
+					for (int x = (int) (Math.floor(offsetX / Const.KSJ.Height.WIDTH)) * Const.KSJ.Height.WIDTH; x
+							- offsetX < width; x += Const.KSJ.Height.WIDTH) {
 						g.setColor(new DefaultMapPreferences().getMizuPreferences().getFillColor());
 						g.fillRect(0, 0, image.getWidth(), image.getHeight());
 						final double virtualX = x / zoom;
 						final double virtualY = y / zoom;
-						final double virtualWidth = Const.Ksj.Height.WIDTH / zoom;
-						final double virtualHeight = Const.Ksj.Height.HEIGHT / zoom;
+						final double virtualWidth = Const.KSJ.Height.WIDTH / zoom;
+						final double virtualHeight = Const.KSJ.Height.HEIGHT / zoom;
 						final AffineTransform transform = new AffineTransform();
 						transform.translate(-x, -y);
 						transform.scale(zoom, zoom);
@@ -171,7 +171,7 @@ public class ConvertHeightToPNG {
 						}
 						g.transform(transform.createInverse());
 						final File file = new File(new Formatter().format("%s%d_%d_%f_%d_%d.png",
-								Const.Ksj.Height.PREFIX, Const.Ksj.Height.WIDTH, Const.Ksj.Height.HEIGHT, zoom, x, y)
+								Const.KSJ.Height.PREFIX, Const.KSJ.Height.WIDTH, Const.KSJ.Height.HEIGHT, zoom, x, y)
 								.toString());
 						if (hadDrawn) {
 							ImageIO.write(image, "PNG", file);

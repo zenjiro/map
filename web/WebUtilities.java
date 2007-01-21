@@ -32,7 +32,7 @@ public class WebUtilities {
     public static Map<String, Map<String, String>> getFileList()
             throws IOException {
         final Map<String, Map<String, String>> ret = new ConcurrentHashMap<String, Map<String, String>>();
-        final String baseURL = Const.Sdf2500.BASE_URL;
+        final String baseURL = Const.SDF2500.BASE_URL;
         final String topPage = "search.html";
         final String encoding = "SJIS";
         final Scanner scanner = new Scanner(new InputStreamReader(new URL(

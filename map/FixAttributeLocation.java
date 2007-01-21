@@ -102,7 +102,7 @@ class FixAttributeLocation {
 			}
 		}
 		// 国土数値情報の駅の表示位置を計算する
-		if (zoom < Const.Zoom.LOAD_ALL && zoom >= Const.Zoom.LOAD_FINE_CITIES) {
+		if (zoom < Const.Zoom.LOAD_ALL && zoom >= Const.Zoom.LOAD_KSJ_RAILWAY) {
 			final FontMetrics metrics = panel.getFontMetrics(panel.getMapPreferences()
 					.getKsjRailwayStationPreferences().getFont());
 			final double attributeHeight = metrics.getHeight() / zoom;
@@ -126,7 +126,7 @@ class FixAttributeLocation {
 			}
 		}
 		// 国土数値情報の鉄道の表示位置を計算する
-		if (zoom < Const.Zoom.LOAD_ALL && zoom >= Const.Zoom.LOAD_FINE_CITIES) {
+		if (zoom < Const.Zoom.LOAD_ALL && zoom >= Const.Zoom.LOAD_KSJ_RAILWAY) {
 			final FontMetrics metrics = panel.getFontMetrics(panel.getMapPreferences().getKsjRailwayPreferences()
 					.getFont());
 			final double captionHeight = metrics.getHeight() / zoom;

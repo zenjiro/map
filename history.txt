@@ -18,6 +18,14 @@
 -- 空港
 
 * リリースノート
+2007/01/21 6.1.5
+- 表示されるべきでないものが表示されないようにするため、地図の種類を扱うパッケージ、インターフェイス、クラスを作りました。（category{.{ISJ,{City,Railway,}KSJ,{Detail,}SDF2500,Yomi,}MapCateogry,}）
+- 地図の設定に地図の種類を持たせました。（map.{Default,}MapPreferences）
+- Ksj、Sdf2500の表記をそれぞれKSJ、SDF2500に変えました。（map.Const）
+- Const.Zoom.LOAD_FINE_ROADをなくしました。広域表示は1/75,000ではなく、1/150,000になりました。（map.Const）
+- Const.Zoom.LOAD_{CITIES,FINE_CITIES}の表記をそれぞれConst.Zoom.LOAD_{KSJ_CITIES,KSJ_RAILWAY}に変えました。（map.Const）
+- 強制再描画のために挙動が不安定になっているような気がするので、強制再描画を無効にしてみました。（map.MapPanel#forceRepaint）
+
 2007/01/21 6.1.4
 - ルートの文字列の白い輪郭を薄くしました。（map.MapPanel）
 - ルートを丸く描画するようにしました。（map.MapPanel）
