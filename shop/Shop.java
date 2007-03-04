@@ -41,12 +41,10 @@ public class Shop {
 	 * @param isj 街区レベル位置参照情報
 	 * @param panel 地図を描画するパネル
 	 * @return コンビニの座標と表記の対応表
-	 * @throws ExecutionException 実行例外
 	 * @throws InterruptedException 割り込み例外
 	 */
 	public Map<Point2D, String> getShops(final String cityID, final String cityLabel, final String prefectureLabel,
-			final Map<String, Point2D> isj, final MapPanel panel) throws InterruptedException,
-			ExecutionException {
+			final Map<String, Point2D> isj, final MapPanel panel) throws InterruptedException {
 		final Map<Point2D, String> ret = new ConcurrentHashMap<Point2D, String>();
 		final Map<String, Point2D> tempIsj = new ConcurrentHashMap<String, Point2D>();
 		for (final Map.Entry<String, Point2D> entry4 : isj.entrySet()) {
@@ -83,7 +81,14 @@ public class Shop {
 		}
 		service.shutdown();
 		for (final Future<Map<Point2D, String>> future : futures) {
-			ret.putAll(future.get());
+			try {
+				ret.putAll(future.get());
+			} catch (final ExecutionException e) {
+				System.err.printf(
+						"%s: 店舗の座標を取得できませんでした。cityID = %s, cityLabel = %s, prefectureLabel = %s\n", this
+								.getClass().getName(), cityID, cityLabel, prefectureLabel);
+				e.printStackTrace();
+			}
 		}
 		panel.removeMessage();
 		return ret;

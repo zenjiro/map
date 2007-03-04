@@ -245,7 +245,6 @@ public class Route {
 			case ROAD_KOKUDO:
 			case ROAD_KENDO:
 			case ROAD_CHIHODO:
-				return 18 * 1000 / 3600;
 			case ROAD_MAJOR:
 				return 16 * 1000 / 3600;
 			case ROAD_OTHER:

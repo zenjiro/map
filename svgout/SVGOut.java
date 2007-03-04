@@ -11,7 +11,7 @@ import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.svggen.SVGGraphics2DIOException;
 import org.w3c.dom.Document;
 
-import com.sun.org.apache.xerces.internal.impl.xs.dom.DocumentImpl;
+import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
 
 /**
  * SVG出力するためのユーティリティクラスです。
