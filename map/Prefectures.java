@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -34,12 +33,11 @@ public class Prefectures {
 	 * @return 地図が変化したかどうか
 	 * @throws IOException 入出力例外
 	 * @throws UnsupportedEncodingException サポート外エンコーディング例外
-	 * @throws ExecutionException 実行例外
 	 * @throws InterruptedException 割り込み例外
 	 */
 	public static boolean loadCities(final Collection<Prefecture> prefectures, final MapPanel panel,
 			final Map<String, MapData> maps, final LoadMap loadMap) throws UnsupportedEncodingException, IOException,
-			InterruptedException, ExecutionException {
+			InterruptedException {
 		boolean ret = false;
 		if (panel.getZoom() >= Zoom.LOAD_KSJ_CITIES) {
 			Progress.getInstance().setLoadMapPaintTyomeProgress(0);

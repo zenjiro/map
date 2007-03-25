@@ -6,10 +6,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Point2D;
 import java.awt.print.PrinterException;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Scanner;
 
 import javax.print.PrintException;
 import javax.swing.ButtonGroup;
@@ -53,8 +56,8 @@ public class MainFrame extends JFrame {
 	class ImageExportListener implements ActionListener {
 		public void actionPerformed(final ActionEvent e) {
 			try {
-				final JFileChooser chooser = new JFileChooser(new File("."));
-				chooser.addChoosableFileFilter(new FileFilter() {
+				MainFrame.this.chooser.resetChoosableFileFilters();
+				MainFrame.this.chooser.addChoosableFileFilter(new FileFilter() {
 					@Override
 					public boolean accept(final File file) {
 						return file.getName().toLowerCase().endsWith(".png")
@@ -67,9 +70,9 @@ public class MainFrame extends JFrame {
 						return "ラスタ画像ファイル（*.png、*.jpg、*.bmp）";
 					}
 				});
-				chooser.showDialog(MainFrame.this, "出力");
-				final File selectedFile = chooser.getSelectedFile();
-				if (selectedFile != null) {
+				final int result = MainFrame.this.chooser.showDialog(MainFrame.this, "出力");
+				final File selectedFile = MainFrame.this.chooser.getSelectedFile();
+				if (selectedFile != null && result == JFileChooser.APPROVE_OPTION) {
 					final String fileName = selectedFile.getName();
 					if (fileName != null) {
 						if (fileName.toLowerCase().endsWith(".bmp")) {
@@ -108,8 +111,8 @@ public class MainFrame extends JFrame {
 	class PSExportListener implements ActionListener {
 		public void actionPerformed(final ActionEvent e) {
 			try {
-				final JFileChooser chooser = new JFileChooser(new File("."));
-				chooser.addChoosableFileFilter(new FileFilter() {
+				MainFrame.this.chooser.resetChoosableFileFilters();
+				MainFrame.this.chooser.addChoosableFileFilter(new FileFilter() {
 					@Override
 					public boolean accept(final File file) {
 						return file.getName().toLowerCase().endsWith(".svg")
@@ -121,9 +124,9 @@ public class MainFrame extends JFrame {
 						return "ベクトル画像ファイル（*.svg、*.ps）";
 					}
 				});
-				chooser.showDialog(MainFrame.this, "出力");
-				final File selectedFile = chooser.getSelectedFile();
-				if (selectedFile != null) {
+				final int result = MainFrame.this.chooser.showDialog(MainFrame.this, "出力");
+				final File selectedFile = MainFrame.this.chooser.getSelectedFile();
+				if (selectedFile != null && result == JFileChooser.APPROVE_OPTION) {
 					final String fileName = selectedFile.getName();
 					if (fileName != null) {
 						if (fileName.toLowerCase().endsWith(".svg")) {
@@ -144,6 +147,70 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
+	 * GPS-CS1Kのログを読み込みます。
+	 * @author zenjiro
+	 * @since 6.2.0
+	 */
+	class GPSListener implements ActionListener {
+		/**
+		 * ルート探索モードかどうかを示すメニュー項目
+		 */
+		private final JMenuItem routeModeMenuItem;
+
+		/**
+		 * コンストラクタです。
+		 * @param routeModeMenuItem ルート探索モードかどうかを示すメニュー項目
+		 */
+		public GPSListener(final JMenuItem routeModeMenuItem) {
+			this.routeModeMenuItem = routeModeMenuItem;
+		}
+
+		public void actionPerformed(final ActionEvent event) {
+			MainFrame.this.chooser.resetChoosableFileFilters();
+			MainFrame.this.chooser.addChoosableFileFilter(new FileFilter() {
+				@Override
+				public boolean accept(final File file) {
+					return file.getName().toLowerCase().endsWith(".log");
+				}
+
+				@Override
+				public String getDescription() {
+					return "GPS-CS1Kのログ（*.log）";
+				}
+			});
+			final int result = MainFrame.this.chooser.showOpenDialog(MainFrame.this);
+			final File selectedFile = MainFrame.this.chooser.getSelectedFile();
+			if (selectedFile != null && result == JFileChooser.APPROVE_OPTION) {
+				try {
+					if (!MainFrame.this.panel.isRouteMode()) {
+						MainFrame.this.panel.toggleRouteMode();
+						this.routeModeMenuItem.setSelected(MainFrame.this.panel.isRouteMode());
+					}
+					Route.getInstance().clearRoute();
+					final Scanner scanner = new Scanner(selectedFile);
+					while (scanner.hasNextLine()) {
+						final String line = scanner.nextLine();
+						if (line.startsWith("$GPGGA")) {
+							final String[] items = line.split(",");
+							final double rawLatitude = Double.parseDouble(items[2]);
+							final double rawLongitude = Double.parseDouble(items[4]);
+							final double longitude = (int) rawLongitude / 100 + (rawLongitude % 100) / 60;
+							final double latitude = (int) rawLatitude / 100 + (rawLatitude % 100) / 60;
+							final Point2D point = UTMUtil.toUTM(longitude, latitude);
+							Route.getInstance().addPoint(new Point2D.Double(point.getX(), -point.getY()));
+						}
+					}
+					scanner.close();
+					Route.getInstance().calcRoute();
+				} catch (final FileNotFoundException exception) {
+				}
+				MainFrame.this.panel.setChanged();
+				MainFrame.this.panel.repaint();
+			}
+		}
+	}
+
+	/**
 	 * 地図を表示するパネル
 	 */
 	final MapPanel panel;
@@ -158,6 +225,11 @@ public class MainFrame extends JFrame {
 	 * @since 5.02
 	 */
 	private final JPanel statusPanel;
+
+	/**
+	 * ファイル選択ダイアログ
+	 */
+	final JFileChooser chooser;
 	
 	/**
 	 * 新しくフレームを初期化します。
@@ -191,6 +263,10 @@ public class MainFrame extends JFrame {
 		psExportItem.setMnemonic('E');
 		psExportItem.addActionListener(new PSExportListener());
 		fileMenu.add(psExportItem);
+		fileMenu.addSeparator();
+		final JMenuItem gpsItem = new JMenuItem("GPS-CS1Kのログを読み込む...");
+		gpsItem.setMnemonic('G');
+		fileMenu.add(gpsItem);
 		fileMenu.addSeparator();
 		final JMenuItem printItem = new JMenuItem("印刷(P)...");
 		printItem.setMnemonic('P');
@@ -368,18 +444,20 @@ public class MainFrame extends JFrame {
 		viewMenu.addSeparator();
 		final JCheckBoxMenuItem centerMarkItem = new JCheckBoxMenuItem("中心点(C)");
 		centerMarkItem.setMnemonic('C');
-		centerMarkItem.addActionListener(new ActionListener(){
+		centerMarkItem.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
 				panel.toggleCenterMark();
 				centerMarkItem.setSelected(panel.isCenterMark());
 				panel.setChanged();
 				panel.repaint();
-			}});
+			}
+		});
 		viewMenu.add(centerMarkItem);
 		final JMenu toolMenu = new JMenu("ツール(T)");
 		toolMenu.setMnemonic('T');
 		menuBar.add(toolMenu);
 		final JCheckBoxMenuItem routeModeMenuItem = new JCheckBoxMenuItem("ルート探索モード(R)");
+		gpsItem.addActionListener(new GPSListener(routeModeMenuItem));
 		routeModeMenuItem.setMnemonic('R');
 		routeModeMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
@@ -453,7 +531,7 @@ public class MainFrame extends JFrame {
 		final JMenuItem clearItem = new JMenuItem("地点とルートを消去(C)");
 		clearItem.setMnemonic('C');
 		clearItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				Route.getInstance().clearRoute();
 				panel.setChanged();
 				panel.repaint();
@@ -467,5 +545,6 @@ public class MainFrame extends JFrame {
 		this.statusPanel.add(Progress.getInstance().getProgressBar(), BorderLayout.EAST);
 		this.add(this.statusPanel, BorderLayout.SOUTH);
 		panel.setStatusBar(this.statusBar);
+		this.chooser = new JFileChooser(".");
 	}
 }

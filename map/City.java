@@ -13,7 +13,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutionException;
 
 import ksj.ShapeIO;
 import map.KsjRailway.Railway;
@@ -256,11 +255,10 @@ public class City {
 
 	/**
 	 * 店舗の一覧を読み込みます。
-	 * @throws ExecutionException 
 	 * @throws InterruptedException 
 	 * @since 3.16
 	 */
-	public void loadShops() throws InterruptedException, ExecutionException {
+	public void loadShops() throws InterruptedException {
 		this.shops = new ArrayList<PointData>();
 		final Map<String, Point2D> tempIsj = new ConcurrentHashMap<String, Point2D>();
 		for (final Map.Entry<String, Point2D> entry4 : this.isj.entrySet()) {
