@@ -13,8 +13,6 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -25,10 +23,6 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-
-import map.Const.SDF2500;
-
-import web.WebUtilities;
 
 /**
  * 読み込む地図を選択するパネルです。 
@@ -70,7 +64,6 @@ public class LoadMapPanel extends JPanel {
 						Const.GAP, Const.GAP, Const.GAP), 0, 0));
 		this.add(loadButton, new GridBagConstraints(0, 2, 1, 1, 1, 0, GridBagConstraints.NORTHWEST,
 				GridBagConstraints.BOTH, new Insets(0, Const.GAP, Const.GAP, Const.GAP), 0, 0));
-		final Map<String, Map<String, String>> files = WebUtilities.loadFileList(SDF2500.FILE_LIST);
 		keywordField.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
 				searchButton.doClick(200);
@@ -78,7 +71,6 @@ public class LoadMapPanel extends JPanel {
 		});
 		searchButton.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
-				try {
 					final String keyword = keywordField.getText();
 					// test from here 4.12
 					final Pattern latLongPattern = Pattern
@@ -127,28 +119,6 @@ public class LoadMapPanel extends JPanel {
 						panel.repaint();
 					}
 					// test to here 4.12
-					final Pattern pattern = Pattern.compile(keyword);
-					final String baseURL = Const.SDF2500.BASE_URL;
-					LoadMapPanel.this.urls.clear();
-					for (final Map.Entry<String, Map<String, String>> entry : files.entrySet()) {
-						final String prefecture = entry.getKey();
-						for (final Map.Entry<String, String> entry2 : entry.getValue().entrySet()) {
-							final String city = entry2.getKey();
-							final String filename = entry2.getValue();
-							if (pattern.matcher(prefecture + city).find()) {
-								LoadMapPanel.this.urls.put(prefecture + city, new URL(baseURL
-										+ filename));
-							}
-						}
-					}
-					resultList.setListData(LoadMapPanel.this.urls.keySet().toArray());
-					if (LoadMapPanel.this.urls.size() == 1) {
-						resultList.setSelectedIndex(0);
-						loadButton.doClick(200);
-					}
-				} catch (final IOException exception) {
-					exception.printStackTrace();
-				}
 			}
 		});
 		resultList.addMouseListener(new MouseAdapter() {
@@ -166,29 +136,6 @@ public class LoadMapPanel extends JPanel {
 					loadButton.doClick(200);
 				}
 			}
-		});
-		loadButton.addActionListener(new ActionListener() {
-			public void actionPerformed(final ActionEvent e) {
-				try {
-					final Collection<URL> selectedURLs = new ArrayList<URL>();
-					for (final Object o : resultList.getSelectedValues()) {
-						selectedURLs.add(LoadMapPanel.this.urls.get(o));
-					}
-					maps.clear();
-					final Collection<String> loadedMaps;
-						loadedMaps = loadMap.loadMaps(selectedURLs, maps);
-					panel.moveTo(panel.getBounds(loadedMaps));
-					if (panel.getZoom() < Const.Zoom.LOAD_KSJ_RAILWAY) {
-						panel.zoomWide();
-					}
-					panel.getActionListener().actionPerformed(
-							new ActionEvent(this, this.hashCode(), "load"));
-					panel.repaint();
-				} catch (final IOException e1) {
-					e1.printStackTrace();
-				}
-			}
-
 		});
 	}
 }

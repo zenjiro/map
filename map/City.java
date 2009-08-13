@@ -7,7 +7,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
@@ -25,11 +24,6 @@ import shop.Shop;
  * 2005/11/11
  */
 public class City {
-	/**
-	 * 数値地図2500（空間データ基盤）を読み込んだかどうか
-	 */
-	private boolean has2500;
-
 	/**
 	 * 外接長方形
 	 */
@@ -59,11 +53,6 @@ public class City {
 	 * 領域
 	 */
 	private final Shape shape;
-
-	/**
-	 * 数値地図2500（空間データ基盤）のURL
-	 */
-	private final URL url;
 
 	/**
 	 * 街区レベル位置参照情報
@@ -97,18 +86,16 @@ public class City {
 	 * @param shape 領域
 	 * @param label 市区町村名
 	 * @param id 市区町村コード
-	 * @param url 数値地図2500（空間データ基盤）のURL
 	 * @param prefecture 都道府県名
 	 * @param panel 地図を描画するパネル。ステータスバーのメッセージを伝えるために持ちます。
 	 */
-	public City(final Shape shape, final String label, final String id, final URL url, final String prefecture,
+	public City(final Shape shape, final String label, final String id, final String prefecture,
 			final MapPanel panel) {
 		this.shape = shape;
 		this.panel = panel;
 		this.bounds = shape.getBounds2D();
 		this.label = label;
 		this.id = id;
-		this.url = url;
 		this.prefecture = prefecture;
 		this.isjLabels = new ConcurrentHashMap<Point2D, String>();
 		this.ksjFineRoad = new ConcurrentLinkedQueue<Railway>();
@@ -188,20 +175,6 @@ public class City {
 	}
 
 	/**
-	 * @return 数値地図2500（空間データ基盤）のURL
-	 */
-	public URL getURL() {
-		return this.url;
-	}
-
-	/**
-	 * @return 数値地図2500（空間データ基盤）を読み込んだかどうか
-	 */
-	public boolean has2500() {
-		return this.has2500;
-	}
-
-	/**
 	 * @return 高精度の領域を持っているかどうか
 	 */
 	public boolean hasFineShape() {
@@ -228,13 +201,6 @@ public class City {
 	 */
 	public void setFineShape(final Shape shape) {
 		this.fineShape = shape;
-	}
-
-	/**
-	 * @param has2500 数値地図2500（空間データ基盤）を読み込んだかどうか 
-	 */
-	public void setHas2500(final boolean has2500) {
-		this.has2500 = has2500;
 	}
 
 	/**

@@ -457,8 +457,6 @@ public class MapPanel extends JPanel implements Printable {
 							}
 							this.drawKsj(g, isTransform, transform, virtualX, virtualY, virtualWidth, virtualHeight,
 									center, zoom);
-							this.drawSdf(g, isTransform, virtualX, virtualY, virtualWidth, virtualHeight, center,
-									transform, zoom);
 							this.drawKsjRailway(g, isTransform, transform, virtualX, virtualY, virtualWidth,
 									virtualHeight, zoom);
 							this.drawCities(g, isTransform, transform, virtualX, virtualY, virtualWidth, virtualHeight,
@@ -559,7 +557,6 @@ public class MapPanel extends JPanel implements Printable {
 			}
 			final Point2D center = this.toVirtualLocation(new Point2D.Double(width / 2, height / 2));
 			this.drawKsj(g, isTransform, transform, x, y, w, h, center, zoom);
-			this.drawSdf(g, isTransform, x, y, w, h, center, transform, zoom);
 			this.drawKsjRailway(g, isTransform, transform, x, y, w, h, zoom);
 			this.drawCities(g, isTransform, transform, x, y, w, h, center, zoom, true);
 			if (isTransform) {
@@ -596,13 +593,6 @@ public class MapPanel extends JPanel implements Printable {
 							final Shape shape = city.hasFineShape() ? city.getFineShape() : city.getShape();
 							if (shape.intersects(x, y, w, h)) {
 								if (isDark) {
-									if (city.getURL() == null) {
-										g.setColor(Color.BLACK);
-										final Composite composite = g.getComposite();
-										g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .1f));
-										this.fill(g, shape, isTransform, transform);
-										g.setComposite(composite);
-									}
 								} else {
 									g.setColor(Color.BLACK);
 									this.draw(g, shape, isTransform, transform);
@@ -654,44 +644,6 @@ public class MapPanel extends JPanel implements Printable {
 					if (point.getAttributeX() != 0 && point.getAttributeY() != 0) {
 						g.drawString(point.getAttribute(), (float) ((point.getAttributeX() * zoom) - offsetX),
 								(float) ((point.getAttributeY() * zoom) - offsetY - descent));
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * 行政界を描画します。
-	 * @param g 描画対象
-	 * @param isTransform 描画対象を座標変換するかどうか
-	 * @param transform 座標変換
-	 * @param mapData 地図
-	 * @param zoom 表示倍率
-	 * @param isSi_tyo 市区町村界のみを描画するかどうか
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	private void drawGyousei(final Graphics2D g, final boolean isTransform, final AffineTransform transform,
-			final MapData mapData, final double zoom, final boolean isSi_tyo) throws FileNotFoundException, IOException {
-		if (mapData.hasGyousei() && mapData.hasTyome()) {
-			for (final ArcData arc : mapData.getGyousei().values()) {
-				if (arc.getTag() == ArcData.TAG_NORMAL) {
-					if (arc.getClassification() == ArcData.TYPE_GYOUSEI_PREFECTURE
-							|| arc.getClassification() == ArcData.TYPE_GYOUSEI_CITY
-							|| arc.getClassification() == ArcData.TYPE_GYOUSEI_VILLAGE) {
-						if (isSi_tyo) {
-							g.setColor(this.mapPreferences.getSi_tyoPreferences().getBorderColor());
-							this.setVariableStroke(g, this.mapPreferences.getSi_tyoPreferences().getWidth(),
-									isTransform, zoom, false);
-							this.draw(g, arc.getPath(), isTransform, transform);
-						}
-					} else {
-						if (!isSi_tyo) {
-							g.setColor(this.mapPreferences.getTyomePreferences().getBorderColor());
-							this.setVariableStroke(g, this.mapPreferences.getTyomePreferences().getWidth(),
-									isTransform, zoom, false);
-							this.draw(g, arc.getPath(), isTransform, transform);
-						}
 					}
 				}
 			}
@@ -999,29 +951,6 @@ public class MapPanel extends JPanel implements Printable {
 			e.printStackTrace();
 		}
 		this.removeMessage();
-	}
-
-	/**
-	 * 内水面の輪郭を描画します。
-	 * @param g 描画対象
-	 * @param isTransform 描画対象を座標変換するかどうか
-	 * @param transform 座標変換
-	 * @param mapData 地図
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	private void drawMizu(final Graphics2D g, final boolean isTransform, final AffineTransform transform,
-			final MapData mapData) throws FileNotFoundException, IOException {
-		if (mapData.hasMizuArc()) {
-			for (final ArcData arc : mapData.getMizuArc().values()) {
-				if (arc.getTag() == ArcData.TAG_NORMAL) {
-					if (arc.getClassification() == ArcData.TYPE_MIZU_INSIDE) {
-						g.setColor(this.mapPreferences.getMizuPreferences().getBorderColor());
-						this.draw(g, arc.getPath(), isTransform, transform);
-					}
-				}
-			}
-		}
 	}
 
 	/**
@@ -1409,71 +1338,6 @@ public class MapPanel extends JPanel implements Printable {
 	}
 
 	/**
-	 * 鉄道を描画します。
-	 * @param g 描画対象
-	 * @param isTransform 描画対象を座標変換するかどうか
-	 * @param transform 座標変換
-	 * @param mapData 地図
-	 * @param zoom 表示倍率
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	private void drawRailway(final Graphics2D g, final boolean isTransform, final AffineTransform transform,
-			final MapData mapData, final double zoom) throws FileNotFoundException, IOException {
-		if (mapData.hasOthers() && mapData.hasTyome()) {
-			this.setVariableStroke(g, this.mapPreferences.getJRPreferences().getWidth() + 4, isTransform, zoom, false);
-			for (final ArcData arc : mapData.getOthers().values()) {
-				if (arc.getClassification() == ArcData.TYPE_RAILWAY) {
-					if (arc.getRailwayType() == ArcData.RAILWAY_JR) {
-						g.setColor(this.mapPreferences.getJRPreferences().getBorderColor());
-						this.draw(g, arc.getPath(), isTransform, transform);
-					} else if (arc.getRailwayType() == ArcData.RAILWAY_JR_SHINKANSEN) {
-						g.setColor(this.mapPreferences.getJRShinkansenPreferences().getBorderColor());
-						this.draw(g, arc.getPath(), isTransform, transform);
-					}
-				}
-			}
-			for (final ArcData arc : mapData.getOthers().values()) {
-				if (arc.getClassification() == ArcData.TYPE_RAILWAY) {
-					if (arc.getRailwayType() == ArcData.RAILWAY_JR) {
-						if (isTransform) {
-							g.setStroke(new BasicStroke(this.mapPreferences.getJRPreferences().getWidth(),
-									BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10, new float[] { this.mapPreferences
-											.getJRPreferences().getWidth() * 5 }, 0));
-						} else {
-							g
-									.setStroke(new BasicStroke((float) (this.mapPreferences.getJRPreferences()
-											.getWidth() * this.zoom), BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER,
-											(float) (10 * this.zoom), new float[] { (float) (this.mapPreferences
-													.getJRPreferences().getWidth() * 5 * this.zoom) }, 0));
-						}
-						g.setColor(this.mapPreferences.getJRPreferences().getFillColor());
-						this.draw(g, arc.getPath(), isTransform, transform);
-					} else if (arc.getRailwayType() == ArcData.RAILWAY_JR_SHINKANSEN) {
-						if (isTransform) {
-							g.setStroke(new BasicStroke(this.mapPreferences.getJRShinkansenPreferences().getWidth(),
-									BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10, new float[] { this.mapPreferences
-											.getJRPreferences().getWidth() * 15 }, 0));
-						} else {
-							g.setStroke(new BasicStroke((float) (this.mapPreferences.getJRShinkansenPreferences()
-									.getWidth() * this.zoom), BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER,
-									(float) (10 * this.zoom), new float[] { (float) (this.mapPreferences
-											.getJRPreferences().getWidth() * 15 * this.zoom) }, 0));
-						}
-						g.setColor(this.mapPreferences.getJRShinkansenPreferences().getFillColor());
-						this.draw(g, arc.getPath(), isTransform, transform);
-					} else {
-						this.setVariableStroke(g, this.mapPreferences.getRailwayPreferences().getWidth(), isTransform,
-								zoom, false);
-						g.setColor(this.mapPreferences.getRailwayPreferences().getBorderColor());
-						this.draw(g, arc.getPath(), isTransform, transform);
-					}
-				}
-			}
-		}
-	}
-
-	/**
 	 * 鉄道の属性を描画します。
 	 * @param g 描画対象
 	 * @param mapData 地図
@@ -1498,55 +1362,6 @@ public class MapPanel extends JPanel implements Printable {
 						g.drawString(arc.getAttribute(), (float) ((arc.getAttributeX() * zoom) - offsetX),
 								(float) ((arc.getAttributeY() * zoom) - offsetY - descent));
 					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * 道路の輪郭部分を描画します。
-	 * @param g 描画対象
-	 * @param isTransform 描画対象を座標変換するかどうか
-	 * @param transform 座標変換
-	 * @param mapData 地図
-	 * @param zoom 表示倍率
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	private void drawRoad(final Graphics2D g, final boolean isTransform, final AffineTransform transform,
-			final MapData mapData, final double zoom) throws FileNotFoundException, IOException {
-		if (mapData.hasRoadArc() && mapData.hasTyome()) {
-			for (final ArcData arc : mapData.getRoadArc().values()) {
-				if (arc.getRoadType() == ArcData.ROAD_HIGHWAY) {
-					this.setVariableFatStroke(g, this.mapPreferences.getHighwayPreferences().getWidth(), isTransform,
-							zoom, true);
-					g.setColor(this.mapPreferences.getHighwayPreferences().getBorderColor());
-					this.draw(g, arc.getPath(), isTransform, transform);
-				} else if (arc.getRoadType() == ArcData.ROAD_KOKUDO) {
-					this.setVariableFatStroke(g, this.mapPreferences.getKokudoPreferences().getWidth(), isTransform,
-							zoom, true);
-					g.setColor(this.mapPreferences.getKokudoPreferences().getBorderColor());
-					this.draw(g, arc.getPath(), isTransform, transform);
-				} else if (arc.getRoadType() == ArcData.ROAD_KENDO) {
-					this.setVariableFatStroke(g, this.mapPreferences.getKendoPreferences().getWidth(), isTransform,
-							zoom, true);
-					g.setColor(this.mapPreferences.getKendoPreferences().getBorderColor());
-					this.draw(g, arc.getPath(), isTransform, transform);
-				} else if (arc.getRoadType() == ArcData.ROAD_CHIHODO) {
-					this.setVariableFatStroke(g, this.mapPreferences.getChihodoPreferences().getWidth(), isTransform,
-							zoom, true);
-					g.setColor(this.mapPreferences.getChihodoPreferences().getBorderColor());
-					this.draw(g, arc.getPath(), isTransform, transform);
-				} else if (arc.getRoadType() == ArcData.ROAD_MAJOR) {
-					this.setVariableFatStroke(g, this.mapPreferences.getMajorRoadPreferences().getWidth(), isTransform,
-							zoom, true);
-					g.setColor(this.mapPreferences.getMajorRoadPreferences().getBorderColor());
-					this.draw(g, arc.getPath(), isTransform, transform);
-				} else {
-					this.setVariableFatStroke(g, this.mapPreferences.getNormalRoadPreferences().getWidth(),
-							isTransform, zoom, true);
-					g.setColor(this.mapPreferences.getNormalRoadPreferences().getBorderColor());
-					this.draw(g, arc.getPath(), isTransform, transform);
 				}
 			}
 		}
@@ -1596,121 +1411,6 @@ public class MapPanel extends JPanel implements Printable {
 	}
 
 	/**
-	 * 数値地図2500を描画します。
-	 * @param g 描画対象
-	 * @param isTransform 描画対象を座標変換するかどうか
-	 * @param x 描画領域の左端のx座標（仮想座標）
-	 * @param y 描画領域の上端のy座標（仮想座標）
-	 * @param w 描画領域の幅（仮想座標）
-	 * @param h 描画領域の高さ（仮想座標）
-	 * @param center 中心の座標（仮想座標）
-	 * @param transform 座標変換
-	 * @param zoom 表示倍率
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	private void drawSdf(final Graphics2D g, final boolean isTransform, final double x, final double y, final double w,
-			final double h, final Point2D center, final AffineTransform transform, final double zoom)
-			throws FileNotFoundException, IOException {
-		if (this.maps != null && this.mapPreferences.getSDF2500MapCateogry().isShow(zoom)) {
-			g.setStroke(new BasicStroke(1f));
-			// 海を描画する
-			this.drawSeas(g, isTransform, transform, x, y, w, h);
-			for (final MapData mapData : this.maps.values()) {
-				if (mapData.getBounds().intersects(x, y, w, h)) {
-					// 丁目を描画する
-					this.fillTyome(g, isTransform, transform, center, mapData);
-				}
-			}
-			if (this.mapPreferences.getDetailSDF2500MapCategory().isShow(zoom)) {
-				for (final MapData mapData : this.maps.values()) {
-					if (mapData.getBounds().intersects(x, y, w, h)) {
-						// 場地を描画する
-						this.fillZyouti(g, isTransform, transform, mapData);
-						// 内水面を描画する
-						this.fillMizu(g, isTransform, transform, mapData);
-					}
-				}
-				for (final MapData mapData : this.maps.values()) {
-					if (mapData.getBounds().intersects(x, y, w, h)) {
-						// 建物を描画する
-						this.fillTatemono(g, isTransform, transform, mapData);
-					}
-				}
-				this.setVariableStroke(g, this.mapPreferences.getZyoutiPreferences().getWidth(), isTransform, zoom,
-						false);
-				for (final MapData mapData : this.maps.values()) {
-					if (mapData.getBounds().intersects(x, y, w, h)) {
-						// 場地界を描画する
-						this.drawZyouti(g, isTransform, transform, mapData);
-						// 内水面界を描画する
-						this.drawMizu(g, isTransform, transform, mapData);
-						// 建物界を描画する
-						this.drawTatemono(g, isTransform, transform, mapData);
-					}
-				}
-				for (final MapData mapData : this.maps.values()) {
-					if (mapData.getBounds().intersects(x, y, w, h)) {
-						// 道路の輪郭を描画する
-						this.drawRoad(g, isTransform, transform, mapData, zoom);
-					}
-				}
-			}
-			for (final MapData mapData : this.maps.values()) {
-				if (mapData.getBounds().intersects(x, y, w, h)) {
-					// 町丁目界を描画する
-					this.drawGyousei(g, isTransform, transform, mapData, zoom, false);
-				}
-			}
-			if (this.mapPreferences.getDetailSDF2500MapCategory().isShow(zoom)) {
-				for (final MapData mapData : this.maps.values()) {
-					if (mapData.getBounds().intersects(x, y, w, h)) {
-						// 道路の塗りつぶし部を描画する
-						this.fillRoad(g, isTransform, transform, mapData, zoom);
-					}
-				}
-			}
-			for (final MapData mapData : this.maps.values()) {
-				if (mapData.getBounds().intersects(x, y, w, h)) {
-					// 市区町村界を描画する
-					this.drawGyousei(g, isTransform, transform, mapData, zoom, true);
-				}
-			}
-			if (this.mapPreferences.getDetailSDF2500MapCategory().isShow(zoom)) {
-				for (final MapData mapData : this.maps.values()) {
-					if (mapData.getBounds().intersects(x, y, w, h)) {
-						// 鉄道を描画する
-						this.drawRailway(g, isTransform, transform, mapData, zoom);
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * 海を塗りつぶします。
-	 * @param g 描画対象
-	 * @param isTransform 描画対象を座標変換するかどうか
-	 * @param transform 座標変換
-	 * @param x 描画領域の左端のx座標（仮想座標）
-	 * @param y 描画領域の上端のy座標（仮想座標）
-	 * @param w 描画領域の幅（仮想座標）
-	 * @param h 描画領域の高さ（仮想座標）
-	 */
-	private void drawSeas(final Graphics2D g, final boolean isTransform, final AffineTransform transform,
-			final double x, final double y, final double w, final double h) {
-		for (final MapData mapData : this.maps.values()) {
-			if (mapData.getBounds().intersects(x, y, w, h)) {
-				if (mapData.hasTyome()) {
-					g.setColor(this.mapPreferences.getMizuPreferences().getFillColor());
-					this.fill(g, mapData.getBounds(), isTransform, transform);
-					this.draw(g, mapData.getBounds(), isTransform, transform);
-				}
-			}
-		}
-	}
-
-	/**
 	 * 店舗を描画します。
 	 * @param g 描画対象
 	 * @param visibleRectangle 実際に表示されている範囲（仮想座標）
@@ -1749,27 +1449,6 @@ public class MapPanel extends JPanel implements Printable {
 							}
 						}
 					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * 建物の輪郭を描画します。
-	 * @param g 描画対象
-	 * @param isTransform 描画対象を座標変換するかどうか
-	 * @param transform 座標変換
-	 * @param mapData 地図
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	private void drawTatemono(final Graphics2D g, final boolean isTransform, final AffineTransform transform,
-			final MapData mapData) throws FileNotFoundException, IOException {
-		if (mapData.hasTatemonoArc()) {
-			for (final ArcData arc : mapData.getTatemonoArc().values()) {
-				if (arc.getTag() == ArcData.TAG_NORMAL) {
-					g.setColor(this.mapPreferences.getTatemonoPreferences().getBorderColor());
-					this.draw(g, arc.getPath(), isTransform, transform);
 				}
 			}
 		}
@@ -1881,29 +1560,6 @@ public class MapPanel extends JPanel implements Printable {
 	}
 
 	/**
-	 * 場地界を描画します。
-	 * @param g 描画対象
-	 * @param isTransform 描画対象を座標変換するかどうか
-	 * @param transform 座標変換
-	 * @param mapData 地図
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	private void drawZyouti(final Graphics2D g, final boolean isTransform, final AffineTransform transform,
-			final MapData mapData) throws FileNotFoundException, IOException {
-		if (mapData.hasZyouti()) {
-			for (final ArcData arc : mapData.getOthers().values()) {
-				if (arc.getClassification() != ArcData.TYPE_RAILWAY) {
-					if (arc.getTag() == ArcData.TAG_NORMAL) {
-						g.setColor(this.mapPreferences.getZyoutiPreferences().getBorderColor());
-						this.draw(g, arc.getPath(), isTransform, transform);
-					}
-				}
-			}
-		}
-	}
-
-	/**
 	 * 場地の属性を描画します。
 	 * @param g 描画対象
 	 * @param mapData 地図
@@ -1927,199 +1583,6 @@ public class MapPanel extends JPanel implements Printable {
 						g.drawString(polygon.getAttribute(), (float) ((polygon.getAttributeX() * zoom) - offsetX),
 								(float) ((polygon.getAttributeY() * zoom) - offsetY - descent));
 					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * 図形を塗りつぶします。
-	 * @param g 描画対象
-	 * @param shape 描画するオブジェクト
-	 * @param isTransform 描画対象全体を座標変換するかどうか
-	 * @param transform 座標変換
-	 */
-	private void fill(final Graphics2D g, final Shape shape, final boolean isTransform, final AffineTransform transform) {
-		if (isTransform) {
-			g.fill(shape);
-		} else {
-			g.fill(transform.createTransformedShape(shape));
-		}
-	}
-
-	/**
-	 * 内水面を塗りつぶします。
-	 * @param g 描画対象
-	 * @param isTransform 描画対象を座標変換するかどうか
-	 * @param transform 座標変換
-	 * @param mapData 地図
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	private void fillMizu(final Graphics2D g, final boolean isTransform, final AffineTransform transform,
-			final MapData mapData) throws FileNotFoundException, IOException {
-		if (mapData.hasMizu()) {
-			for (final PolygonData polygon : mapData.getMizu().values()) {
-				if (polygon.getArea() != null) {
-					g.setColor(this.mapPreferences.getMizuPreferences().getFillColor());
-					this.fill(g, polygon.getArea(), isTransform, transform);
-					this.draw(g, polygon.getArea(), isTransform, transform);
-				}
-			}
-		}
-	}
-
-	/**
-	 * 道路の塗りつぶし部分を描画します。
-	 * @param g 描画対象
-	 * @param isTransform 描画対象を座標変換するかどうか
-	 * @param transform 座標変換
-	 * @param mapData 地図
-	 * @param zoom 表示倍率
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	private void fillRoad(final Graphics2D g, final boolean isTransform, final AffineTransform transform,
-			final MapData mapData, final double zoom) throws FileNotFoundException, IOException {
-		if (mapData.hasRoadArc() && mapData.hasTyome()) {
-			// 一般の道路を描画する
-			for (final ArcData arc : mapData.getRoadArc().values()) {
-				if (arc.getRoadType() == ArcData.ROAD_NORMAL) {
-					g.setColor(this.mapPreferences.getNormalRoadPreferences().getFillColor());
-					this.setVariableStroke(g, this.mapPreferences.getNormalRoadPreferences().getWidth(), isTransform,
-							zoom, true);
-					this.draw(g, arc.getPath(), isTransform, transform);
-				} else if (arc.getRoadType() == ArcData.ROAD_MAJOR) {
-					g.setColor(this.mapPreferences.getMajorRoadPreferences().getFillColor());
-					this.setVariableStroke(g, this.mapPreferences.getMajorRoadPreferences().getWidth(), isTransform,
-							zoom, true);
-					this.draw(g, arc.getPath(), isTransform, transform);
-				}
-			}
-			// 主要地方道、県道を描画する
-			for (final ArcData arc : mapData.getRoadArc().values()) {
-				if (arc.getRoadType() == ArcData.ROAD_KENDO) {
-					this.setVariableStroke(g, this.mapPreferences.getKendoPreferences().getWidth(), isTransform, zoom,
-							true);
-					g.setColor(this.mapPreferences.getKendoPreferences().getFillColor());
-					this.draw(g, arc.getPath(), isTransform, transform);
-				} else if (arc.getRoadType() == ArcData.ROAD_CHIHODO) {
-					this.setVariableStroke(g, this.mapPreferences.getChihodoPreferences().getWidth(), isTransform,
-							zoom, true);
-					g.setColor(this.mapPreferences.getChihodoPreferences().getFillColor());
-					this.draw(g, arc.getPath(), isTransform, transform);
-				}
-			}
-			// 国道を描画する
-			this.setVariableStroke(g, this.mapPreferences.getKokudoPreferences().getWidth(), isTransform, zoom, true);
-			g.setColor(this.mapPreferences.getKokudoPreferences().getFillColor());
-			for (final ArcData arc : mapData.getRoadArc().values()) {
-				if (arc.getRoadType() == ArcData.ROAD_KOKUDO) {
-					this.draw(g, arc.getPath(), isTransform, transform);
-				}
-			}
-			// 高速道路を描画する
-			this.setVariableStroke(g, this.mapPreferences.getHighwayPreferences().getWidth(), isTransform, zoom, true);
-			g.setColor(this.mapPreferences.getHighwayPreferences().getFillColor());
-			for (final ArcData arc : mapData.getRoadArc().values()) {
-				if (arc.getRoadType() == ArcData.ROAD_HIGHWAY) {
-					this.draw(g, arc.getPath(), isTransform, transform);
-				}
-			}
-		}
-	}
-
-	/**
-	 * 建物を塗りつぶします。
-	 * @param g 描画対象
-	 * @param isTransform 描画対象を座標変換するかどうか
-	 * @param transform 座標変換
-	 * @param mapData 地図
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	private void fillTatemono(final Graphics2D g, final boolean isTransform, final AffineTransform transform,
-			final MapData mapData) throws FileNotFoundException, IOException {
-		if (mapData.hasTatemono()) {
-			for (final PolygonData polygon : mapData.getTatemono().values()) {
-				if (polygon.getArea() != null) {
-					g.setColor(this.mapPreferences.getTatemonoPreferences().getFillColor());
-					this.fill(g, polygon.getArea(), isTransform, transform);
-				}
-			}
-		}
-	}
-
-	/**
-	 * 町丁目を塗りつぶします
-	 * @param g 描画対象
-	 * @param isTransform 描画対象を座標変換するかどうか
-	 * @param transform 座標変換
-	 * @param mapData 地図
-	 * @param center 中心の座標（仮想座標）
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	private void fillTyome(final Graphics2D g, final boolean isTransform, final AffineTransform transform,
-			final Point2D center, final MapData mapData) throws FileNotFoundException, IOException {
-		if (mapData.hasTyome()) {
-			for (final PolygonData polygon : mapData.getTyome().values()) {
-				if (polygon.getArea() != null) {
-					if (polygon.getClassificationCode() == PolygonData.CLASSIFICATION_TYOME) {
-						final Color color = this.mapPreferences.getTyomeFillColor(polygon.getTyomeColorIndex());
-						if (this.saturationDifference == 0) {
-							g.setColor(color);
-						} else {
-							final float[] hsb = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(),
-									new float[] { 0, 0, 0 });
-							hsb[1] = Math.min(1, Math.max(0, hsb[1] + this.saturationDifference));
-							g.setColor(Color.getHSBColor(hsb[0], hsb[1], hsb[2]));
-						}
-						this.fill(g, polygon.getArea(), isTransform, transform);
-						// since 4.06
-						if (polygon.getArea().contains(center)) {
-							this.centerTyome = polygon.getAttribute() + "付近";
-						}
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * 場地を塗りつぶします。
-	 * @param g 描画対象
-	 * @param isTransform 描画対象を座標変換するかどうか
-	 * @param transform 座標変換
-	 * @param mapData 地図
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	private void fillZyouti(final Graphics2D g, final boolean isTransform, final AffineTransform transform,
-			final MapData mapData) throws FileNotFoundException, IOException {
-		if (mapData.hasZyouti()) {
-			for (final PolygonData polygon : mapData.getZyouti().values()) {
-				if (polygon.getClassificationCode() == PolygonData.CLASSIFICATION_RAILROAD) {
-					g.setColor(this.mapPreferences.getZyoutiPreferences().getFillColor());
-					this.fill(g, polygon.getArea(), isTransform, transform);
-				} else if (polygon.getClassificationCode() == PolygonData.CLASSIFICATION_PARK) {
-					g.setColor(this.mapPreferences.getParkPreferences().getFillColor());
-					this.fill(g, polygon.getArea(), isTransform, transform);
-				} else if (polygon.getClassificationCode() == PolygonData.CLASSIFICATION_SCHOOL) {
-					g.setColor(this.mapPreferences.getZyoutiPreferences().getFillColor());
-					this.fill(g, polygon.getArea(), isTransform, transform);
-				} else if (polygon.getClassificationCode() == PolygonData.CLASSIFICATION_TEMPLE) {
-					g.setColor(this.mapPreferences.getZyoutiPreferences().getFillColor());
-					this.fill(g, polygon.getArea(), isTransform, transform);
-				} else if (polygon.getClassificationCode() == PolygonData.CLASSIFICATION_GRAVEYARD) {
-					g.setColor(this.mapPreferences.getZyoutiPreferences().getFillColor());
-					this.fill(g, polygon.getArea(), isTransform, transform);
-				} else if (polygon.getClassificationCode() == PolygonData.CLASSIFICATION_OTHER) {
-					g.setColor(this.mapPreferences.getZyoutiPreferences().getFillColor());
-					this.fill(g, polygon.getArea(), isTransform, transform);
-				} else {
-					System.out.println(this.getClass().getName() + ": unknown classification code "
-							+ polygon.getClassificationCode());
 				}
 			}
 		}
@@ -2707,44 +2170,6 @@ public class MapPanel extends JPanel implements Printable {
 	 */
 	public void setSWTSize(final Dimension size) {
 		this.size = size;
-	}
-
-	/**
-	 * 表示倍率に応じて線の幅が変わるように、太めの線を設定します。
-	 * @param g 描画対象
-	 * @param strokeWidth 線の幅
-	 * @param isTransform 描画対象全体を座標変換するかどうか
-	 * @param zoom 表示倍率
-	 * @param isRound 丸く描画するかどうか
-	 */
-	private void setVariableFatStroke(final Graphics2D g, final float strokeWidth, final boolean isTransform,
-			final double zoom, final boolean isRound) {
-		if (isTransform) {
-			g.setStroke(isRound ? new BasicStroke(strokeWidth + (float) (2 / zoom), BasicStroke.CAP_ROUND,
-					BasicStroke.JOIN_ROUND) : new BasicStroke(strokeWidth + (float) (2 / zoom)));
-		} else {
-			g.setStroke(isRound ? new BasicStroke((float) (strokeWidth * zoom) + 2, BasicStroke.CAP_ROUND,
-					BasicStroke.JOIN_ROUND) : new BasicStroke((float) (strokeWidth * zoom) + 2));
-		}
-	}
-
-	/**
-	 * 表示倍率に応じて線の幅が変わるように設定します。
-	 * @param g 描画対象
-	 * @param strokeWidth 線の幅
-	 * @param isTransform 描画対象全体を座標変換するかどうか
-	 * @param zoom 表示倍率
-	 * @param isRound 丸く描画するかどうか
-	 */
-	private void setVariableStroke(final Graphics2D g, final float strokeWidth, final boolean isTransform,
-			final double zoom, final boolean isRound) {
-		if (isTransform) {
-			g.setStroke(isRound ? new BasicStroke(strokeWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
-					: new BasicStroke(strokeWidth));
-		} else {
-			g.setStroke(isRound ? new BasicStroke((float) (strokeWidth * zoom), BasicStroke.CAP_ROUND,
-					BasicStroke.JOIN_ROUND) : new BasicStroke((float) (strokeWidth * zoom)));
-		}
 	}
 
 	/**

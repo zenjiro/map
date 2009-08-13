@@ -5,18 +5,12 @@ import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import map.Const.SDF2500;
 
 import ksj.LoadKsj;
 import ksj.ShapeIO;
@@ -185,33 +179,10 @@ public class Prefecture {
 		final Map<Shape, String> shapes = LoadKsj.loadShapesUTM(new File(Const.KSJ.CACHE_DIR), Const.KSJ.TXT_PREFIX
 				+ this.id + Const.KSJ.TXT_SUFFIX, Const.KSJ.CACHE_DIR + File.separator + Const.KSJ.CACHE_PREFIX
 				+ this.id + Const.KSJ.CACHE_SUFFIX, true, this.panel);
-		final Map<String, URL> urls = new ConcurrentHashMap<String, URL>();
-		final java.util.Scanner scanner = new java.util.Scanner(new InputStreamReader(SDF2500.FILE_LIST.openStream(),
-				"SJIS"));
-		while (scanner.hasNextLine()) {
-			final String line = scanner.nextLine();
-			if (!line.startsWith("#")) {
-				final String[] strings = line.split(",");
-				if (strings.length == 3) {
-					final String filename = strings[2];
-					final Pattern pattern = Pattern.compile(".+/([0-9][0-9][0-9][0-9][0-9])\\.lzh");
-					final Matcher matcher = pattern.matcher(filename);
-					if (matcher.matches()) {
-						final String cityID = matcher.group(1);
-						final URL url = new URL(Const.SDF2500.BASE_URL + filename);
-						urls.put(cityID, url);
-					} else {
-						System.out.println("WARNING: ファイル名の形式が不正です。" + filename);
-					}
-				} else {
-					System.out.println("WARNING: ファイル一覧の形式が不正です。" + line);
-				}
-			}
-		}
 		for (final Map.Entry<Shape, String> entry : shapes.entrySet()) {
 			final String[] values = entry.getValue().split("_");
 			if (values.length == 4) {
-				this.cities.add(new City(entry.getKey(), values[3], values[2], urls.get(values[2]), this.label,
+				this.cities.add(new City(entry.getKey(), values[3], values[2], this.label,
 						this.panel));
 			} else {
 				System.out.println("WARNING: 市区町村名の表記がおかしいです。" + entry.getValue());

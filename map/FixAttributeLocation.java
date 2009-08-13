@@ -102,7 +102,7 @@ class FixAttributeLocation {
 			}
 		}
 		// 国土数値情報の駅の表示位置を計算する
-		if (zoom < Const.Zoom.LOAD_ALL && zoom >= Const.Zoom.LOAD_KSJ_RAILWAY) {
+		if (zoom >= Const.Zoom.LOAD_KSJ_RAILWAY) {
 			final FontMetrics metrics = panel.getFontMetrics(panel.getMapPreferences()
 					.getKsjRailwayStationPreferences().getFont());
 			final double attributeHeight = metrics.getHeight() / zoom;

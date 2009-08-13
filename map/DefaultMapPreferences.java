@@ -3,6 +3,7 @@ package map;
 import java.awt.Color;
 import java.awt.Font;
 
+import map.Const.Fonts;
 import category.CityKSJMapCategory;
 import category.DetailSDF2500MapCategory;
 import category.ISJMapCategory;
@@ -11,8 +12,6 @@ import category.MapCategory;
 import category.RailwayKSJMapCategory;
 import category.SDF2500MapCategory;
 import category.YomiMapCateogry;
-
-import map.Const.Fonts;
 
 /**
  * デフォルトの地図の設定を扱うクラスです。

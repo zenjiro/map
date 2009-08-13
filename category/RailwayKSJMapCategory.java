@@ -10,7 +10,7 @@ import map.Const;
 public class RailwayKSJMapCategory implements MapCategory {
 
 	public boolean isShow(double zoom) {
-		return zoom >= Const.Zoom.LOAD_KSJ_RAILWAY && zoom < Const.Zoom.LOAD_ALL;
+		return zoom >= Const.Zoom.LOAD_KSJ_RAILWAY;
 	}
 
 }

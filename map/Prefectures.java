@@ -181,43 +181,6 @@ public class Prefectures {
 				}
 			}
 		}
-		if (panel.getZoom() >= Zoom.LOAD_GYOUSEI) {
-			Progress.getInstance().setLoadMapPaintTyomeProgress(12);
-			final Rectangle2D visibleRectangle = panel.getVisibleRectangle(false);
-			final Collection<URL> urls = new ArrayList<URL>();
-			for (final Prefecture prefecture : prefectures) {
-				if (prefecture.hasCities()) {
-					for (final City city : prefecture.getCities()) {
-						if (city.getURL() != null) {
-							final Shape shape = city.hasFineShape() ? city.getFineShape() : city.getShape();
-							if (shape.getBounds2D().intersects(visibleRectangle)) {
-								if (shape.intersects(visibleRectangle)) {
-									if (!city.has2500()) {
-										urls.add(city.getURL());
-										city.setHas2500(true);
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-			if (!urls.isEmpty()) {
-				loadMap.loadMaps(urls, maps);
-				ret = true;
-			}
-		} else {
-			synchronized (maps) {
-				maps.clear();
-			}
-			for (final Prefecture prefecture : prefectures) {
-				if (prefecture.hasCities()) {
-					for (final City city : prefecture.getCities()) {
-						city.setHas2500(false);
-					}
-				}
-			}
-		}
 		// since 3.08
 		if (panel.getZoom() >= Zoom.LOAD_ALL) {
 			Progress.getInstance().setLoadMapPaintTyomeProgress(16);
@@ -225,15 +188,13 @@ public class Prefectures {
 			for (final Prefecture prefecture : prefectures) {
 				if (prefecture.hasCities()) {
 					for (final City city : prefecture.getCities()) {
-						if (city.getURL() != null) {
-							final Shape shape = city.hasFineShape() ? city.getFineShape() : city.getShape();
-							if (shape.getBounds2D().intersects(visibleRectangle)) {
-								if (shape.intersects(visibleRectangle)) {
-									if (!city.hasIsj()) {
-										city.loadIsj();
-										// since 3.16
-										city.loadShops();
-									}
+						final Shape shape = city.hasFineShape() ? city.getFineShape() : city.getShape();
+						if (shape.getBounds2D().intersects(visibleRectangle)) {
+							if (shape.intersects(visibleRectangle)) {
+								if (!city.hasIsj()) {
+									city.loadIsj();
+									// since 3.16
+									city.loadShops();
 								}
 							}
 						}

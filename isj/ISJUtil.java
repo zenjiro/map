@@ -134,7 +134,7 @@ public class ISJUtil {
 					}
 				}
 			}
-			{
+			if (csvFile.canRead()) {
 				panel.addMessage(csvFile + "の座標系を変換しています。");
 				final PrintWriter out = new PrintWriter(new File(cacheFile), "SJIS");
 				final Scanner scanner = new Scanner(new InputStreamReader(new FileInputStream(csvFile), "SJIS"));

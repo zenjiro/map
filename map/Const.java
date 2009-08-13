@@ -22,7 +22,7 @@ public class Const {
 		/**
 		 * 国土数値情報の配布URL
 		 */
-		public static final String BASE_URL = "http://nlftp.mlit.go.jp/ksj/dls/data/";
+		public static final String BASE_URL = "http://nlftp.mlit.go.jp/ksj/old/data/N03/N03-11A/";
 
 		/**
 		 * キャッシュディレクトリの相対パス
@@ -155,11 +155,6 @@ public class Const {
 	 * 2005/11/14
 	 */
 	public static class SDF2500 {
-		/**
-		 * 数値地図2500（空間データ基盤）の配布URL 
-		 */
-		public static final String BASE_URL = "http://sdf.gsi.go.jp/";
-
 		/**
 		 * キャッシュディレクトリの相対パス 
 		 */
@@ -315,7 +310,7 @@ public class Const {
 		/**
 		 * ビットマップキャッシュの接頭辞
 		 */
-		public static final String PREFIX = "bitmap_6.1.3_";
+		public static final String PREFIX = "bitmap_6.2.1_";
 	}
 
 	/**
