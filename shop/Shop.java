@@ -52,8 +52,8 @@ public class Shop {
 		}
 
 		final Set<AddressParser> parsers = new LinkedHashSet<AddressParser>(Arrays.asList(new AddressParser[] {
-				new SMBC(), new SEJ(), new McDonalds(), new Mos(), new Yoshinoya(), new Matsuya(), new Cocoichi(),
-				new MisterDonut(), new KFC(), new Daiso(), new Doutor(), new Skylark(), new Shop99() }));
+				new SMBC(), new Mos(), new Yoshinoya(), new Matsuya(), new MisterDonut(), new KFC(), new Daiso(),
+				new Doutor(), new Shop99() }));
 		final Set<AddressParser> doneSet = new HashSet<AddressParser>(parsers);
 		panel.addMessage("店舗の住所をダウンロードしています。");
 		try {
@@ -74,8 +74,8 @@ public class Shop {
 		final Collection<Future<Map<Point2D, String>>> futures = new ArrayList<Future<Map<Point2D, String>>>();
 		for (final LatLongParser parser : new LatLongParser[] { new LatLongMUFJ(), new LatLongMizuho(),
 				new LatLongResona(), new LatLongLawson(), new LatLongFamima(), new LatLongAmPm(), new LatLongSunks(),
-				new LatLongUniqlo(), new LatLongTsutaya(), new LatLongBookOff(), new LatLongYellowHat(),
-				new LatLongTeng(), new LatLongNissan(), new LatLongTimes() }) {
+				new LatLongUniqlo(), new LatLongTsutaya(), new LatLongYellowHat(), new LatLongTeng(),
+				new LatLongNissan(), new LatLongTimes() }) {
 			futures.add(service.submit(new LatLongCallable(parser, cityID, cityLabel, prefectureLabel)));
 			Thread.sleep(10);
 		}
@@ -84,9 +84,8 @@ public class Shop {
 			try {
 				ret.putAll(future.get());
 			} catch (final ExecutionException e) {
-				System.err.printf(
-						"%s: 店舗の座標を取得できませんでした。cityID = %s, cityLabel = %s, prefectureLabel = %s\n", this
-								.getClass().getName(), cityID, cityLabel, prefectureLabel);
+				System.err.printf("%s: 店舗の座標を取得できませんでした。cityID = %s, cityLabel = %s, prefectureLabel = %s\n", this
+						.getClass().getName(), cityID, cityLabel, prefectureLabel);
 				e.printStackTrace();
 			}
 		}

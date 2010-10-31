@@ -26,7 +26,7 @@ import search.Search;
 /*
  * Map
  * 国土地理院の数値地図2500（空間データ基盤）を表示するプログラムです。
- * Copyright (C) 2003-2006 zenjiro
+ * Copyright (C) 2003-2010 zenjiro
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
